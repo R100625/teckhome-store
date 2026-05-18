@@ -192,6 +192,11 @@ app.patch('/api/products/:categoryId/:productId/featured', async (c) => {
   return c.json({ success: true, product })
 })
 
+// Favicon (evita 404 em logs)
+app.get('/favicon.ico', (c) => {
+  return new Response(null, { status: 204 })
+})
+
 // === PÁGINA PRINCIPAL ===
 app.get('/', (c) => {
   return c.html(homePage())
