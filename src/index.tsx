@@ -446,18 +446,20 @@ function homePage(): string {
     }
     .hero-bg-img {
       position: absolute;
-      inset: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       object-position: center center;
-      opacity: 0.30;
+      opacity: 0.38;
       /* SEM animação — completamente estática */
       transform: none !important;
       animation: none !important;
+      transition: none !important;
       pointer-events: none;
       user-select: none;
       z-index: 1;
+      display: block;
     }
     .hero-overlay {
       position: absolute;
@@ -737,7 +739,7 @@ function homePage(): string {
               <div class="relative">
                 <div class="w-28 h-28 rounded-2xl flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e3a5f 100%);">
                   <div class="text-center">
-                    <div class="text-3xl mb-1">🏠</div>
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     <div class="text-white text-xs font-bold tracking-wide">TECH</div>
                   </div>
                 </div>
@@ -779,7 +781,7 @@ function homePage(): string {
                   <div class="text-xs text-gray-500 font-medium mt-0.5">Imparcial</div>
                 </div>
                 <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                  <div class="text-xl font-black text-indigo-600">🇧🇷</div>
+                  <div class="flex justify-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                   <div class="text-xs text-gray-500 font-medium mt-0.5">Mercado BR</div>
                 </div>
               </div>
@@ -870,13 +872,13 @@ function homePage(): string {
         <div>
           <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Categorias</h4>
           <ul class="flex flex-col gap-3 text-sm text-gray-400">
-            <li><a href="/categoria/eletronicos" class="hover:text-white transition-colors">📱 Eletrônicos</a></li>
-            <li><a href="/categoria/eletrodomesticos" class="hover:text-white transition-colors">🏠 Eletrodomésticos</a></li>
-            <li><a href="/categoria/ferramentas" class="hover:text-white transition-colors">🔧 Ferramentas Elétricas</a></li>
-            <li><a href="/categoria/refrigeracao" class="hover:text-white transition-colors">❄️ Refrigeração</a></li>
-            <li><a href="/categoria/cama-mesa" class="hover:text-white transition-colors">🛏️ Cama e Mesa</a></li>
-            <li><a href="/categoria/ventilacao" class="hover:text-white transition-colors">💨 Ventilação</a></li>
-            <li><a href="/categoria/jardim" class="hover:text-white transition-colors">🌱 Jardim</a></li>
+            <li><a href="/categoria/eletronicos" class="hover:text-white transition-colors flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Eletrônicos</a></li>
+            <li><a href="/categoria/eletrodomesticos" class="hover:text-white transition-colors flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"><path d="M3 9l1-5h16l1 5"/><rect x="3" y="9" width="18" height="13" rx="1"/><path d="M8 9v13M16 9v13"/></svg> Eletrodomésticos</a></li>
+            <li><a href="/categoria/ferramentas" class="hover:text-white transition-colors flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Ferramentas</a></li>
+            <li><a href="/categoria/refrigeracao" class="hover:text-white transition-colors flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v20M4.93 4.93l14.14 14.14M2 12h20M4.93 19.07L19.07 4.93"/><circle cx="12" cy="12" r="2"/></svg> Refrigeração</a></li>
+            <li><a href="/categoria/cama-mesa" class="hover:text-white transition-colors flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/></svg> Cama e Mesa</a></li>
+            <li><a href="/categoria/ventilacao" class="hover:text-white transition-colors flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M12 9c0-3-1.5-6-3-6s-2 2.5-2 4c0 2.5 2 4 5 3"/></svg> Ventilação</a></li>
+            <li><a href="/categoria/jardim" class="hover:text-white transition-colors flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.8" stroke-linecap="round"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6-1 5-5 8-9 6"/></svg> Jardim</a></li>
           </ul>
         </div>
 
@@ -939,11 +941,14 @@ function homePage(): string {
     }
 
     function createProductCard(product, category) {
-      const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg"><i class="fas fa-star text-xs"></i> Destaque</div>\` : ''
+      const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Destaque</div>\` : ''
       const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400\`
       const storeName = product.store || 'Loja Parceira'
       const analysis = generateAnalysis(product, category)
-      const catIcon = category ? category.icon : '🛒'
+      const catColor = category ? category.color : '#6366f1'
+      const catSvgSmall = category ? getCatSvg(category.id, '#ffffff') : \`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>\`
 
       return \`
         <article class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col" itemscope itemtype="https://schema.org/Product">
@@ -955,7 +960,10 @@ function homePage(): string {
               </div>
             </a>
             \${featuredBadge}
-            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-xl w-9 h-9 rounded-xl flex items-center justify-center shadow-sm">\${catIcon}</div>
+            <!-- Ícone da categoria (SVG) no canto -->
+            <div class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style="background:\${catColor};">
+              \${catSvgSmall.replace(/width="28" height="28"/g,'width="18" height="18"')}
+            </div>
             <!-- Loja badge -->
             <div class="absolute bottom-3 left-3">
               <span class="bg-white/95 backdrop-blur-sm text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm border border-indigo-100">\${storeName}</span>
@@ -967,10 +975,10 @@ function homePage(): string {
             <!-- Título -->
             <h3 class="font-black text-gray-900 text-sm leading-snug line-clamp-2" itemprop="name">\${product.title}</h3>
 
-            <!-- Análise persuasiva gerada automaticamente -->
+            <!-- Análise persuasiva -->
             <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-3 border border-indigo-100">
               <div class="flex items-center gap-1.5 mb-1.5">
-                <i class="fas fa-clipboard-check text-indigo-500 text-xs"></i>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 <span class="text-xs font-bold text-indigo-700 uppercase tracking-wide">Análise TeckHome</span>
               </div>
               <p class="text-gray-700 text-xs leading-relaxed line-clamp-4">\${analysis}</p>
@@ -979,10 +987,12 @@ function homePage(): string {
             <!-- Trust signals -->
             <div class="flex items-center gap-2 flex-wrap">
               <span class="trust-badge text-xs font-semibold text-green-700 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                <i class="fas fa-shield-alt text-xs"></i> Verificado
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Verificado
               </span>
               <span class="bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-700 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                <i class="fas fa-star text-xs"></i> Recomendado
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="#d97706"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Recomendado
               </span>
             </div>
 
@@ -990,16 +1000,18 @@ function homePage(): string {
             <div class="mt-auto pt-2">
               <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer sponsored"
                 class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold px-4 py-3 rounded-xl transition-all shadow-md hover:shadow-indigo-200 hover:shadow-lg">
-                <i class="fas fa-tag text-xs"></i>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                 Ver Preço na \${storeName}
-                <i class="fas fa-arrow-right text-xs ml-auto"></i>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:auto"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </a>
             </div>
           </div>
 
           <!-- Editorial footer -->
           <div class="editorial-footer px-4 py-3 flex items-center gap-2 rounded-b-2xl">
-            <div class="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center text-xs" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
+            <div class="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            </div>
             <div class="min-w-0 flex items-center gap-1">
               <span class="text-xs font-bold text-indigo-700">Por Equipe TeckHome</span>
               <span class="text-gray-300 text-xs">·</span>
@@ -1010,22 +1022,39 @@ function homePage(): string {
       \`
     }
 
+    // SVGs por categoria — sem dependência de fontes de emoji
+    const CATEGORY_SVGS = {
+      'eletronicos': \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 8h.01M9 8h6"/></svg>\`,
+      'eletrodomesticos': \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><rect x="3" y="9" width="18" height="13" rx="1"/><path d="M8 9v13M16 9v13"/><circle cx="16" cy="5" r="1" fill="currentColor"/></svg>\`,
+      'ferramentas': \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>\`,
+      'refrigeracao': \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.93 4.93l14.14 14.14M2 12h20M4.93 19.07L19.07 4.93"/><circle cx="12" cy="12" r="3"/></svg>\`,
+      'cama-mesa': \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20M6 8v9"/><rect x="6" y="5" width="6" height="3" rx="1"/></svg>\`,
+      'ventilacao': \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M12 9c0-3-1.5-6-3-6s-2 2.5-2 4c0 2.5 2 4 5 3"/><path d="M14.6 13.5c2.6 1.5 5.4 1.8 6.4.3s-.5-4-2.5-5c-2.2-1.2-4.5-.4-5.5 2.5"/><path d="M9.4 13.5C6.8 15 4 15.3 3 13.8s.5-4 2.5-5c2.2-1.2 4.5-.4 5.5 2.5"/></svg>\`,
+      'jardim': \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6-1 5-5 8-9 6"/></svg>\`
+    }
+
+    function getCatSvg(catId, color) {
+      const svg = CATEGORY_SVGS[catId] || \`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>\`
+      return svg.replace(/stroke="currentColor"/g, \`stroke="\${color}"\`).replace(/fill="currentColor"/g, \`fill="\${color}"\`)
+    }
+
     async function loadCategories() {
       const res = await fetch('/api/categories')
       const categories = await res.json()
       
       const grid = document.getElementById('categoriesGrid')
       grid.innerHTML = categories.map(cat => \`
-        <a href="/categoria/\${cat.id}" class="category-card card-hover bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex flex-col items-start gap-3 cursor-pointer group">
-          <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, \${cat.color}22, \${cat.color}44); border: 2px solid \${cat.color}33;">
-            <span style="font-size:1.75rem; line-height:1; font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;">\${cat.icon}</span>
+        <a href="/categoria/\${cat.id}" class="category-card card-hover bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex flex-col items-start gap-3 cursor-pointer group" style="text-decoration:none;">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, \${cat.color}18, \${cat.color}35); border: 2px solid \${cat.color}40;">
+            \${getCatSvg(cat.id, cat.color)}
           </div>
           <div>
             <h3 class="font-bold text-gray-800 group-hover:text-indigo-600 transition-colors text-base">\${cat.name}</h3>
             <p class="text-gray-400 text-xs mt-0.5 line-clamp-2">\${cat.description}</p>
           </div>
           <div class="flex items-center gap-1.5 mt-auto" style="color:\${cat.color}; font-size:0.75rem; font-weight:700;">
-            Ver produtos <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Ver produtos 
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="\${cat.color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </a>
       \`).join('')
@@ -1289,11 +1318,14 @@ function categoryPage(categoryId: string): string {
       <div class="shimmer rounded-2xl h-80"></div>
     </div>
     <div id="emptyState" class="hidden text-center py-20">
-      <div class="text-7xl mb-6 opacity-30" id="emptyIcon">📦</div>
+      <div class="mb-6 opacity-30 flex justify-center" id="emptyIcon">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      </div>
       <h3 class="text-xl font-bold text-gray-600 mb-2">Nenhum produto nesta categoria ainda</h3>
       <p class="text-gray-400 mb-6">Seja o primeiro a adicionar um produto!</p>
       <a href="/admin" class="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors inline-flex items-center gap-2">
-        <i class="fas fa-plus"></i> Adicionar Produto
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar Produto
       </a>
     </div>
   </main>
@@ -1344,7 +1376,7 @@ function categoryPage(categoryId: string): string {
               <div class="relative">
                 <div class="w-28 h-28 rounded-2xl flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e3a5f 100%);">
                   <div class="text-center">
-                    <div class="text-3xl mb-1">🏠</div>
+                    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                     <div class="text-white text-xs font-bold tracking-wide">TECH</div>
                   </div>
                 </div>
@@ -1386,7 +1418,7 @@ function categoryPage(categoryId: string): string {
                   <div class="text-xs text-gray-500 font-medium mt-0.5">Imparcial</div>
                 </div>
                 <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                  <div class="text-xl font-black text-indigo-600">🇧🇷</div>
+                  <div class="flex justify-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                   <div class="text-xs text-gray-500 font-medium mt-0.5">Mercado BR</div>
                 </div>
               </div>
@@ -1447,10 +1479,25 @@ function categoryPage(categoryId: string): string {
     let currentFilter = 'all'
     let currentSearch = ''
 
+    // SVGs por categoria (mesmos da home)
+    const CAT_SVGS = {
+      'eletronicos': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M6 8h.01M9 8h6"/></svg>',
+      'eletrodomesticos': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><rect x="3" y="9" width="18" height="13" rx="1"/><path d="M8 9v13M16 9v13"/></svg>',
+      'ferramentas': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+      'refrigeracao': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.93 4.93l14.14 14.14M2 12h20M4.93 19.07L19.07 4.93"/><circle cx="12" cy="12" r="3"/></svg>',
+      'cama-mesa': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20M6 8v9"/><rect x="6" y="5" width="6" height="3" rx="1"/></svg>',
+      'ventilacao': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 9c0-3-1.5-6-3-6s-2 2.5-2 4c0 2.5 2 4 5 3"/><path d="M14.6 13.5c2.6 1.5 5.4 1.8 6.4.3s-.5-4-2.5-5c-2.2-1.2-4.5-.4-5.5 2.5"/><path d="M9.4 13.5C6.8 15 4 15.3 3 13.8s.5-4 2.5-5c2.2-1.2 4.5-.4 5.5 2.5"/></svg>',
+      'jardim': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M12 12C12 7 7 4 3 6c0 5 4 8 9 6M12 12c0-5 5-8 9-6-1 5-5 8-9 6"/></svg>'
+    }
+    function getCatSvgCp(catId, color) {
+      const svg = CAT_SVGS[catId] || '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'
+      return svg.replace(/<svg /, \`<svg stroke="\${color}" \`)
+    }
+
     function createProductCard(product) {
-      const stars = product.rating ? '★'.repeat(Math.round(product.rating)) + '☆'.repeat(5 - Math.round(product.rating)) : ''
       const storeIcon = product.store ? \`<span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">\${product.store}</span>\` : ''
-      const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1"><i class="fas fa-star text-xs"></i> Destaque</div>\` : ''
+      const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>\` : ''
       const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=200\`
       
       return \`
@@ -1466,15 +1513,13 @@ function categoryPage(categoryId: string): string {
           <div class="p-4 flex flex-col flex-1 gap-2">
             <h3 class="font-bold text-gray-800 text-sm leading-tight line-clamp-2">\${product.title}</h3>
             \${product.description ? \`<p class="text-gray-500 text-xs line-clamp-2">\${product.description}</p>\` : ''}
-            <div class="flex items-center gap-2">
-              \${storeIcon}
-              \${stars ? \`<span class="text-yellow-400 text-xs">\${stars}</span>\` : ''}
-            </div>
+            \${storeIcon ? \`<div>\${storeIcon}</div>\` : ''}
             <div class="flex items-center justify-between gap-2 mt-auto pt-2">
               \${product.price ? \`<span class="text-lg font-black text-indigo-700">\${product.price}</span>\` : '<span class="text-sm text-gray-400">Ver preço</span>'}
               <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer" 
-                class="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors">
-                Comprar <i class="fas fa-external-link-alt text-xs"></i>
+                class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors">
+                Comprar
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
               </a>
             </div>
           </div>
@@ -1503,7 +1548,7 @@ function categoryPage(categoryId: string): string {
       if (filtered.length === 0) {
         grid.innerHTML = ''
         emptyState.classList.remove('hidden')
-        if (category) document.getElementById('emptyIcon').textContent = category.icon
+        if (category) document.getElementById('emptyIcon').innerHTML = getCatSvgCp(category.id, category.color).replace('width="26" height="26"','width="70" height="70"')
       } else {
         emptyState.classList.add('hidden')
         grid.innerHTML = filtered.map(createProductCard).join('')
@@ -1539,12 +1584,12 @@ function categoryPage(categoryId: string): string {
           <div class="max-w-7xl mx-auto">
             <nav class="text-sm text-gray-400 mb-3 flex items-center gap-2">
               <a href="/" class="hover:text-indigo-600 transition-colors">Início</a>
-              <i class="fas fa-chevron-right text-xs"></i>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
               <span class="text-gray-600 font-medium">\${category.name}</span>
             </nav>
             <div class="flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl" style="background: \${category.color}20">
-                \${category.icon}
+              <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, \${category.color}18, \${category.color}35); border: 2px solid \${category.color}40;">
+                \${getCatSvgCp(category.id, category.color)}
               </div>
               <div>
                 <h1 class="text-3xl font-black text-gray-900">\${category.name}</h1>
@@ -2432,7 +2477,7 @@ function articlePage(article: any): string {
 
     <!-- Autor -->
     <div class="flex items-center gap-3 mb-8 pb-6 border-b border-gray-200">
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
       <div>
         <p class="font-bold text-gray-900 text-sm">Equipe TeckHome</p>
         <p class="text-gray-400 text-xs">Análise editorial independente · TeckHome Store</p>
@@ -2983,7 +3028,7 @@ function sobrePage(): string {
       </h2>
       <div class="flex items-start gap-5">
         <div class="w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e3a5f 100%);">
-          <span class="text-2xl">🏠</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
         <div>
           <p class="text-gray-600 leading-relaxed">
