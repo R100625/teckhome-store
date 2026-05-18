@@ -209,6 +209,23 @@ app.get('/admin', (c) => {
   return c.html(adminPage())
 })
 
+// === PÁGINAS INFORMATIVAS ===
+app.get('/termos-de-uso', (c) => {
+  return c.html(termosPage())
+})
+
+app.get('/politica-de-privacidade', (c) => {
+  return c.html(privacidadePage())
+})
+
+app.get('/politica-de-cookies', (c) => {
+  return c.html(cookiesPage())
+})
+
+app.get('/sobre', (c) => {
+  return c.html(sobrePage())
+})
+
 // === HTML PAGES ===
 
 function homePage(): string {
@@ -1475,6 +1492,479 @@ function adminPage(): string {
 
     init()
   </script>
+</body>
+</html>`
+}
+
+// === HELPER: navbar compartilhada ===
+function sharedNavbar(): string {
+  return `
+  <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-2">
+          <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md">
+          <div>
+            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span> Store</span>
+            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
+          </div>
+        </a>
+        <a href="/" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors">
+          <i class="fas fa-arrow-left text-xs"></i> Voltar ao início
+        </a>
+      </div>
+    </div>
+  </nav>`
+}
+
+// === HELPER: footer compartilhado ===
+function sharedFooter(): string {
+  return `
+  <footer class="bg-gray-900 text-white py-8 px-4 mt-16">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+      <div class="flex items-center gap-2">
+        <img src="/static/logo.png" alt="TeckHome Store" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white">Teck<span class="text-indigo-400">Home</span> Store</span>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/termos-de-uso" class="hover:text-white transition-colors">Termos de Uso</a>
+        <a href="/politica-de-privacidade" class="hover:text-white transition-colors">Privacidade</a>
+        <a href="/politica-de-cookies" class="hover:text-white transition-colors">Cookies</a>
+        <a href="/sobre" class="hover:text-white transition-colors">Sobre Nós</a>
+      </div>
+      <p>© 2025 TeckHome Store</p>
+    </div>
+  </footer>`
+}
+
+// === PÁGINA: TERMOS DE USO ===
+function termosPage(): string {
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termos de Uso — TeckHome Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  ${sharedNavbar()}
+
+  <main class="max-w-3xl mx-auto px-4 py-14">
+
+    <!-- Cabeçalho -->
+    <div class="mb-10">
+      <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Legal</span>
+      <h1 class="text-4xl font-black text-gray-900 mb-2">Termos de Uso</h1>
+      <p class="text-gray-500 text-sm">Última atualização: maio de 2025 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+      <div class="w-16 h-1 bg-indigo-600 rounded-full mt-4"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8 text-gray-700 leading-relaxed">
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-file-alt text-indigo-500 text-base"></i> 1. Aceitação dos Termos</h2>
+        <p>Ao acessar e utilizar o site <strong>TeckHome Store</strong> (teckhomestore.com), você concorda integralmente com estes Termos de Uso. Caso não concorde com qualquer disposição aqui presente, solicitamos que interrompa imediatamente o uso do site.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-info-circle text-indigo-500 text-base"></i> 2. Sobre o Site</h2>
+        <p>O TeckHome Store é um portal editorial de conteúdo informativo focado em reviews, comparativos e recomendações de produtos nas categorias de tecnologia, eletrodomésticos, ferramentas, refrigeração, cama e mesa, ventilação e jardim. Todo o conteúdo é produzido pela <strong>Equipe TeckHome</strong> com finalidade exclusivamente informativa.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-link text-indigo-500 text-base"></i> 3. Links de Afiliados</h2>
+        <p>Os links de produtos presentes neste site podem ser links de afiliados. Isso significa que podemos receber uma comissão caso você realize uma compra através desses links, <strong>sem custo adicional para você</strong>. Essas parcerias não influenciam nossa avaliação dos produtos.</p>
+        <p class="mt-3">Os preços, disponibilidade e condições dos produtos são de responsabilidade exclusiva dos respectivos varejistas (Amazon, Mercado Livre, Shopee, Magazine Luiza, etc.) e podem ser alterados sem aviso prévio.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-ban text-indigo-500 text-base"></i> 4. Uso Proibido</h2>
+        <p>É expressamente proibido:</p>
+        <ul class="list-disc list-inside mt-3 space-y-1 text-gray-600">
+          <li>Reproduzir, copiar ou distribuir o conteúdo sem autorização prévia por escrito</li>
+          <li>Utilizar o site para fins ilegais ou fraudulentos</li>
+          <li>Tentar acessar áreas restritas do sistema sem autorização</li>
+          <li>Publicar conteúdo difamatório, enganoso ou que viole direitos de terceiros</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-pencil-alt text-indigo-500 text-base"></i> 5. Propriedade Intelectual</h2>
+        <p>Todo o conteúdo publicado no TeckHome Store — incluindo textos, imagens, logotipos e design — é propriedade do TeckHome Store ou licenciado para uso. É proibida a reprodução total ou parcial sem autorização expressa.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-exclamation-triangle text-indigo-500 text-base"></i> 6. Limitação de Responsabilidade</h2>
+        <p>O TeckHome Store não se responsabiliza por decisões de compra tomadas com base em nosso conteúdo, nem por problemas com produtos adquiridos através dos links disponibilizados. As relações de compra e venda são exclusivamente entre o consumidor e o varejista.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-sync text-indigo-500 text-base"></i> 7. Alterações nos Termos</h2>
+        <p>Reservamo-nos o direito de alterar estes Termos de Uso a qualquer momento. As alterações entrarão em vigor imediatamente após a publicação no site. O uso continuado do site após as alterações implica na aceitação dos novos termos.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-envelope text-indigo-500 text-base"></i> 8. Contato</h2>
+        <p>Para dúvidas sobre estes Termos de Uso, entre em contato:</p>
+        <div class="mt-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+          <p class="font-semibold text-gray-800">TeckHome Store</p>
+          <p class="text-sm text-gray-600 mt-1"><i class="fas fa-envelope text-indigo-500 mr-2"></i><a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+          <p class="text-sm text-gray-600 mt-1"><i class="fas fa-globe text-indigo-500 mr-2"></i><a href="https://teckhomestore.com" class="text-indigo-600 hover:underline">teckhomestore.com</a></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  ${sharedFooter()}
+</body>
+</html>`
+}
+
+// === PÁGINA: POLÍTICA DE PRIVACIDADE ===
+function privacidadePage(): string {
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidade — TeckHome Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  ${sharedNavbar()}
+
+  <main class="max-w-3xl mx-auto px-4 py-14">
+
+    <div class="mb-10">
+      <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Legal</span>
+      <h1 class="text-4xl font-black text-gray-900 mb-2">Política de Privacidade</h1>
+      <p class="text-gray-500 text-sm">Última atualização: maio de 2025 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+      <div class="w-16 h-1 bg-indigo-600 rounded-full mt-4"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8 text-gray-700 leading-relaxed">
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-shield-alt text-indigo-500 text-base"></i> 1. Compromisso com sua Privacidade</h2>
+        <p>O <strong>TeckHome Store</strong> respeita sua privacidade e está comprometido em proteger seus dados pessoais. Esta política explica como coletamos, usamos e protegemos as informações dos nossos visitantes, em conformidade com a <strong>Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018)</strong>.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-database text-indigo-500 text-base"></i> 2. Dados que Coletamos</h2>
+        <p>Podemos coletar as seguintes informações:</p>
+        <ul class="list-disc list-inside mt-3 space-y-2 text-gray-600">
+          <li><strong>Dados de navegação:</strong> páginas acessadas, tempo de visita, dispositivo e navegador utilizado</li>
+          <li><strong>Dados de uso:</strong> buscas realizadas, produtos visualizados e categorias acessadas</li>
+          <li><strong>Dados de contato:</strong> nome e e-mail, apenas quando você nos contata voluntariamente</li>
+          <li><strong>Cookies e tecnologias similares:</strong> conforme descrito em nossa Política de Cookies</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-cogs text-indigo-500 text-base"></i> 3. Como Usamos seus Dados</h2>
+        <p>Utilizamos as informações coletadas para:</p>
+        <ul class="list-disc list-inside mt-3 space-y-2 text-gray-600">
+          <li>Melhorar a experiência de navegação e o conteúdo do site</li>
+          <li>Analisar o desempenho das páginas e categorias</li>
+          <li>Responder mensagens e solicitações de contato</li>
+          <li>Cumprir obrigações legais quando necessário</li>
+        </ul>
+        <p class="mt-3">Não vendemos, alugamos ou compartilhamos seus dados pessoais com terceiros para fins de marketing.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-share-alt text-indigo-500 text-base"></i> 4. Compartilhamento de Dados</h2>
+        <p>Seus dados podem ser compartilhados apenas nas seguintes situações:</p>
+        <ul class="list-disc list-inside mt-3 space-y-2 text-gray-600">
+          <li>Com plataformas de análise (Google Analytics, etc.) de forma anonimizada</li>
+          <li>Com autoridades competentes, quando exigido por lei</li>
+          <li>Ao clicar em links de afiliados, você será redirecionado para sites de terceiros com suas próprias políticas de privacidade</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-lock text-indigo-500 text-base"></i> 5. Segurança dos Dados</h2>
+        <p>Adotamos medidas técnicas e organizacionais adequadas para proteger seus dados contra acesso não autorizado, alteração, divulgação ou destruição. No entanto, nenhum sistema é 100% seguro e não podemos garantir segurança absoluta.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-user-check text-indigo-500 text-base"></i> 6. Seus Direitos (LGPD)</h2>
+        <p>Como titular de dados, você tem direito a:</p>
+        <ul class="list-disc list-inside mt-3 space-y-2 text-gray-600">
+          <li>Confirmar a existência de tratamento de seus dados</li>
+          <li>Acessar seus dados pessoais</li>
+          <li>Solicitar correção de dados incompletos ou incorretos</li>
+          <li>Solicitar a exclusão dos seus dados</li>
+          <li>Revogar o consentimento a qualquer momento</li>
+        </ul>
+        <p class="mt-3">Para exercer esses direitos, entre em contato pelo e-mail <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline font-medium">contato@teckhomestore.com</a>.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-external-link-alt text-indigo-500 text-base"></i> 7. Sites de Terceiros</h2>
+        <p>Nosso site contém links para lojas parceiras e afiliados. Ao acessar esses sites, você estará sujeito às políticas de privacidade deles. Não nos responsabilizamos pelo tratamento de dados realizado por terceiros.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-envelope text-indigo-500 text-base"></i> 8. Contato do Responsável</h2>
+        <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+          <p class="font-semibold text-gray-800">TeckHome Store — Encarregado de Dados (DPO)</p>
+          <p class="text-sm text-gray-600 mt-2"><i class="fas fa-envelope text-indigo-500 mr-2"></i><a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+          <p class="text-sm text-gray-600 mt-1"><i class="fas fa-globe text-indigo-500 mr-2"></i><a href="https://teckhomestore.com" class="text-indigo-600 hover:underline">teckhomestore.com</a></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  ${sharedFooter()}
+</body>
+</html>`
+}
+
+// === PÁGINA: POLÍTICA DE COOKIES ===
+function cookiesPage(): string {
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Cookies — TeckHome Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  ${sharedNavbar()}
+
+  <main class="max-w-3xl mx-auto px-4 py-14">
+
+    <div class="mb-10">
+      <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Legal</span>
+      <h1 class="text-4xl font-black text-gray-900 mb-2">Política de Cookies</h1>
+      <p class="text-gray-500 text-sm">Última atualização: maio de 2025 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+      <div class="w-16 h-1 bg-indigo-600 rounded-full mt-4"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8 text-gray-700 leading-relaxed">
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-cookie-bite text-indigo-500 text-base"></i> 1. O que são Cookies?</h2>
+        <p>Cookies são pequenos arquivos de texto armazenados no seu dispositivo quando você visita um site. Eles servem para melhorar sua experiência de navegação, lembrar suas preferências e coletar informações sobre como o site é utilizado.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-list text-indigo-500 text-base"></i> 2. Tipos de Cookies que Utilizamos</h2>
+
+        <div class="space-y-4 mt-3">
+          <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 mb-1"><i class="fas fa-check-circle text-green-500"></i> Cookies Essenciais</h3>
+            <p class="text-sm text-gray-600">Necessários para o funcionamento básico do site. Não podem ser desativados. Incluem cookies de sessão e de segurança.</p>
+          </div>
+          <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 mb-1"><i class="fas fa-chart-bar text-blue-500"></i> Cookies de Desempenho / Análise</h3>
+            <p class="text-sm text-gray-600">Coletam informações anônimas sobre como os visitantes usam o site (páginas mais acessadas, tempo de visita, etc.). Utilizamos ferramentas como Google Analytics.</p>
+          </div>
+          <div class="p-4 bg-purple-50 rounded-xl border border-purple-100">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 mb-1"><i class="fas fa-sliders-h text-purple-500"></i> Cookies de Funcionalidade</h3>
+            <p class="text-sm text-gray-600">Permitem que o site lembre suas preferências (idioma, modo de visualização, etc.) para melhorar sua experiência.</p>
+          </div>
+          <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
+            <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2 mb-1"><i class="fas fa-ad text-orange-500"></i> Cookies de Parceiros / Afiliados</h3>
+            <p class="text-sm text-gray-600">Quando você clica em um link de afiliado, cookies de terceiros podem ser definidos pelos varejistas parceiros (Amazon, Mercado Livre, etc.) para rastrear a origem da compra.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-tools text-indigo-500 text-base"></i> 3. Como Gerenciar Cookies</h2>
+        <p>Você pode controlar e/ou excluir cookies conforme desejar. A maioria dos navegadores permite:</p>
+        <ul class="list-disc list-inside mt-3 space-y-2 text-gray-600">
+          <li>Visualizar os cookies armazenados e excluí-los individualmente</li>
+          <li>Bloquear cookies de terceiros</li>
+          <li>Bloquear cookies de sites específicos</li>
+          <li>Bloquear todos os cookies</li>
+          <li>Excluir todos os cookies ao fechar o navegador</li>
+        </ul>
+        <p class="mt-3 text-sm text-gray-500">Atenção: desativar cookies pode afetar o funcionamento de algumas funcionalidades do site.</p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-clock text-indigo-500 text-base"></i> 4. Tempo de Armazenamento</h2>
+        <div class="overflow-x-auto mt-3">
+          <table class="w-full text-sm border-collapse">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="text-left p-3 border border-gray-200 font-semibold text-gray-700">Tipo de Cookie</th>
+                <th class="text-left p-3 border border-gray-200 font-semibold text-gray-700">Duração</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="p-3 border border-gray-200">Sessão</td><td class="p-3 border border-gray-200">Até fechar o navegador</td></tr>
+              <tr class="bg-gray-50"><td class="p-3 border border-gray-200">Preferências</td><td class="p-3 border border-gray-200">Até 1 ano</td></tr>
+              <tr><td class="p-3 border border-gray-200">Análise (Analytics)</td><td class="p-3 border border-gray-200">Até 2 anos</td></tr>
+              <tr class="bg-gray-50"><td class="p-3 border border-gray-200">Afiliados</td><td class="p-3 border border-gray-200">Conforme política do parceiro</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2"><i class="fas fa-envelope text-indigo-500 text-base"></i> 5. Contato</h2>
+        <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+          <p class="font-semibold text-gray-800">TeckHome Store</p>
+          <p class="text-sm text-gray-600 mt-2"><i class="fas fa-envelope text-indigo-500 mr-2"></i><a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+          <p class="text-sm text-gray-600 mt-1"><i class="fas fa-globe text-indigo-500 mr-2"></i><a href="https://teckhomestore.com" class="text-indigo-600 hover:underline">teckhomestore.com</a></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  ${sharedFooter()}
+</body>
+</html>`
+}
+
+// === PÁGINA: SOBRE NÓS ===
+function sobrePage(): string {
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre Nós — TeckHome Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .gradient-hero { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #1e3a5f 70%, #0f172a 100%); }
+    @keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  ${sharedNavbar()}
+
+  <!-- Hero -->
+  <section class="gradient-hero text-white py-16 px-4 text-center">
+    <div class="max-w-3xl mx-auto">
+      <img src="/static/logo.png" alt="TeckHome Store" class="w-24 h-24 rounded-2xl object-cover shadow-2xl mx-auto mb-6 border-2 border-white/20">
+      <h1 class="text-4xl md:text-5xl font-black mb-3">Sobre o TeckHome Store</h1>
+      <p class="text-indigo-300 text-lg">Descubra antes de comprar</p>
+    </div>
+  </section>
+
+  <main class="max-w-3xl mx-auto px-4 py-14 space-y-8">
+
+    <!-- Missão -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h2 class="text-2xl font-black text-gray-900 mb-4 flex items-center gap-3">
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><i class="fas fa-bullseye text-indigo-600"></i></div>
+        Nossa Missão
+      </h2>
+      <p class="text-gray-600 leading-relaxed">
+        O <strong>TeckHome Store</strong> nasceu com um objetivo claro: <strong>ajudar consumidores brasileiros a fazer escolhas de compra mais inteligentes</strong>. Em um mercado com milhares de produtos e opções, nossa missão é organizar, analisar e recomendar os melhores itens de tecnologia, eletrodomésticos e utilidades para o lar.
+      </p>
+      <p class="text-gray-600 leading-relaxed mt-4">
+        Acreditamos que uma boa decisão de compra começa com informação de qualidade. Por isso, a Equipe TeckHome produz conteúdo editorial imparcial, baseado em análises técnicas, avaliações reais de usuários e comparativos de mercado.
+      </p>
+    </div>
+
+    <!-- O que fazemos -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h2 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><i class="fas fa-star text-indigo-600"></i></div>
+        O que Fazemos
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+          <i class="fas fa-search text-indigo-600 mb-2"></i>
+          <h3 class="font-bold text-gray-800 mb-1">Reviews de Produtos</h3>
+          <p class="text-sm text-gray-500">Análises detalhadas com pontos positivos, negativos e para quem o produto é indicado.</p>
+        </div>
+        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+          <i class="fas fa-balance-scale text-blue-600 mb-2"></i>
+          <h3 class="font-bold text-gray-800 mb-1">Comparativos</h3>
+          <p class="text-sm text-gray-500">Comparamos produtos similares para ajudar você a escolher o melhor custo-benefício.</p>
+        </div>
+        <div class="p-4 bg-sky-50 rounded-xl border border-sky-100">
+          <i class="fas fa-tags text-sky-600 mb-2"></i>
+          <h3 class="font-bold text-gray-800 mb-1">Melhores Preços</h3>
+          <p class="text-sm text-gray-500">Links diretos para as maiores lojas do Brasil com os melhores preços disponíveis.</p>
+        </div>
+        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+          <i class="fas fa-th-large text-emerald-600 mb-2"></i>
+          <h3 class="font-bold text-gray-800 mb-1">7 Categorias</h3>
+          <p class="text-sm text-gray-500">Eletrônicos, Eletrodomésticos, Ferramentas, Refrigeração, Cama e Mesa, Ventilação e Jardim.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Equipe -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h2 class="text-2xl font-black text-gray-900 mb-4 flex items-center gap-3">
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><i class="fas fa-users text-indigo-600"></i></div>
+        Equipe TeckHome
+      </h2>
+      <div class="flex items-start gap-5">
+        <div class="w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e3a5f 100%);">
+          <span class="text-2xl">🏠</span>
+        </div>
+        <div>
+          <p class="text-gray-600 leading-relaxed">
+            A <strong>Equipe TeckHome</strong> reúne conteúdos, análises e recomendações de produtos voltados para tecnologia, casa e utilidades do dia a dia. Nosso objetivo é ajudar consumidores a fazer escolhas mais inteligentes através de reviews organizados, comparativos e conteúdos informativos.
+          </p>
+          <p class="text-gray-600 leading-relaxed mt-3">
+            Todo o conteúdo publicado é produzido com foco informativo, baseado em análises de mercado, avaliações públicas e características técnicas dos produtos, sempre com total transparência sobre nosso modelo de monetização via links de afiliados.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contato -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <h2 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center"><i class="fas fa-envelope text-indigo-600"></i></div>
+        Entre em Contato
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="mailto:contato@teckhomestore.com" class="flex items-center gap-4 p-5 bg-indigo-50 rounded-2xl border border-indigo-100 hover:border-indigo-400 hover:shadow-md transition-all group">
+          <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-700 transition-colors">
+            <i class="fas fa-envelope text-white"></i>
+          </div>
+          <div>
+            <div class="font-bold text-gray-800 text-sm">E-mail</div>
+            <div class="text-indigo-600 text-sm font-medium mt-0.5">contato@teckhomestore.com</div>
+          </div>
+        </a>
+        <a href="https://teckhomestore.com" target="_blank" rel="noopener noreferrer" class="flex items-center gap-4 p-5 bg-indigo-50 rounded-2xl border border-indigo-100 hover:border-indigo-400 hover:shadow-md transition-all group">
+          <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-700 transition-colors">
+            <i class="fas fa-globe text-white"></i>
+          </div>
+          <div>
+            <div class="font-bold text-gray-800 text-sm">Site</div>
+            <div class="text-indigo-600 text-sm font-medium mt-0.5">teckhomestore.com</div>
+          </div>
+        </a>
+      </div>
+      <p class="text-gray-500 text-sm mt-5 leading-relaxed">
+        Tem sugestões de produtos para analisarmos, quer fazer uma parceria ou tem alguma dúvida? Entre em contato! Respondemos em até 48 horas úteis.
+      </p>
+    </div>
+
+  </main>
+
+  ${sharedFooter()}
 </body>
 </html>`
 }
