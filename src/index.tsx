@@ -234,6 +234,9 @@ function homePage(): string {
     .search-box:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
     .pulse-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+    .editorial-footer { background: linear-gradient(135deg, #f8faff, #eef2ff); border-top: 1px solid #e0e7ff; }
+    .editorial-footer:hover { background: linear-gradient(135deg, #eef2ff, #e0e7ff); }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
@@ -328,23 +331,6 @@ function homePage(): string {
     </div>
   </div>
 
-  <!-- CATEGORIAS -->
-  <section id="categorias" class="max-w-7xl mx-auto px-4 py-16">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-black text-gray-900 mb-3">Explore por Categoria</h2>
-      <p class="text-gray-500 text-lg">Encontre exatamente o que você precisa</p>
-    </div>
-    <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-    </div>
-  </section>
-
   <!-- DESTAQUES -->
   <section id="destaques" class="bg-white py-16 px-4">
     <div class="max-w-7xl mx-auto">
@@ -371,22 +357,134 @@ function homePage(): string {
     </div>
   </section>
 
-  <!-- RECENTES POR CATEGORIA -->
-  <section class="max-w-7xl mx-auto px-4 py-16" id="recentSection">
-    <div class="text-center mb-10">
-      <h2 class="text-3xl font-black text-gray-900 mb-3">Adicionados Recentemente</h2>
-      <p class="text-gray-500">Últimos produtos cadastrados</p>
+  <!-- CATEGORIAS -->
+  <section id="categorias" class="max-w-7xl mx-auto px-4 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-black text-gray-900 mb-3">Explore por Categoria</h2>
+      <p class="text-gray-500 text-lg">Encontre exatamente o que você precisa</p>
     </div>
-    <div id="recentGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div class="shimmer rounded-2xl h-80"></div>
-      <div class="shimmer rounded-2xl h-80"></div>
-      <div class="shimmer rounded-2xl h-80"></div>
-      <div class="shimmer rounded-2xl h-80"></div>
+    <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="shimmer rounded-2xl h-36"></div>
+      <div class="shimmer rounded-2xl h-36"></div>
+      <div class="shimmer rounded-2xl h-36"></div>
+      <div class="shimmer rounded-2xl h-36"></div>
+      <div class="shimmer rounded-2xl h-36"></div>
+      <div class="shimmer rounded-2xl h-36"></div>
+      <div class="shimmer rounded-2xl h-36"></div>
     </div>
-    <div id="noRecent" class="hidden text-center py-16 text-gray-400">
-      <i class="fas fa-box-open text-5xl mb-4 opacity-30"></i>
-      <p class="text-lg font-medium mb-2">Nenhum produto cadastrado ainda</p>
-      <a href="/admin" class="text-indigo-600 font-medium hover:underline">Começar a adicionar produtos →</a>
+  </section>
+
+
+  <!-- EQUIPE TECKHOME -->
+  <section id="equipe-teckhome" class="py-20 px-4" style="background: linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0f9ff 100%);">
+    <div class="max-w-4xl mx-auto">
+
+      <!-- Header editorial -->
+      <div class="text-center mb-12">
+        <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">Editorial</span>
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">Sobre a Equipe TeckHome</h2>
+        <div class="w-16 h-1 bg-indigo-600 rounded-full mx-auto"></div>
+      </div>
+
+      <!-- Card principal da equipe -->
+      <div class="bg-white rounded-3xl shadow-xl border border-indigo-50 overflow-hidden" style="box-shadow: 0 20px 60px rgba(99,102,241,0.12);">
+
+        <!-- Top accent bar -->
+        <div class="h-1.5 w-full" style="background: linear-gradient(90deg, #6366f1, #818cf8, #38bdf8, #6366f1); background-size: 200% 100%; animation: gradientMove 4s linear infinite;"></div>
+
+        <div class="p-8 md:p-10">
+          <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+
+            <!-- Avatar / Logo identidade -->
+            <div class="flex-shrink-0">
+              <div class="relative">
+                <div class="w-28 h-28 rounded-2xl flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e3a5f 100%);">
+                  <div class="text-center">
+                    <div class="text-3xl mb-1">🏠</div>
+                    <div class="text-white text-xs font-bold tracking-wide">TECH</div>
+                  </div>
+                </div>
+                <!-- Badge verificado -->
+                <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center shadow-md border-2 border-white">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conteúdo editorial -->
+            <div class="flex-1 text-center md:text-left">
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-4">
+                <div>
+                  <h3 class="text-2xl font-black text-gray-900">Equipe TeckHome</h3>
+                  <div class="flex items-center justify-center md:justify-start gap-2 mt-1">
+                    <span class="inline-flex items-center gap-1 text-xs text-indigo-600 font-semibold bg-indigo-50 px-3 py-1 rounded-full">
+                      <i class="fas fa-shield-alt text-xs"></i> Portal Verificado
+                    </span>
+                    <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="animation: pulse 2s infinite;"></span> Ativo
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-gray-600 text-base leading-relaxed mb-6">
+                A Equipe TeckHome reúne conteúdos, análises e recomendações de produtos voltados para tecnologia, casa e utilidades do dia a dia. Nosso objetivo é ajudar consumidores a fazer escolhas mais inteligentes através de reviews organizados, comparativos e conteúdos informativos.
+              </p>
+
+              <!-- Stats da equipe -->
+              <div class="grid grid-cols-3 gap-4">
+                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                  <div class="text-xl font-black text-indigo-600">7</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Categorias</div>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                  <div class="text-xl font-black text-indigo-600">100%</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Imparcial</div>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                  <div class="text-xl font-black text-indigo-600">🇧🇷</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Mercado BR</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pilares editoriais -->
+          <div class="mt-10 pt-8 border-t border-gray-100">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Nossos Pilares</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="flex items-start gap-3 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 hover:border-indigo-300 transition-all">
+                <div class="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-search text-indigo-600 text-sm"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-gray-800 text-sm">Análise Técnica</div>
+                  <div class="text-gray-500 text-xs mt-0.5 leading-relaxed">Reviews baseados em dados e avaliações reais de mercado</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100 hover:border-blue-300 transition-all">
+                <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-balance-scale text-blue-600 text-sm"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-gray-800 text-sm">Comparativos</div>
+                  <div class="text-gray-500 text-xs mt-0.5 leading-relaxed">Comparações honestas para facilitar sua decisão de compra</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-4 bg-sky-50 rounded-2xl border border-sky-100 hover:border-sky-300 transition-all">
+                <div class="w-9 h-9 bg-sky-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-home text-sky-600 text-sm"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-gray-800 text-sm">Foco no Lar</div>
+                  <div class="text-gray-500 text-xs mt-0.5 leading-relaxed">Especialistas em tecnologia, eletrodomésticos e utilidades</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -456,6 +554,14 @@ function homePage(): string {
               </a>
             </div>
           </div>
+          <!-- Editorial footer -->
+          <div class="editorial-footer px-4 py-3 mt-auto flex items-start gap-2.5 rounded-b-2xl transition-all">
+            <div class="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center text-sm" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-indigo-700">Por Equipe TeckHome</div>
+              <div class="text-xs text-gray-400 leading-snug mt-0.5">Conteúdo produzido com foco informativo e baseado em análises de mercado, avaliações públicas e características técnicas dos produtos.</div>
+            </div>
+          </div>
         </div>
       \`
     }
@@ -502,24 +608,6 @@ function homePage(): string {
       grid.innerHTML = featured.map(p => createProductCard(p, catMap[p.categoryId])).join('')
     }
 
-    async function loadRecent(categories) {
-      const catMap = {}
-      categories.forEach(c => catMap[c.id] = c)
-      
-      const recent = [...allProductsCache].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 8)
-      
-      const grid = document.getElementById('recentGrid')
-      const noRecent = document.getElementById('noRecent')
-      
-      if (recent.length === 0) {
-        grid.innerHTML = ''
-        noRecent.classList.remove('hidden')
-        return
-      }
-      
-      grid.innerHTML = recent.map(p => createProductCard(p, catMap[p.categoryId])).join('')
-    }
-
     function handleSearch(query) {
       const searchResults = document.getElementById('searchResults')
       const heroSection = document.getElementById('categorias')
@@ -553,7 +641,6 @@ function homePage(): string {
     async function init() {
       const categories = await loadCategories()
       await loadFeatured(categories)
-      await loadRecent(categories)
     }
 
     init()
@@ -656,6 +743,119 @@ function categoryPage(categoryId: string): string {
       </a>
     </div>
   </main>
+
+  <!-- EQUIPE TECKHOME -->
+  <section id="equipe-teckhome" class="py-20 px-4" style="background: linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0f9ff 100%);">
+    <div class="max-w-4xl mx-auto">
+
+      <!-- Header editorial -->
+      <div class="text-center mb-12">
+        <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">Editorial</span>
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">Sobre a Equipe TeckHome</h2>
+        <div class="w-16 h-1 bg-indigo-600 rounded-full mx-auto"></div>
+      </div>
+
+      <!-- Card principal da equipe -->
+      <div class="bg-white rounded-3xl shadow-xl border border-indigo-50 overflow-hidden" style="box-shadow: 0 20px 60px rgba(99,102,241,0.12);">
+
+        <!-- Top accent bar -->
+        <div class="h-1.5 w-full" style="background: linear-gradient(90deg, #6366f1, #818cf8, #38bdf8, #6366f1); background-size: 200% 100%; animation: gradientMove 4s linear infinite;"></div>
+
+        <div class="p-8 md:p-10">
+          <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+
+            <!-- Avatar / Logo identidade -->
+            <div class="flex-shrink-0">
+              <div class="relative">
+                <div class="w-28 h-28 rounded-2xl flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e3a5f 100%);">
+                  <div class="text-center">
+                    <div class="text-3xl mb-1">🏠</div>
+                    <div class="text-white text-xs font-bold tracking-wide">TECH</div>
+                  </div>
+                </div>
+                <!-- Badge verificado -->
+                <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center shadow-md border-2 border-white">
+                  <i class="fas fa-check text-white text-xs"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conteúdo editorial -->
+            <div class="flex-1 text-center md:text-left">
+              <div class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-4">
+                <div>
+                  <h3 class="text-2xl font-black text-gray-900">Equipe TeckHome</h3>
+                  <div class="flex items-center justify-center md:justify-start gap-2 mt-1">
+                    <span class="inline-flex items-center gap-1 text-xs text-indigo-600 font-semibold bg-indigo-50 px-3 py-1 rounded-full">
+                      <i class="fas fa-shield-alt text-xs"></i> Portal Verificado
+                    </span>
+                    <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full">
+                      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="animation: pulse 2s infinite;"></span> Ativo
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p class="text-gray-600 text-base leading-relaxed mb-6">
+                A Equipe TeckHome reúne conteúdos, análises e recomendações de produtos voltados para tecnologia, casa e utilidades do dia a dia. Nosso objetivo é ajudar consumidores a fazer escolhas mais inteligentes através de reviews organizados, comparativos e conteúdos informativos.
+              </p>
+
+              <!-- Stats da equipe -->
+              <div class="grid grid-cols-3 gap-4">
+                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                  <div class="text-xl font-black text-indigo-600">7</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Categorias</div>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                  <div class="text-xl font-black text-indigo-600">100%</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Imparcial</div>
+                </div>
+                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                  <div class="text-xl font-black text-indigo-600">🇧🇷</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Mercado BR</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pilares editoriais -->
+          <div class="mt-10 pt-8 border-t border-gray-100">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Nossos Pilares</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="flex items-start gap-3 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 hover:border-indigo-300 transition-all">
+                <div class="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-search text-indigo-600 text-sm"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-gray-800 text-sm">Análise Técnica</div>
+                  <div class="text-gray-500 text-xs mt-0.5 leading-relaxed">Reviews baseados em dados e avaliações reais de mercado</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-4 bg-blue-50 rounded-2xl border border-blue-100 hover:border-blue-300 transition-all">
+                <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-balance-scale text-blue-600 text-sm"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-gray-800 text-sm">Comparativos</div>
+                  <div class="text-gray-500 text-xs mt-0.5 leading-relaxed">Comparações honestas para facilitar sua decisão de compra</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-4 bg-sky-50 rounded-2xl border border-sky-100 hover:border-sky-300 transition-all">
+                <div class="w-9 h-9 bg-sky-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-home text-sky-600 text-sm"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-gray-800 text-sm">Foco no Lar</div>
+                  <div class="text-gray-500 text-xs mt-0.5 leading-relaxed">Especialistas em tecnologia, eletrodomésticos e utilidades</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
 
   <!-- FOOTER -->
   <footer class="bg-gray-900 text-white py-8 px-4 mt-8">
