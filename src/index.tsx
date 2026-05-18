@@ -489,25 +489,91 @@ function homePage(): string {
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-gray-900 text-white py-12 px-4">
+  <footer class="bg-gray-900 text-white pt-14 pb-6 px-4">
     <div class="max-w-7xl mx-auto">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2">
-            <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover">
+
+      <!-- Grade principal do footer -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-10 border-b border-gray-700">
+
+        <!-- Coluna 1: Logo + descrição -->
+        <div class="lg:col-span-1">
+          <div class="flex items-center gap-3 mb-4">
+            <img src="/static/logo.png" alt="TeckHome Store" class="w-12 h-12 rounded-xl object-cover shadow-lg">
             <div>
               <span class="text-xl font-black">Teck<span class="text-indigo-400">Home</span> Store</span>
               <p class="text-gray-400 text-xs mt-0.5">Descubra antes de comprar</p>
             </div>
           </div>
+          <p class="text-gray-400 text-sm leading-relaxed mb-4">
+            Portal de reviews, comparativos e recomendações de produtos para tecnologia, casa e utilidades do dia a dia.
+          </p>
+          <div class="flex flex-col gap-2 text-sm">
+            <a href="https://teckhomestore.com" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+              <i class="fas fa-globe text-xs"></i> teckhomestore.com
+            </a>
+            <a href="mailto:contato@teckhomestore.com" class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+              <i class="fas fa-envelope text-xs"></i> contato@teckhomestore.com
+            </a>
+          </div>
         </div>
-        <div class="flex gap-6 text-sm text-gray-400">
-          <a href="/" class="hover:text-white transition-colors">Início</a>
-          <a href="#categorias" class="hover:text-white transition-colors">Categorias</a>
-          <a href="/admin" class="hover:text-white transition-colors">Admin</a>
+
+        <!-- Coluna 2: Navegação -->
+        <div>
+          <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Navegação</h4>
+          <ul class="flex flex-col gap-3 text-sm text-gray-400">
+            <li><a href="/" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-home text-xs text-indigo-400"></i> Início</a></li>
+            <li><a href="#destaques" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-star text-xs text-indigo-400"></i> Destaques</a></li>
+            <li><a href="#categorias" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-th-large text-xs text-indigo-400"></i> Categorias</a></li>
+            <li><a href="#equipe-teckhome" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-users text-xs text-indigo-400"></i> Equipe TeckHome</a></li>
+            <li><a href="/admin" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-lock text-xs text-indigo-400"></i> Painel Admin</a></li>
+          </ul>
         </div>
-        <p class="text-gray-500 text-sm">© 2025 TeckHome Store. Todos os direitos reservados.</p>
+
+        <!-- Coluna 3: Categorias -->
+        <div>
+          <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Categorias</h4>
+          <ul class="flex flex-col gap-3 text-sm text-gray-400">
+            <li><a href="/categoria/eletronicos" class="hover:text-white transition-colors">📱 Eletrônicos</a></li>
+            <li><a href="/categoria/eletrodomesticos" class="hover:text-white transition-colors">🏠 Eletrodomésticos</a></li>
+            <li><a href="/categoria/ferramentas" class="hover:text-white transition-colors">🔧 Ferramentas Elétricas</a></li>
+            <li><a href="/categoria/refrigeracao" class="hover:text-white transition-colors">❄️ Refrigeração</a></li>
+            <li><a href="/categoria/cama-mesa" class="hover:text-white transition-colors">🛏️ Cama e Mesa</a></li>
+            <li><a href="/categoria/ventilacao" class="hover:text-white transition-colors">💨 Ventilação</a></li>
+            <li><a href="/categoria/jardim" class="hover:text-white transition-colors">🌱 Jardim</a></li>
+          </ul>
+        </div>
+
+        <!-- Coluna 4: Informações legais + Contato -->
+        <div>
+          <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-5">Informações</h4>
+          <ul class="flex flex-col gap-3 text-sm text-gray-400">
+            <li><a href="/termos-de-uso" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-file-alt text-xs text-indigo-400"></i> Termos de Uso</a></li>
+            <li><a href="/politica-de-privacidade" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-xs text-indigo-400"></i> Política de Privacidade</a></li>
+            <li><a href="/politica-de-cookies" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-cookie-bite text-xs text-indigo-400"></i> Política de Cookies</a></li>
+            <li><a href="/sobre" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-info-circle text-xs text-indigo-400"></i> Sobre Nós</a></li>
+          </ul>
+          <div class="mt-6 pt-5 border-t border-gray-700">
+            <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-3">Contato</h4>
+            <a href="mailto:contato@teckhomestore.com" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-2">
+              <i class="fas fa-envelope text-indigo-400 text-xs"></i> contato@teckhomestore.com
+            </a>
+            <a href="https://teckhomestore.com" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+              <i class="fas fa-globe text-indigo-400 text-xs"></i> teckhomestore.com
+            </a>
+          </div>
+        </div>
+
       </div>
+
+      <!-- Rodapé inferior: copyright + disclaimer -->
+      <div class="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+        <p>© 2025 TeckHome Store. Todos os direitos reservados.</p>
+        <p class="text-center max-w-xl leading-relaxed">
+          Este site contém links de afiliados. Podemos receber comissão por compras realizadas através dos links, sem custo adicional para você. Os preços e disponibilidade podem variar.
+        </p>
+        <p>Desenvolvido por <span class="text-indigo-400 font-semibold">Equipe TeckHome</span></p>
+      </div>
+
     </div>
   </footer>
 
