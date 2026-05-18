@@ -584,7 +584,7 @@ function homePage(): string {
 
       <!-- Rodapé inferior: copyright + disclaimer -->
       <div class="pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-        <p>© 2025 TeckHome Store. Todos os direitos reservados.</p>
+        <p>© 2026 TeckHome Store. Todos os direitos reservados.</p>
         <p class="text-center max-w-xl leading-relaxed">
           Este site contém links de afiliados. Podemos receber comissão por compras realizadas através dos links, sem custo adicional para você. Os preços e disponibilidade podem variar.
         </p>
@@ -944,7 +944,7 @@ function categoryPage(categoryId: string): string {
   <footer class="bg-gray-900 text-white py-8 px-4 mt-8">
     <div class="max-w-7xl mx-auto flex justify-between items-center flex-wrap gap-4">
       <span class="font-black text-lg">Teck<span class="text-indigo-400">Home</span> Store</span>
-      <p class="text-gray-500 text-sm">© 2025 TeckHome Store</p>
+      <p class="text-gray-500 text-sm">© 2026 TeckHome Store</p>
     </div>
   </footer>
 
@@ -1122,6 +1122,9 @@ function adminPage(): string {
         <div class="flex items-center gap-3">
           <a href="/" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
             <i class="fas fa-eye text-xs"></i> Ver Site
+          </a>
+          <a href="/admin/logout" class="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold px-4 py-2 rounded-xl transition-colors border border-red-200">
+            <i class="fas fa-sign-out-alt text-xs"></i> Sair
           </a>
         </div>
       </div>
@@ -1532,12 +1535,110 @@ function sharedFooter(): string {
         <a href="/politica-de-cookies" class="hover:text-white transition-colors">Cookies</a>
         <a href="/sobre" class="hover:text-white transition-colors">Sobre Nós</a>
       </div>
-      <p>© 2025 TeckHome Store</p>
+      <p>© 2026 TeckHome Store</p>
     </div>
   </footer>`
 }
 
 // === PÁGINA: TERMOS DE USO ===
+// === PÁGINA DE LOGIN DO ADMIN ===
+function loginPage(erro?: string): string {
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acesso Restrito — TeckHome Store</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #1e3a5f 100%); }
+  </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center px-4">
+
+  <div class="w-full max-w-sm">
+
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <img src="/static/logo.png" alt="TeckHome Store" class="w-20 h-20 rounded-2xl object-cover shadow-2xl mx-auto mb-4 border-2 border-white/20">
+      <h1 class="text-2xl font-black text-white">Teck<span class="text-indigo-300">Home</span> Store</h1>
+      <p class="text-indigo-300 text-sm mt-1">Painel Administrativo</p>
+    </div>
+
+    <!-- Card de login -->
+    <div class="bg-white rounded-3xl shadow-2xl p-8">
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+          <i class="fas fa-lock text-indigo-600"></i>
+        </div>
+        <div>
+          <h2 class="font-black text-gray-900 text-lg">Acesso Restrito</h2>
+          <p class="text-gray-400 text-xs">Apenas administradores</p>
+        </div>
+      </div>
+
+      ${erro ? `
+      <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl mb-5 flex items-center gap-2">
+        <i class="fas fa-exclamation-circle"></i> ${erro}
+      </div>` : ''}
+
+      <form method="POST" action="/admin/login" class="space-y-4">
+
+        <div>
+          <label class="text-sm font-semibold text-gray-700 block mb-1.5">Usuário</label>
+          <div class="relative">
+            <i class="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input
+              type="text"
+              name="username"
+              placeholder="Digite seu usuário"
+              required
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm font-semibold text-gray-700 block mb-1.5">Senha</label>
+          <div class="relative">
+            <i class="fas fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input
+              type="password"
+              name="password"
+              placeholder="Digite sua senha"
+              required
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+            >
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 mt-2">
+          <i class="fas fa-sign-in-alt"></i> Entrar
+        </button>
+
+      </form>
+
+      <div class="mt-6 pt-5 border-t border-gray-100 text-center">
+        <a href="/" class="text-sm text-gray-400 hover:text-indigo-600 transition-colors flex items-center justify-center gap-1">
+          <i class="fas fa-arrow-left text-xs"></i> Voltar ao site
+        </a>
+      </div>
+
+    </div>
+
+    <p class="text-center text-indigo-300/50 text-xs mt-6">© 2026 TeckHome Store</p>
+  </div>
+
+</body>
+</html>`
+}
+
 function termosPage(): string {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -1559,7 +1660,7 @@ function termosPage(): string {
     <div class="mb-10">
       <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Legal</span>
       <h1 class="text-4xl font-black text-gray-900 mb-2">Termos de Uso</h1>
-      <p class="text-gray-500 text-sm">Última atualização: maio de 2025 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+      <p class="text-gray-500 text-sm">Última atualização: maio de 2026 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
       <div class="w-16 h-1 bg-indigo-600 rounded-full mt-4"></div>
     </div>
 
@@ -1646,7 +1747,7 @@ function privacidadePage(): string {
     <div class="mb-10">
       <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Legal</span>
       <h1 class="text-4xl font-black text-gray-900 mb-2">Política de Privacidade</h1>
-      <p class="text-gray-500 text-sm">Última atualização: maio de 2025 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+      <p class="text-gray-500 text-sm">Última atualização: maio de 2026 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
       <div class="w-16 h-1 bg-indigo-600 rounded-full mt-4"></div>
     </div>
 
@@ -1751,7 +1852,7 @@ function cookiesPage(): string {
     <div class="mb-10">
       <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Legal</span>
       <h1 class="text-4xl font-black text-gray-900 mb-2">Política de Cookies</h1>
-      <p class="text-gray-500 text-sm">Última atualização: maio de 2025 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
+      <p class="text-gray-500 text-sm">Última atualização: maio de 2026 · <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 hover:underline">contato@teckhomestore.com</a></p>
       <div class="w-16 h-1 bg-indigo-600 rounded-full mt-4"></div>
     </div>
 
