@@ -11,6 +11,11 @@
       "binding": "PRODUCTS_KV",
       "id": "23b42de11be3486ba776fa82ab4effef",
       "preview_id": "23b42de11be3486ba776fa82ab4effef"
+    },
+    {
+      "binding": "ARTICLES_KV",
+      "id": "ARTICLES_KV_ID_PLACEHOLDER",
+      "preview_id": "ARTICLES_KV_ID_PLACEHOLDER"
     }
   ]
 }

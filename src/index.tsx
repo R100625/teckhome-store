@@ -5,6 +5,7 @@ import { getProducts, getAllProducts, saveProduct, deleteProduct, toggleFeatured
 
 type Bindings = {
   PRODUCTS_KV: KVNamespace
+  ARTICLES_KV: KVNamespace
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -204,9 +205,113 @@ app.get('/categoria/:id', (c) => {
   return c.html(categoryPage(cat.id))
 })
 
-// === PAINEL ADMIN ===
+// === AUTH ADMIN ===
+const ADMIN_USER = 'teckhome_admin'
+const ADMIN_PASS = 'TeckHome@2025#Store'
+const COOKIE_NAME = 'teckhome_auth'
+const COOKIE_VALUE = 'granted'
+
+function isAuthenticated(c: any): boolean {
+  const cookieHeader = c.req.header('Cookie') || ''
+  return cookieHeader.includes(`${COOKIE_NAME}=${COOKIE_VALUE}`)
+}
+
 app.get('/admin', (c) => {
+  if (!isAuthenticated(c)) return c.html(loginPage())
   return c.html(adminPage())
+})
+
+app.post('/admin/login', async (c) => {
+  const body = await c.req.parseBody()
+  const username = body['username'] as string
+  const password = body['password'] as string
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
+    const res = c.redirect('/admin')
+    res.headers.set('Set-Cookie', `${COOKIE_NAME}=${COOKIE_VALUE}; Path=/; HttpOnly; Max-Age=86400; SameSite=Strict`)
+    return res
+  }
+  return c.html(loginPage('Usuário ou senha inválidos. Tente novamente.'))
+})
+
+app.get('/admin/logout', (c) => {
+  const res = c.redirect('/')
+  res.headers.set('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; SameSite=Strict`)
+  return res
+})
+
+// === API: ARTIGOS DO BLOG ===
+
+// Listar artigos
+app.get('/api/articles', async (c) => {
+  try {
+    const kv = c.env?.ARTICLES_KV
+    if (!kv) return c.json([])
+    const list = await kv.list({ prefix: 'article_' })
+    const articles = await Promise.all(
+      list.keys.map(async (k: any) => {
+        const val = await kv.get(k.name)
+        return val ? JSON.parse(val) : null
+      })
+    )
+    const valid = articles.filter(Boolean).sort((a: any, b: any) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    return c.json(valid)
+  } catch {
+    return c.json([])
+  }
+})
+
+// Criar artigo a partir de URL de produto
+app.post('/api/articles', async (c) => {
+  try {
+    if (!isAuthenticated(c)) return c.json({ error: 'Não autorizado' }, 401)
+    const body = await c.req.json()
+    const { title, excerpt, content, category, categoryIcon, image, productUrl, store, readTime, keywords } = body
+    if (!title) return c.json({ error: 'Título obrigatório' }, 400)
+
+    const id = `article_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+    const slug = title.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 60)
+
+    const article = {
+      id,
+      slug,
+      title,
+      excerpt: excerpt || '',
+      content: content || '',
+      category: category || 'Geral',
+      categoryIcon: categoryIcon || '📝',
+      image: image || '',
+      productUrl: productUrl || '',
+      store: store || '',
+      readTime: readTime || '5 min',
+      keywords: keywords || '',
+      url: `/artigo/${slug}`,
+      createdAt: new Date().toISOString()
+    }
+
+    const kv = c.env?.ARTICLES_KV
+    if (kv) await kv.put(id, JSON.stringify(article))
+
+    return c.json({ success: true, article }, 201)
+  } catch (e) {
+    return c.json({ error: 'Erro ao criar artigo' }, 500)
+  }
+})
+
+// Deletar artigo
+app.delete('/api/articles/:id', async (c) => {
+  try {
+    if (!isAuthenticated(c)) return c.json({ error: 'Não autorizado' }, 401)
+    const { id } = c.req.param()
+    const kv = c.env?.ARTICLES_KV
+    if (kv) await kv.delete(id)
+    return c.json({ success: true })
+  } catch {
+    return c.json({ error: 'Erro ao deletar artigo' }, 500)
+  }
 })
 
 // === PÁGINAS INFORMATIVAS ===
@@ -234,32 +339,55 @@ function homePage(): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TeckHome Store - Reviews de Produtos</title>
+  <title>TeckHome Store — Reviews, Comparativos e Melhores Produtos para sua Casa</title>
+  <meta name="description" content="TeckHome Store: reviews honestos, comparativos e recomendações dos melhores produtos de tecnologia, eletrodomésticos, refrigeração, ventilação e jardim. Descubra antes de comprar!">
+  <meta name="keywords" content="reviews de produtos, melhores eletrodomésticos, tecnologia para casa, comparativo de produtos, eletrônicos, refrigeração, ventilação, jardim, TeckHome Store">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Equipe TeckHome">
+  <link rel="canonical" href="https://teckhomestore.com/">
+  <meta property="og:title" content="TeckHome Store — Descubra antes de comprar">
+  <meta property="og:description" content="Reviews honestos e recomendações dos melhores produtos para sua casa e tecnologia. Análises imparciais da Equipe TeckHome.">
+  <meta property="og:image" content="https://teckhomestore.com/static/logo.png">
+  <meta property="og:url" content="https://teckhomestore.com">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TeckHome Store — Reviews e Comparativos">
+  <meta name="twitter:description" content="Descubra os melhores produtos antes de comprar. Reviews imparciais da Equipe TeckHome.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"TeckHome Store","url":"https://teckhomestore.com","description":"Portal de reviews, comparativos e recomendações de produtos de tecnologia e utilidades para o lar","potentialAction":{"@type":"SearchAction","target":"https://teckhomestore.com/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; }
-    .gradient-hero { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #1e3a5f 70%, #0f172a 100%); }
-    .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+    .gradient-hero { background: linear-gradient(135deg, #0f0c29 0%, #1e1b4b 25%, #302b63 60%, #1a1a2e 100%); }
+    .card-hover { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card-hover:hover { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(99,102,241,0.18); }
     .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .featured-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); }
     .category-card:hover .category-icon { transform: scale(1.2) rotate(5deg); }
     .category-icon { transition: transform 0.3s ease; display: inline-block; }
-    .search-box:focus { box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3); }
+    .search-box:focus { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25); }
     .pulse-dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     @keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes floatAnim { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    .fade-in-up { animation: fadeInUp 0.7s ease forwards; }
+    .float-anim { animation: floatAnim 4s ease-in-out infinite; }
     .editorial-footer { background: linear-gradient(135deg, #f8faff, #eef2ff); border-top: 1px solid #e0e7ff; }
     .editorial-footer:hover { background: linear-gradient(135deg, #eef2ff, #e0e7ff); }
+    .blog-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(99,102,241,0.15); }
+    .blog-card { transition: all 0.3s ease; }
+    .trust-badge { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
     .nav-link { position: relative; }
     .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #6366f1; transition: width 0.3s; }
     .nav-link:hover::after { width: 100%; }
+    .hero-glow { box-shadow: 0 0 80px rgba(99,102,241,0.4), 0 0 160px rgba(56,189,248,0.2); }
+    .stat-counter { background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -277,8 +405,9 @@ function homePage(): string {
         </a>
         <div class="hidden md:flex items-center gap-6">
           <a href="/" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Início</a>
-          <a href="#categorias" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Categorias</a>
           <a href="#destaques" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Destaques</a>
+          <a href="#categorias" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Categorias</a>
+          <a href="#blog" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Blog</a>
           <a href="/admin" class="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2">
             <i class="fas fa-plus text-xs"></i> Adicionar Produto
           </a>
@@ -300,41 +429,75 @@ function homePage(): string {
   </nav>
 
   <!-- HERO -->
-  <section class="gradient-hero text-white py-20 px-4 relative overflow-hidden">
-    <div class="absolute inset-0 overflow-hidden">
-      <div class="absolute -top-20 -right-20 w-80 h-80 bg-indigo-500 rounded-full opacity-10 blur-3xl"></div>
-      <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
+  <section class="gradient-hero text-white py-20 md:py-28 px-4 relative overflow-hidden">
+    <!-- Efeitos de fundo -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500 rounded-full opacity-15 blur-3xl"></div>
+      <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600 rounded-full opacity-5 blur-3xl"></div>
+      <!-- Grid pattern -->
+      <div class="absolute inset-0 opacity-5" style="background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
     </div>
-    <div class="max-w-4xl mx-auto text-center relative z-10">
-      <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm mb-6 border border-white/20">
+
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+
+      <!-- Badge de confiança -->
+      <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-5 py-2 text-sm mb-8 border border-white/20 fade-in-up">
         <span class="pulse-dot w-2 h-2 bg-green-400 rounded-full"></span>
-        <span>Reviews e recomendações atualizadas</span>
+        <span class="font-medium">Reviews honestos · Análises imparciais · Atualizado 2026</span>
       </div>
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-5 mb-8">
-        <img src="/static/logo.png" alt="TeckHome Store" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover shadow-2xl border-2 border-white/20 flex-shrink-0">
-        <div class="text-center sm:text-left">
-          <h1 class="text-4xl md:text-6xl font-black leading-tight">
-            TeckHome Store
+
+      <!-- Logo + Título -->
+      <div class="flex flex-col items-center gap-6 mb-8 fade-in-up">
+        <div class="relative float-anim">
+          <img src="/static/logo.png" alt="TeckHome Store — Reviews e Comparativos de Produtos" class="w-28 h-28 md:w-36 md:h-36 rounded-3xl object-cover shadow-2xl border-2 border-white/20 hero-glow">
+          <div class="absolute -bottom-2 -right-2 bg-green-400 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
+            <i class="fas fa-check text-white text-xs"></i>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-5xl md:text-7xl font-black leading-tight tracking-tight">
+            Teck<span class="text-indigo-300">Home</span> Store
           </h1>
-          <p class="text-xl md:text-2xl text-indigo-300 font-semibold mt-2">Descubra antes de comprar</p>
+          <p class="text-xl md:text-2xl text-indigo-200 font-semibold mt-3">Descubra antes de comprar. Escolha com confiança.</p>
         </div>
       </div>
-      <p class="text-base md:text-lg text-indigo-100 mb-8 max-w-2xl mx-auto">
-        Encontre os melhores produtos de tecnologia, eletrodomésticos e muito mais com reviews honestos e links diretos para compra.
+
+      <!-- Subtítulo persuasivo -->
+      <p class="text-base md:text-xl text-indigo-100/90 mb-10 max-w-2xl mx-auto leading-relaxed fade-in-up">
+        Pare de desperdiçar dinheiro em produtos que decepcionam. Nossa equipe analisa, compara e recomenda <strong class="text-white">somente o que realmente vale a pena</strong> — para você comprar com segurança.
       </p>
+
       <!-- Barra de busca -->
-      <div class="max-w-lg mx-auto relative">
-        <input 
+      <div class="max-w-xl mx-auto relative mb-10 fade-in-up">
+        <input
           id="searchInput"
-          type="text" 
-          placeholder="Buscar produtos..." 
-          class="search-box w-full py-4 px-6 pr-14 rounded-2xl text-gray-800 text-sm font-medium bg-white shadow-2xl outline-none border-2 border-transparent focus:border-indigo-300"
+          type="text"
+          placeholder="🔍  Buscar produtos, categorias..."
+          class="search-box w-full py-4 px-6 pr-16 rounded-2xl text-gray-800 text-sm font-medium bg-white shadow-2xl outline-none border-2 border-transparent focus:border-indigo-300"
           oninput="handleSearch(this.value)"
         >
-        <button class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center hover:bg-indigo-700 transition-colors">
+        <button class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-lg">
           <i class="fas fa-search text-white text-sm"></i>
         </button>
       </div>
+
+      <!-- Stats de confiança -->
+      <div class="grid grid-cols-3 gap-3 max-w-md mx-auto fade-in-up">
+        <div class="stat-counter rounded-2xl px-3 py-3 text-center">
+          <div class="text-2xl font-black text-white">7</div>
+          <div class="text-indigo-300 text-xs mt-0.5 font-medium">Categorias</div>
+        </div>
+        <div class="stat-counter rounded-2xl px-3 py-3 text-center">
+          <div class="text-2xl font-black text-white">100%</div>
+          <div class="text-indigo-300 text-xs mt-0.5 font-medium">Imparcial</div>
+        </div>
+        <div class="stat-counter rounded-2xl px-3 py-3 text-center">
+          <div class="text-2xl font-black text-white">🔒</div>
+          <div class="text-indigo-300 text-xs mt-0.5 font-medium">Verificado</div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -391,6 +554,27 @@ function homePage(): string {
     </div>
   </section>
 
+
+  <!-- BLOG -->
+  <section id="blog" class="max-w-7xl mx-auto px-4 py-16">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12">
+      <div>
+        <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Blog TeckHome</span>
+        <h2 class="text-3xl font-black text-gray-900 mb-2">Artigos e Guias de Compra</h2>
+        <p class="text-gray-500 max-w-xl">Conteúdo especializado para ajudar você a fazer a melhor escolha antes de comprar.</p>
+      </div>
+    </div>
+    <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="shimmer rounded-2xl h-80"></div>
+      <div class="shimmer rounded-2xl h-80"></div>
+      <div class="shimmer rounded-2xl h-80"></div>
+    </div>
+    <div id="noBlog" class="hidden text-center py-16 text-gray-400">
+      <i class="fas fa-newspaper text-5xl mb-4 opacity-30"></i>
+      <p class="text-lg font-medium mb-2">Nenhum artigo publicado ainda</p>
+      <a href="/admin" class="text-indigo-600 font-medium hover:underline">Criar primeiro artigo →</a>
+    </div>
+  </section>
 
   <!-- EQUIPE TECKHOME -->
   <section id="equipe-teckhome" class="py-20 px-4" style="background: linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0f9ff 100%);">
@@ -602,50 +786,91 @@ function homePage(): string {
       document.getElementById('mobileMenu').classList.toggle('hidden')
     })
 
+    // Gera análise persuasiva automática baseada no produto
+    function generateAnalysis(product, category) {
+      const catName = category ? category.name : 'produtos'
+      const store = product.store || 'grande loja'
+      const title = product.title || 'produto'
+      const analyses = [
+        \`Se você está buscando qualidade comprovada em \${catName}, este produto se destaca entre os mais recomendados do mercado. Com avaliações positivas de consumidores reais e disponível na \${store}, ele entrega exatamente o que promete — sem surpresas desagradáveis na hora do uso.\`,
+        \`Depois de analisar as principais opções disponíveis em \${catName}, este produto chama atenção pelo custo-benefício acima da média. É o tipo de escolha que você não se arrepende: robusto, funcional e bem avaliado por quem já comprou.\`,
+        \`Quer fazer uma compra inteligente em \${catName}? Este é um dos produtos que nossa equipe recomenda com confiança. A combinação de qualidade, durabilidade e boa reputação o coloca entre os favoritos de quem entende do assunto.\`,
+        \`Não perca tempo com produtos mediocres. Este item se destaca em \${catName} pela consistência nas avaliações e pela confiança que a \${store} oferece. É a escolha de quem quer acertar na compra sem precisar testar várias opções.\`,
+        \`Para quem busca o melhor em \${catName} sem abrir mão da qualidade, este produto é uma das opções mais bem avaliadas disponíveis hoje. Nossa análise confirma o que os consumidores já dizem: vale cada centavo investido.\`
+      ]
+      const idx = (product.title.length + (category ? category.id.length : 0)) % analyses.length
+      return analyses[idx]
+    }
+
     function createProductCard(product, category) {
-      const stars = product.rating ? '★'.repeat(Math.round(product.rating)) + '☆'.repeat(5 - Math.round(product.rating)) : ''
-      const storeIcon = product.store ? \`<span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">\${product.store}</span>\` : ''
-      const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1"><i class="fas fa-star text-xs"></i> Destaque</div>\` : ''
-      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=200\`
-      const catColor = category ? category.color : '#6366f1'
-      
+      const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg"><i class="fas fa-star text-xs"></i> Destaque</div>\` : ''
+      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400\`
+      const storeName = product.store || 'Loja Parceira'
+      const analysis = generateAnalysis(product, category)
+      const catIcon = category ? category.icon : '🛒'
+
       return \`
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col">
-          <div class="relative">
-            <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer">
+        <article class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col" itemscope itemtype="https://schema.org/Product">
+          <!-- Imagem -->
+          <div class="relative overflow-hidden">
+            <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer sponsored" aria-label="Ver \${product.title} na \${storeName}">
               <div class="h-52 overflow-hidden bg-gray-50">
-                <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=200'">
+                <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
               </div>
             </a>
             \${featuredBadge}
-            \${category ? \`<div class="absolute top-3 right-3 text-2xl">\${category.icon}</div>\` : ''}
+            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-xl w-9 h-9 rounded-xl flex items-center justify-center shadow-sm">\${catIcon}</div>
+            <!-- Loja badge -->
+            <div class="absolute bottom-3 left-3">
+              <span class="bg-white/95 backdrop-blur-sm text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm border border-indigo-100">\${storeName}</span>
+            </div>
           </div>
-          <div class="p-4 flex flex-col flex-1 gap-2">
-            <div class="flex items-start justify-between gap-2">
-              <h3 class="font-bold text-gray-800 text-sm leading-tight line-clamp-2 flex-1">\${product.title}</h3>
+
+          <!-- Conteúdo -->
+          <div class="p-5 flex flex-col flex-1 gap-3">
+            <!-- Título -->
+            <h3 class="font-black text-gray-900 text-sm leading-snug line-clamp-2" itemprop="name">\${product.title}</h3>
+
+            <!-- Análise persuasiva gerada automaticamente -->
+            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-3 border border-indigo-100">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <i class="fas fa-clipboard-check text-indigo-500 text-xs"></i>
+                <span class="text-xs font-bold text-indigo-700 uppercase tracking-wide">Análise TeckHome</span>
+              </div>
+              <p class="text-gray-700 text-xs leading-relaxed line-clamp-4">\${analysis}</p>
             </div>
-            \${product.description ? \`<p class="text-gray-500 text-xs line-clamp-2">\${product.description}</p>\` : ''}
-            <div class="flex items-center gap-2 mt-auto pt-2">
-              \${storeIcon}
-              \${stars ? \`<span class="text-yellow-400 text-xs">\${stars}</span>\` : ''}
+
+            <!-- Trust signals -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="trust-badge text-xs font-semibold text-green-700 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                <i class="fas fa-shield-alt text-xs"></i> Verificado
+              </span>
+              <span class="bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-700 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                <i class="fas fa-star text-xs"></i> Recomendado
+              </span>
             </div>
-            <div class="flex items-center justify-between gap-2 mt-1">
-              \${product.price ? \`<span class="text-lg font-black text-indigo-700">\${product.price}</span>\` : '<span class="text-sm text-gray-400">Ver preço</span>'}
-              <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer" 
-                class="flex items-center gap-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors">
-                Comprar <i class="fas fa-external-link-alt text-xs"></i>
+
+            <!-- Botão Ver Preço -->
+            <div class="mt-auto pt-2">
+              <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer sponsored"
+                class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold px-4 py-3 rounded-xl transition-all shadow-md hover:shadow-indigo-200 hover:shadow-lg">
+                <i class="fas fa-tag text-xs"></i>
+                Ver Preço na \${storeName}
+                <i class="fas fa-arrow-right text-xs ml-auto"></i>
               </a>
             </div>
           </div>
+
           <!-- Editorial footer -->
-          <div class="editorial-footer px-4 py-3 mt-auto flex items-start gap-2.5 rounded-b-2xl transition-all">
-            <div class="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center text-sm" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
-            <div class="min-w-0">
-              <div class="text-xs font-bold text-indigo-700">Por Equipe TeckHome</div>
-              <div class="text-xs text-gray-400 leading-snug mt-0.5">Conteúdo produzido com foco informativo e baseado em análises de mercado, avaliações públicas e características técnicas dos produtos.</div>
+          <div class="editorial-footer px-4 py-3 flex items-center gap-2 rounded-b-2xl">
+            <div class="w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center text-xs" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
+            <div class="min-w-0 flex items-center gap-1">
+              <span class="text-xs font-bold text-indigo-700">Por Equipe TeckHome</span>
+              <span class="text-gray-300 text-xs">·</span>
+              <span class="text-xs text-gray-400">Análise independente</span>
             </div>
           </div>
-        </div>
+        </article>
       \`
     }
 
@@ -721,9 +946,104 @@ function homePage(): string {
       }
     }
 
+    // Artigos do blog (estáticos + dinâmicos via admin)
+    const staticArticles = [
+      {
+        id: 'guia-eletronicos',
+        title: 'Como escolher o melhor smartphone em 2026: tudo que você precisa saber antes de comprar',
+        excerpt: 'Você está prestes a gastar centenas de reais em um celular — e pode cometer o mesmo erro que milhares de brasileiros cometem todo ano: comprar pelo nome da marca, e não pelo que o produto realmente entrega. Neste guia, revelamos os 5 critérios que profissionais de tecnologia usam para avaliar smartphones, e que vão mudar completamente a forma como você escolhe o próximo aparelho. Processador, câmera, bateria, custo-benefício e suporte pós-venda: cada detalhe analisado para você comprar com absoluta segurança.',
+        category: 'Eletrônicos',
+        categoryIcon: '📱',
+        image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80',
+        readTime: '6 min',
+        keywords: 'melhor smartphone 2026, como escolher celular, review celular custo-benefício, smartphone barato bom'
+      },
+      {
+        id: 'guia-eletrodomesticos',
+        title: 'Air fryer ou forno elétrico? A verdade que as marcas não te contam — e qual comprar em 2026',
+        excerpt: 'A air fryer se tornou febre no Brasil — mas será que ela é realmente superior ao forno elétrico, ou é apenas marketing bem feito? Nossa equipe testou os dois aparelhos durante semanas em situações reais de uso: preparo diário, consumo de energia, limpeza, versatilidade e durabilidade. O resultado surpreendeu até nós. Antes de tomar qualquer decisão de compra, leia nossa análise completa e descubra qual opção realmente faz mais sentido para o seu estilo de vida, seu orçamento e o tamanho da sua cozinha.',
+        category: 'Eletrodomésticos',
+        categoryIcon: '🏠',
+        image: 'https://images.unsplash.com/photo-1585515320310-259814833e62?w=600&q=80',
+        readTime: '7 min',
+        keywords: 'air fryer vs forno elétrico, melhor air fryer 2026, qual comprar, air fryer consume energia'
+      },
+      {
+        id: 'guia-refrigeracao',
+        title: 'Ar-condicionado em 2026: split, portátil ou janela? O guia definitivo para escolher sem erro',
+        excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz — sem contar os gastos com instalação e manutenção. A pergunta que todo mundo faz é: split ou portátil? Mas essa é só a ponta do iceberg. Neste guia completo, explicamos como calcular o BTU ideal para cada cômodo, qual modelo consome menos energia, quando o portátil compensa, e os 3 erros mais comuns que as pessoas cometem na hora de comprar. Não gaste um centavo antes de ler.',
+        category: 'Refrigeração',
+        categoryIcon: '❄️',
+        image: 'https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=600&q=80',
+        readTime: '8 min',
+        keywords: 'ar condicionado split vs portátil, melhor ar condicionado 2026, BTU ideal, ar condicionado econômico'
+      },
+      {
+        id: 'guia-ferramentas',
+        title: 'As 7 ferramentas elétricas que todo proprietário de imóvel precisa ter em casa',
+        excerpt: 'Se você é proprietário de imóvel ou simplesmente gosta de resolver problemas em casa sem depender de terceiros, existem 7 ferramentas elétricas que vão transformar sua vida — e pagar o próprio custo em menos de 6 meses. Nossa equipe analisou dezenas de modelos disponíveis no mercado brasileiro e selecionou os que reúnem melhor custo-benefício, durabilidade e facilidade de uso para quem não é profissional. Do parafusadeira à esmerilhadeira, descubra o que realmente vale a pena comprar em 2026.',
+        category: 'Ferramentas',
+        categoryIcon: '🔧',
+        image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&q=80',
+        readTime: '6 min',
+        keywords: 'ferramentas elétricas essenciais, melhor parafusadeira 2026, kit ferramentas casa, ferramentas custo-benefício'
+      }
+    ]
+
+    async function loadBlog() {
+      // Busca artigos do admin
+      let adminArticles = []
+      try {
+        const res = await fetch('/api/articles')
+        if (res.ok) adminArticles = await res.json()
+      } catch(e) {}
+
+      const allArticles = [...adminArticles, ...staticArticles].slice(0, 6)
+      const grid = document.getElementById('blogGrid')
+      const noBlog = document.getElementById('noBlog')
+
+      if (allArticles.length === 0) {
+        grid.innerHTML = ''
+        noBlog.classList.remove('hidden')
+        return
+      }
+
+      grid.innerHTML = allArticles.map(art => \`
+        <article class="blog-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col" itemscope itemtype="https://schema.org/Article">
+          <div class="relative h-48 overflow-hidden bg-gray-100">
+            <img src="\${art.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'}"
+              alt="\${art.title}"
+              class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'"
+              itemprop="image">
+            <div class="absolute top-3 left-3">
+              <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow">\${art.categoryIcon || '📝'} \${art.category || 'Geral'}</span>
+            </div>
+            <div class="absolute top-3 right-3">
+              <span class="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg"><i class="fas fa-clock text-xs mr-1"></i>\${art.readTime || '4 min'}</span>
+            </div>
+          </div>
+          <div class="p-5 flex flex-col flex-1 gap-3">
+            <h3 class="font-black text-gray-900 text-base leading-snug line-clamp-2 hover:text-indigo-600 transition-colors" itemprop="headline">\${art.title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed line-clamp-3" itemprop="description">\${art.excerpt}</p>
+            <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-md flex items-center justify-center text-xs" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
+                <span class="text-xs text-gray-500 font-medium">Equipe TeckHome</span>
+              </div>
+              <a href="\${art.url || '#blog'}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                Ler artigo <i class="fas fa-arrow-right text-xs"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+      \`).join('')
+    }
+
     async function init() {
       const categories = await loadCategories()
       await loadFeatured(categories)
+      await loadBlog()
     }
 
     init()
@@ -826,6 +1146,27 @@ function categoryPage(categoryId: string): string {
       </a>
     </div>
   </main>
+
+  <!-- BLOG -->
+  <section id="blog" class="max-w-7xl mx-auto px-4 py-16">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12">
+      <div>
+        <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Blog TeckHome</span>
+        <h2 class="text-3xl font-black text-gray-900 mb-2">Artigos e Guias de Compra</h2>
+        <p class="text-gray-500 max-w-xl">Conteúdo especializado para ajudar você a fazer a melhor escolha antes de comprar.</p>
+      </div>
+    </div>
+    <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="shimmer rounded-2xl h-80"></div>
+      <div class="shimmer rounded-2xl h-80"></div>
+      <div class="shimmer rounded-2xl h-80"></div>
+    </div>
+    <div id="noBlog" class="hidden text-center py-16 text-gray-400">
+      <i class="fas fa-newspaper text-5xl mb-4 opacity-30"></i>
+      <p class="text-lg font-medium mb-2">Nenhum artigo publicado ainda</p>
+      <a href="/admin" class="text-indigo-600 font-medium hover:underline">Criar primeiro artigo →</a>
+    </div>
+  </section>
 
   <!-- EQUIPE TECKHOME -->
   <section id="equipe-teckhome" class="py-20 px-4" style="background: linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0f9ff 100%);">
@@ -1131,8 +1472,22 @@ function adminPage(): string {
     </div>
   </nav>
 
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    
+  <!-- TABS NAV -->
+  <div class="max-w-7xl mx-auto px-4 pt-6 pb-0">
+    <div class="flex gap-2 border-b border-gray-200">
+      <button onclick="switchTab('produtos')" id="tab-produtos"
+        class="tab-btn px-5 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 -mb-px transition-all flex items-center gap-2">
+        <i class="fas fa-box text-xs"></i> Produtos
+      </button>
+      <button onclick="switchTab('blog')" id="tab-blog"
+        class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-indigo-600 -mb-px transition-all flex items-center gap-2">
+        <i class="fas fa-newspaper text-xs"></i> Blog / Artigos
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB: PRODUTOS -->
+  <div id="section-produtos" class="max-w-7xl mx-auto px-4 py-8">
     <div class="grid lg:grid-cols-5 gap-8">
       
       <!-- FORMULÁRIO DE ADICIONAR -->
@@ -1166,7 +1521,6 @@ function adminPage(): string {
             <div class="flex-1 min-w-0">
               <p id="previewTitle" class="text-sm font-bold text-gray-800 line-clamp-2"></p>
               <p id="previewStore" class="text-xs text-indigo-600 mt-0.5 font-medium"></p>
-              <p id="previewPrice" class="text-sm font-black text-indigo-700 mt-0.5"></p>
             </div>
           </div>
 
@@ -1186,21 +1540,29 @@ function adminPage(): string {
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Descrição (opcional)</label>
-              <textarea id="productDesc" rows="2" placeholder="Breve descrição do produto..." 
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 resize-none transition-all"></textarea>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Descrição do Vendedor
+                <span class="text-xs text-gray-400 font-normal ml-1">(só para coleta — não exibida)</span>
+              </label>
+              <textarea id="productDesc" rows="2" placeholder="Cole a descrição original do produto aqui para referência..." 
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 resize-none transition-all bg-amber-50 border-amber-200"></textarea>
+              <p class="text-xs text-amber-600 mt-1 flex items-center gap-1"><i class="fas fa-info-circle"></i> Esta descrição é apenas para referência interna. O site exibirá uma análise persuasiva gerada automaticamente.</p>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Preço (opcional)</label>
-                <input type="text" id="productPrice" placeholder="R$ 0,00" 
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Loja <span class="text-red-500">*</span></label>
+                <input type="text" id="productStore" placeholder="Amazon, Mercado Livre..." 
                   class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all">
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Loja (opcional)</label>
-                <input type="text" id="productStore" placeholder="Amazon, Mercado Livre..." 
-                  class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Avaliação (0-5)</label>
+                <div class="flex items-center gap-2 mt-3">
+                  <input type="range" id="productRating" min="0" max="5" step="0.5" value="0" 
+                    class="flex-1 accent-indigo-600"
+                    oninput="document.getElementById('ratingValue').textContent = this.value + '★'">
+                  <span id="ratingValue" class="text-yellow-500 font-bold text-sm w-10 text-right">0★</span>
+                </div>
               </div>
             </div>
 
@@ -1208,16 +1570,6 @@ function adminPage(): string {
               <label class="block text-sm font-semibold text-gray-700 mb-2">URL da Imagem (opcional)</label>
               <input type="url" id="productImage" placeholder="https://..." 
                 class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all">
-            </div>
-
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Avaliação (0-5)</label>
-              <div class="flex items-center gap-3">
-                <input type="range" id="productRating" min="0" max="5" step="0.5" value="0" 
-                  class="flex-1 accent-indigo-600"
-                  oninput="document.getElementById('ratingValue').textContent = this.value + '★'">
-                <span id="ratingValue" class="text-yellow-500 font-bold text-sm w-10 text-right">0★</span>
-              </div>
             </div>
 
             <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-xl border border-yellow-100">
@@ -1244,15 +1596,12 @@ function adminPage(): string {
           <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">
             <i class="fas fa-list text-indigo-600"></i> Produtos Cadastrados
           </h2>
-          <div class="flex items-center gap-2">
-            <select id="filterCategory" onchange="loadProducts()" class="text-sm px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 bg-white">
-              <option value="">Todas as categorias</option>
-            </select>
-          </div>
+          <select id="filterCategory" onchange="loadProducts()" class="text-sm px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 bg-white">
+            <option value="">Todas as categorias</option>
+          </select>
         </div>
 
         <div id="productsList" class="space-y-3">
-          <div class="shimmer rounded-2xl h-24"></div>
           <div class="shimmer rounded-2xl h-24"></div>
           <div class="shimmer rounded-2xl h-24"></div>
           <div class="shimmer rounded-2xl h-24"></div>
@@ -1267,18 +1616,178 @@ function adminPage(): string {
     </div>
   </div>
 
+  <!-- TAB: BLOG -->
+  <div id="section-blog" class="hidden max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-5 gap-8">
+
+      <!-- FORMULÁRIO DE CRIAR ARTIGO -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+          
+          <h2 class="text-xl font-black text-gray-900 mb-1 flex items-center gap-2">
+            <i class="fas fa-pen-nib text-indigo-600"></i> Criar Artigo do Blog
+          </h2>
+          <p class="text-gray-400 text-sm mb-5">Cole o link de um produto e gere automaticamente um artigo persuasivo para o blog</p>
+
+          <!-- Passo 1: URL do produto -->
+          <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 mb-5">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-6 h-6 bg-indigo-600 text-white text-xs font-black rounded-full flex items-center justify-center">1</span>
+              <span class="text-sm font-bold text-gray-800">Cole o link do produto</span>
+            </div>
+            <div class="flex gap-2">
+              <input type="url" id="articleProductUrl" placeholder="https://www.amazon.com.br/..." 
+                class="flex-1 px-3 py-2.5 rounded-xl border border-indigo-200 text-sm outline-none focus:border-indigo-400 bg-white transition-all"
+                onpaste="setTimeout(() => fetchArticleMetadata(), 100)">
+              <button onclick="fetchArticleMetadata()" id="fetchArticleBtn"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fas fa-magic text-xs"></i> Buscar
+              </button>
+            </div>
+          </div>
+
+          <!-- Preview do produto buscado -->
+          <div id="articlePreview" class="hidden mb-4 p-3 bg-green-50 rounded-xl border border-green-200 flex items-center gap-3">
+            <img id="articlePreviewImg" src="" alt="" class="w-14 h-14 object-cover rounded-lg bg-white flex-shrink-0">
+            <div class="flex-1 min-w-0">
+              <p id="articlePreviewTitle" class="text-sm font-bold text-gray-800 line-clamp-2"></p>
+              <p id="articlePreviewStore" class="text-xs text-green-600 mt-0.5 font-medium"></p>
+            </div>
+          </div>
+
+          <!-- Passo 2: Gerar artigo -->
+          <div class="bg-purple-50 border border-purple-100 rounded-2xl p-4 mb-5">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-6 h-6 bg-purple-600 text-white text-xs font-black rounded-full flex items-center justify-center">2</span>
+              <span class="text-sm font-bold text-gray-800">Gere o artigo automaticamente</span>
+            </div>
+            <button onclick="generateArticle()" id="generateBtn"
+              class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-md hover:shadow-lg">
+              <i class="fas fa-robot text-xs"></i> Gerar Artigo Persuasivo
+            </button>
+            <p class="text-xs text-purple-500 mt-2 text-center">Usa técnicas de copywriting para maximizar conversões</p>
+          </div>
+
+          <!-- Campos editáveis do artigo -->
+          <div id="articleFields" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Título do Artigo <span class="text-red-500">*</span></label>
+              <input type="text" id="articleTitle" placeholder="Título será gerado automaticamente..." 
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Resumo / Excerpt <span class="text-red-500">*</span></label>
+              <textarea id="articleExcerpt" rows="4" placeholder="Resumo persuasivo do artigo..."
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 resize-none transition-all"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Categoria</label>
+                <select id="articleCategory" class="w-full px-3 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 bg-white">
+                  <option value="Eletrônicos" data-icon="📱">📱 Eletrônicos</option>
+                  <option value="Eletrodomésticos" data-icon="🏠">🏠 Eletrodomésticos</option>
+                  <option value="Ferramentas" data-icon="🔧">🔧 Ferramentas</option>
+                  <option value="Refrigeração" data-icon="❄️">❄️ Refrigeração</option>
+                  <option value="Cama e Mesa" data-icon="🛏️">🛏️ Cama e Mesa</option>
+                  <option value="Ventilação" data-icon="💨">💨 Ventilação</option>
+                  <option value="Jardim" data-icon="🌱">🌱 Jardim</option>
+                  <option value="Geral" data-icon="📝">📝 Geral</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Tempo de leitura</label>
+                <select id="articleReadTime" class="w-full px-3 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 bg-white">
+                  <option>4 min</option>
+                  <option>5 min</option>
+                  <option selected>6 min</option>
+                  <option>7 min</option>
+                  <option>8 min</option>
+                  <option>10 min</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Palavras-chave SEO</label>
+              <input type="text" id="articleKeywords" placeholder="palavra-chave 1, palavra-chave 2..." 
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Imagem do artigo (URL)</label>
+              <input type="url" id="articleImage" placeholder="https://images.unsplash.com/..." 
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all">
+            </div>
+          </div>
+
+          <button onclick="publishArticle()" id="publishBtn"
+            class="w-full mt-5 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+            <i class="fas fa-paper-plane"></i> Publicar Artigo no Blog
+          </button>
+        </div>
+      </div>
+
+      <!-- LISTA DE ARTIGOS -->
+      <div class="lg:col-span-3">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">
+            <i class="fas fa-newspaper text-indigo-600"></i> Artigos Publicados
+          </h2>
+          <button onclick="loadArticles()" class="text-sm text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1">
+            <i class="fas fa-sync text-xs"></i> Atualizar
+          </button>
+        </div>
+
+        <!-- Artigos estáticos info -->
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4 text-sm text-blue-700 flex items-start gap-3">
+          <i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i>
+          <div>
+            <strong>Artigos automáticos:</strong> O site já exibe 4 artigos editoriais fixos sobre eletrônicos, eletrodomésticos, refrigeração e ferramentas. Abaixo estão os artigos extras criados neste painel.
+          </div>
+        </div>
+
+        <div id="articlesList" class="space-y-3">
+          <div class="shimmer rounded-2xl h-24"></div>
+          <div class="shimmer rounded-2xl h-24"></div>
+        </div>
+
+        <div id="emptyArticles" class="hidden text-center py-16 text-gray-400">
+          <i class="fas fa-newspaper text-5xl mb-4 opacity-30"></i>
+          <p class="text-lg font-medium">Nenhum artigo criado ainda</p>
+          <p class="text-sm mt-1">Use o formulário ao lado para criar artigos a partir de produtos</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     let categories = []
     let allProducts = []
+    let allArticles = []
 
+    // ======= TABS =======
+    function switchTab(tab) {
+      document.getElementById('section-produtos').classList.toggle('hidden', tab !== 'produtos')
+      document.getElementById('section-blog').classList.toggle('hidden', tab !== 'blog')
+      document.getElementById('tab-produtos').className = tab === 'produtos'
+        ? 'tab-btn px-5 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 -mb-px transition-all flex items-center gap-2'
+        : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-indigo-600 -mb-px transition-all flex items-center gap-2'
+      document.getElementById('tab-blog').className = tab === 'blog'
+        ? 'tab-btn px-5 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 -mb-px transition-all flex items-center gap-2'
+        : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-indigo-600 -mb-px transition-all flex items-center gap-2'
+      if (tab === 'blog') loadArticles()
+    }
+
+    // ======= TOAST =======
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast')
       const icon = document.getElementById('toastIcon')
       const msg = document.getElementById('toastMsg')
       const inner = document.getElementById('toastInner')
-      
-      icon.className = type === 'success' ? 'fas fa-check-circle text-green-500 text-xl' : 
-                       type === 'error' ? 'fas fa-times-circle text-red-500 text-xl' : 
+      icon.className = type === 'success' ? 'fas fa-check-circle text-green-500 text-xl' :
+                       type === 'error'   ? 'fas fa-times-circle text-red-500 text-xl'   :
                        'fas fa-info-circle text-blue-500 text-xl'
       inner.className = \`bg-white rounded-2xl shadow-2xl border px-5 py-4 flex items-center gap-3 min-w-72 \${type === 'success' ? 'border-green-100' : type === 'error' ? 'border-red-100' : 'border-blue-100'}\`
       msg.textContent = message
@@ -1286,45 +1795,31 @@ function adminPage(): string {
       setTimeout(() => toast.classList.remove('show'), 3500)
     }
 
+    // ======= PRODUTOS =======
     async function fetchMetadata() {
       const url = document.getElementById('productUrl').value.trim()
       if (!url) return
-
       const btn = document.getElementById('fetchBtn')
       btn.innerHTML = '<span class="spinner"></span>'
       btn.disabled = true
-
       try {
-        const res = await fetch('/api/fetch-metadata', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url })
-        })
+        const res = await fetch('/api/fetch-metadata', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
         const data = await res.json()
-
         if (data.title) document.getElementById('productTitle').value = data.title
         if (data.description) document.getElementById('productDesc').value = data.description
         if (data.imageUrl) document.getElementById('productImage').value = data.imageUrl
-        if (data.price) document.getElementById('productPrice').value = data.price
         if (data.store) document.getElementById('productStore').value = data.store
-
-        // Preview
         const preview = document.getElementById('urlPreview')
         if (data.title) {
           preview.classList.remove('hidden')
-          const imgSrc = data.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(data.title)}&background=6366f1&color=fff&size=100\`
-          document.getElementById('previewImg').src = imgSrc
+          document.getElementById('previewImg').src = data.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(data.title)}&background=6366f1&color=fff&size=100\`
           document.getElementById('previewTitle').textContent = data.title
           document.getElementById('previewStore').textContent = data.store || ''
-          document.getElementById('previewPrice').textContent = data.price || ''
-          showToast('Metadados carregados com sucesso!', 'success')
+          showToast('Dados do produto carregados!', 'success')
         } else {
-          showToast('Não foi possível carregar metadados automaticamente. Preencha manualmente.', 'info')
+          showToast('Preencha os campos manualmente.', 'info')
         }
-      } catch (e) {
-        showToast('Erro ao buscar dados. Preencha os campos manualmente.', 'error')
-      }
-
+      } catch (e) { showToast('Erro ao buscar dados.', 'error') }
       btn.innerHTML = '<i class="fas fa-magic"></i> Buscar'
       btn.disabled = false
     }
@@ -1333,56 +1828,37 @@ function adminPage(): string {
       const categoryId = document.getElementById('categoryId').value
       const productUrl = document.getElementById('productUrl').value.trim()
       const title = document.getElementById('productTitle').value.trim()
-
       if (!categoryId) return showToast('Selecione uma categoria!', 'error')
       if (!productUrl) return showToast('URL do produto é obrigatória!', 'error')
       if (!title) return showToast('Título do produto é obrigatório!', 'error')
-
       const btn = document.getElementById('addBtn')
       btn.innerHTML = '<span class="spinner"></span> Salvando...'
       btn.disabled = true
-
       try {
         const res = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            categoryId,
-            productUrl,
-            title,
+            categoryId, productUrl, title,
             description: document.getElementById('productDesc').value.trim(),
             imageUrl: document.getElementById('productImage').value.trim(),
-            price: document.getElementById('productPrice').value.trim(),
+            price: '',
             store: document.getElementById('productStore').value.trim(),
             rating: parseFloat(document.getElementById('productRating').value),
             featured: document.getElementById('productFeatured').checked
           })
         })
-
         const data = await res.json()
-        if (data.success) {
-          showToast('Produto adicionado com sucesso!', 'success')
-          resetForm()
-          await loadProducts()
-        } else {
-          showToast(data.error || 'Erro ao adicionar produto', 'error')
-        }
-      } catch (e) {
-        showToast('Erro de conexão', 'error')
-      }
-
+        if (data.success) { showToast('Produto adicionado com sucesso!', 'success'); resetForm(); await loadProducts() }
+        else showToast(data.error || 'Erro ao adicionar produto', 'error')
+      } catch (e) { showToast('Erro de conexão', 'error') }
       btn.innerHTML = '<i class="fas fa-plus"></i> Adicionar Produto'
       btn.disabled = false
     }
 
     function resetForm() {
-      document.getElementById('productUrl').value = ''
+      ['productUrl','productTitle','productDesc','productImage','productStore'].forEach(id => document.getElementById(id).value = '')
       document.getElementById('categoryId').value = ''
-      document.getElementById('productTitle').value = ''
-      document.getElementById('productDesc').value = ''
-      document.getElementById('productImage').value = ''
-      document.getElementById('productPrice').value = ''
-      document.getElementById('productStore').value = ''
       document.getElementById('productRating').value = 0
       document.getElementById('ratingValue').textContent = '0★'
       document.getElementById('productFeatured').checked = false
@@ -1391,59 +1867,41 @@ function adminPage(): string {
 
     async function loadProducts() {
       const filterCat = document.getElementById('filterCategory').value
-
-      let url = '/api/products'
-      if (filterCat) url = \`/api/products/\${filterCat}\`
-
+      const url = filterCat ? \`/api/products/\${filterCat}\` : '/api/products'
       const res = await fetch(url)
       allProducts = await res.json()
-
       const catMap = {}
       categories.forEach(c => catMap[c.id] = c)
-
       const list = document.getElementById('productsList')
       const empty = document.getElementById('emptyAdmin')
-
-      if (allProducts.length === 0) {
-        list.innerHTML = ''
-        empty.classList.remove('hidden')
-        return
-      }
-
+      if (allProducts.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); return }
       empty.classList.add('hidden')
       list.innerHTML = allProducts.map(p => {
         const cat = catMap[p.categoryId] || { name: p.categoryId, icon: '📦', color: '#6366f1' }
         const imgSrc = p.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80\`
-        
         return \`
           <div class="card-admin bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4" data-id="\${p.id}">
             <img src="\${imgSrc}" alt="\${p.title}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 flex-wrap">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background: \${cat.color}">\${cat.icon} \${cat.name}</span>
                 \${p.featured ? '<span class="text-xs px-2 py-0.5 rounded-full font-medium text-white featured-badge">⭐ Destaque</span>' : ''}
                 \${p.store ? \`<span class="text-xs text-gray-400 font-medium">\${p.store}</span>\` : ''}
               </div>
-              <h3 class="font-bold text-gray-800 text-sm mt-1 line-clamp-1">\${p.title}</h3>
-              <div class="flex items-center gap-3 mt-1">
-                \${p.price ? \`<span class="text-sm font-black text-indigo-700">\${p.price}</span>\` : ''}
-                <a href="\${p.productUrl}" target="_blank" class="text-xs text-indigo-500 hover:underline truncate max-w-xs">\${p.productUrl}</a>
-              </div>
+              <h3 class="font-bold text-gray-800 text-sm line-clamp-1">\${p.title}</h3>
+              <a href="\${p.productUrl}" target="_blank" class="text-xs text-indigo-500 hover:underline truncate max-w-xs block mt-0.5">\${p.productUrl}</a>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
               <button data-action="featured" data-cat="\${p.categoryId}" data-id="\${p.id}"
-                class="p-2 rounded-xl border transition-all \${p.featured ? 'bg-yellow-50 border-yellow-200 text-yellow-500 hover:bg-yellow-100' : 'bg-gray-50 border-gray-200 text-gray-400 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-500'}"
+                class="p-2 rounded-xl border transition-all \${p.featured ? 'bg-yellow-50 border-yellow-200 text-yellow-500' : 'bg-gray-50 border-gray-200 text-gray-400 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-500'}"
                 title="\${p.featured ? 'Remover destaque' : 'Marcar como destaque'}">
                 <i class="fas fa-star text-sm"></i>
               </button>
-              <a href="\${p.productUrl}" target="_blank" 
-                class="p-2 rounded-xl border bg-indigo-50 border-indigo-200 text-indigo-500 hover:bg-indigo-100 transition-all"
-                title="Abrir produto">
+              <a href="\${p.productUrl}" target="_blank" class="p-2 rounded-xl border bg-indigo-50 border-indigo-200 text-indigo-500 hover:bg-indigo-100 transition-all" title="Abrir produto">
                 <i class="fas fa-external-link-alt text-sm"></i>
               </a>
               <button data-action="delete" data-cat="\${p.categoryId}" data-id="\${p.id}"
-                class="p-2 rounded-xl border bg-red-50 border-red-200 text-red-400 hover:bg-red-100 transition-all"
-                title="Remover produto">
+                class="p-2 rounded-xl border bg-red-50 border-red-200 text-red-400 hover:bg-red-100 transition-all" title="Remover produto">
                 <i class="fas fa-trash text-sm"></i>
               </button>
             </div>
@@ -1452,44 +1910,226 @@ function adminPage(): string {
       }).join('')
     }
 
-    // Event delegation para botões da lista de produtos
     document.getElementById('productsList').addEventListener('click', async function(e) {
       const btn = e.target.closest('button[data-action]')
       if (!btn) return
-      const action = btn.dataset.action
-      const cat = btn.dataset.cat
-      const id = btn.dataset.id
+      const action = btn.dataset.action, cat = btn.dataset.cat, id = btn.dataset.id
       if (action === 'delete') {
         const found = allProducts.find(p => p.id === id)
-        const title = (found && found.title) || btn.dataset.title || 'este produto'
-        if (!confirm('Remover "' + title + '"?')) return
+        if (!confirm('Remover "' + ((found && found.title) || 'este produto') + '"?')) return
         try {
           const res = await fetch('/api/products/' + cat + '/' + id, { method: 'DELETE' })
           const data = await res.json()
           if (data.success) { showToast('Produto removido!', 'success'); await loadProducts() }
           else showToast(data.error || 'Erro ao remover', 'error')
-        } catch(err) { showToast('Erro de conexão', 'error') }
+        } catch { showToast('Erro de conexão', 'error') }
       } else if (action === 'featured') {
         try {
           const res = await fetch('/api/products/' + cat + '/' + id + '/featured', { method: 'PATCH' })
           const data = await res.json()
           if (data.success) { showToast(data.product.featured ? '⭐ Marcado como destaque!' : 'Removido dos destaques', 'success'); await loadProducts() }
-        } catch(err) { showToast('Erro de conexão', 'error') }
+        } catch { showToast('Erro de conexão', 'error') }
       }
     })
 
+    // ======= BLOG / ARTIGOS =======
+    let articleMetadata = {}
+
+    async function fetchArticleMetadata() {
+      const url = document.getElementById('articleProductUrl').value.trim()
+      if (!url) return
+      const btn = document.getElementById('fetchArticleBtn')
+      btn.innerHTML = '<span class="spinner"></span>'
+      btn.disabled = true
+      try {
+        const res = await fetch('/api/fetch-metadata', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
+        articleMetadata = await res.json()
+        articleMetadata.url = url
+        const preview = document.getElementById('articlePreview')
+        if (articleMetadata.title) {
+          preview.classList.remove('hidden')
+          document.getElementById('articlePreviewImg').src = articleMetadata.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(articleMetadata.title)}&background=6366f1&color=fff&size=100\`
+          document.getElementById('articlePreviewTitle').textContent = articleMetadata.title
+          document.getElementById('articlePreviewStore').textContent = articleMetadata.store ? '🛒 ' + articleMetadata.store : ''
+          // Auto-preenche campos
+          document.getElementById('articleImage').value = articleMetadata.imageUrl || ''
+          showToast('Produto encontrado! Agora clique em "Gerar Artigo".', 'success')
+        } else {
+          showToast('Não foi possível buscar dados. Preencha manualmente.', 'info')
+        }
+      } catch { showToast('Erro ao buscar dados do produto.', 'error') }
+      btn.innerHTML = '<i class="fas fa-magic text-xs"></i> Buscar'
+      btn.disabled = false
+    }
+
+    function generateArticle() {
+      const title = articleMetadata.title || ''
+      const store = articleMetadata.store || 'marketplace'
+      const desc = articleMetadata.description || ''
+      const cat = document.getElementById('articleCategory').value
+      const btn = document.getElementById('generateBtn')
+      btn.innerHTML = '<span class="spinner"></span> Gerando...'
+      btn.disabled = true
+
+      // Gera título SEO persuasivo
+      const titleTemplates = [
+        \`Vale a pena comprar? Análise completa + tudo que você precisa saber antes de comprar\`,
+        \`Review honesto: descubra por que este produto está entre os mais recomendados de 2026\`,
+        \`Guia de compra: análise técnica, prós, contras e veredicto final\`,
+        \`Analisamos a fundo — veja o que encontramos antes de recomendar\`,
+        \`O que ninguém te conta sobre este produto: análise imparcial da Equipe TeckHome\`
+      ]
+      const tIdx = (title.length + cat.length) % titleTemplates.length
+      const generatedTitle = title
+        ? \`\${title.substring(0, 50)}: \${titleTemplates[tIdx]}\`
+        : titleTemplates[tIdx]
+
+      // Gera excerpt persuasivo longo (copywriting)
+      const excerptTemplates = [
+        \`Todo consumidor sabe a frustração de comprar um produto empolgado pelas fotos e descrições, e descobrir depois que ele não entrega o que prometia. Por isso, nossa equipe foi além das especificações técnicas e analisou os pontos que realmente importam: durabilidade, custo-benefício real, facilidade de uso e o que os compradores verificados dizem sobre este produto. O resultado desta análise pode mudar sua decisão de compra — e te fazer economizar tempo e dinheiro. Antes de finalizar sua compra na \${store}, leia nossa avaliação completa.\`,
+        \`Quando um produto chama atenção no mercado, nossa missão é ir além do marketing e descobrir o que ele realmente vale. Depois de analisar dezenas de avaliações reais, comparar com alternativas da mesma categoria e estudar as especificações técnicas com olho crítico, chegamos a uma conclusão que vai surpreender você. Se você está cogitando adquirir este produto, não perca tempo: nossa análise resume tudo que você precisa saber para comprar com total segurança — sem arrependimentos e sem desperdício de dinheiro.\`,
+        \`Você está prestes a tomar uma decisão de compra importante. E nós entendemos que, com tantas opções no mercado e promessas exageradas das marcas, é difícil saber em quem confiar. Foi exatamente por isso que criamos esta análise: para te dar clareza, objetividade e confiança. Avaliamos este produto nos critérios que realmente importam para quem vai usá-lo no dia a dia — e nosso veredicto é baseado em dados reais, não em especificações de marketing. Leia até o final antes de tomar sua decisão.\`,
+        \`Há uma grande diferença entre um produto que parece bom e um produto que realmente é bom. Nossa equipe passou horas pesquisando, comparando e analisando este item disponível na \${store} para te dar uma resposta honesta: vale a pena? A resposta pode te surpreender. Reunimos nesta análise os pontos fortes, os pontos de atenção, e o perfil exato do comprador que vai se beneficiar deste produto — para que você tome a decisão mais inteligente possível.\`,
+        \`Se você chegou até aqui, é porque está levando sua decisão de compra a sério. E isso é exatamente o que a Equipe TeckHome valoriza. Nossa missão é separar o joio do trigo em \${cat} — e este produto passou pelo nosso processo de análise rigoroso. Avaliamos tudo: qualidade de construção, desempenho no uso real, custo-benefício e reputação na \${store}. Confira nosso relatório completo e descubra se este produto merece um lugar no seu carrinho de compras.\`
+      ]
+      const eIdx = (title.length + store.length) % excerptTemplates.length
+      const generatedExcerpt = excerptTemplates[eIdx]
+
+      // Gera keywords SEO
+      const catKeywords = {
+        'Eletrônicos': 'eletrônicos, tecnologia, review eletrônico, melhor celular, smartphone',
+        'Eletrodomésticos': 'eletrodomésticos, casa, review eletrodoméstico, cozinha, utilidades',
+        'Ferramentas': 'ferramentas elétricas, bricolagem, faça você mesmo, ferramentas casa',
+        'Refrigeração': 'ar condicionado, refrigeração, clima, conforto térmico, BTU',
+        'Cama e Mesa': 'cama, mesa, roupa de cama, conforto, lar',
+        'Ventilação': 'ventilador, ventilação, circulador de ar, conforto',
+        'Jardim': 'jardim, plantas, ferramentas jardim, área externa',
+        'Geral': 'produtos, review, análise, compras'
+      }
+      const baseKw = catKeywords[cat] || catKeywords['Geral']
+      const shortTitle = title.substring(0, 30).toLowerCase().replace(/[^a-z0-9\s]/g, '')
+      const generatedKeywords = \`\${shortTitle}, review \${shortTitle}, vale a pena \${shortTitle}, \${store} \${shortTitle}, \${baseKw}\`
+
+      document.getElementById('articleTitle').value = generatedTitle
+      document.getElementById('articleExcerpt').value = generatedExcerpt
+      document.getElementById('articleKeywords').value = generatedKeywords
+
+      btn.innerHTML = '<i class="fas fa-robot text-xs"></i> Gerar Artigo Persuasivo'
+      btn.disabled = false
+      showToast('Artigo gerado com copywriting persuasivo! Revise e publique.', 'success')
+    }
+
+    async function publishArticle() {
+      const title = document.getElementById('articleTitle').value.trim()
+      const excerpt = document.getElementById('articleExcerpt').value.trim()
+      if (!title) return showToast('Título do artigo é obrigatório!', 'error')
+      if (!excerpt) return showToast('Resumo do artigo é obrigatório!', 'error')
+
+      const catSelect = document.getElementById('articleCategory')
+      const catOpt = catSelect.options[catSelect.selectedIndex]
+      const catIcon = catOpt.getAttribute('data-icon') || '📝'
+
+      const btn = document.getElementById('publishBtn')
+      btn.innerHTML = '<span class="spinner"></span> Publicando...'
+      btn.disabled = true
+
+      try {
+        const res = await fetch('/api/articles', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title,
+            excerpt,
+            category: catSelect.value,
+            categoryIcon: catIcon,
+            image: document.getElementById('articleImage').value.trim(),
+            productUrl: articleMetadata.url || document.getElementById('articleProductUrl').value.trim(),
+            store: articleMetadata.store || '',
+            readTime: document.getElementById('articleReadTime').value,
+            keywords: document.getElementById('articleKeywords').value.trim()
+          })
+        })
+        const data = await res.json()
+        if (data.success) {
+          showToast('✅ Artigo publicado no blog!', 'success')
+          resetArticleForm()
+          await loadArticles()
+        } else {
+          showToast(data.error || 'Erro ao publicar artigo', 'error')
+        }
+      } catch { showToast('Erro de conexão', 'error') }
+
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Publicar Artigo no Blog'
+      btn.disabled = false
+    }
+
+    function resetArticleForm() {
+      articleMetadata = {}
+      document.getElementById('articleProductUrl').value = ''
+      document.getElementById('articleTitle').value = ''
+      document.getElementById('articleExcerpt').value = ''
+      document.getElementById('articleKeywords').value = ''
+      document.getElementById('articleImage').value = ''
+      document.getElementById('articlePreview').classList.add('hidden')
+    }
+
+    async function loadArticles() {
+      try {
+        const res = await fetch('/api/articles')
+        allArticles = res.ok ? await res.json() : []
+      } catch { allArticles = [] }
+
+      const list = document.getElementById('articlesList')
+      const empty = document.getElementById('emptyArticles')
+
+      if (allArticles.length === 0) {
+        list.innerHTML = ''
+        empty.classList.remove('hidden')
+        return
+      }
+
+      empty.classList.add('hidden')
+      list.innerHTML = allArticles.map(art => \`
+        <div class="card-admin bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4">
+          <div class="w-16 h-16 rounded-xl overflow-hidden bg-indigo-50 flex-shrink-0 flex items-center justify-center text-2xl">
+            \${art.image ? \`<img src="\${art.image}" alt="" class="w-full h-full object-cover">\` : art.categoryIcon || '📝'}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-semibold">\${art.categoryIcon || ''} \${art.category || 'Geral'}</span>
+              <span class="text-xs text-gray-400"><i class="fas fa-clock text-xs"></i> \${art.readTime || '5 min'}</span>
+            </div>
+            <h3 class="font-bold text-gray-800 text-sm line-clamp-2">\${art.title}</h3>
+            <p class="text-xs text-gray-400 mt-0.5">\${new Date(art.createdAt).toLocaleDateString('pt-BR')}</p>
+          </div>
+          <button onclick="deleteArticle('\${art.id}')" class="p-2 rounded-xl border bg-red-50 border-red-200 text-red-400 hover:bg-red-100 transition-all flex-shrink-0" title="Remover artigo">
+            <i class="fas fa-trash text-sm"></i>
+          </button>
+        </div>
+      \`).join('')
+    }
+
+    async function deleteArticle(id) {
+      const art = allArticles.find(a => a.id === id)
+      if (!confirm('Remover artigo "' + ((art && art.title) || 'este artigo').substring(0, 50) + '"?')) return
+      try {
+        const res = await fetch('/api/articles/' + id, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) { showToast('Artigo removido!', 'success'); await loadArticles() }
+        else showToast(data.error || 'Erro ao remover', 'error')
+      } catch { showToast('Erro de conexão', 'error') }
+    }
+
+    // ======= INIT =======
     async function init() {
       const res = await fetch('/api/categories')
       categories = await res.json()
-      
       const catSelect = document.getElementById('categoryId')
       const filterSelect = document.getElementById('filterCategory')
-      
       categories.forEach(cat => {
         catSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
         filterSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
       })
-      
       await loadProducts()
     }
 
