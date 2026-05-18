@@ -336,6 +336,77 @@ app.get('/sobre', (c) => {
   return c.html(sobrePage())
 })
 
+// === PÁGINA DE ARTIGO DO BLOG ===
+app.get('/artigo/:slug', async (c) => {
+  const { slug } = c.req.param()
+
+  // Artigos estáticos embutidos
+  const staticArticlesFull: Record<string, any> = {
+    'guia-eletronicos': {
+      slug: 'guia-eletronicos',
+      title: 'Como escolher o melhor smartphone em 2026: tudo que você precisa saber antes de comprar',
+      category: 'Eletrônicos', categoryIcon: '📱',
+      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
+      readTime: '6 min',
+      keywords: 'melhor smartphone 2026, como escolher celular, review celular custo-benefício',
+      excerpt: 'Você está prestes a gastar centenas de reais em um celular — e pode cometer o mesmo erro que milhares de brasileiros cometem todo ano.',
+      content: `<h2>Por que a maioria das pessoas escolhe errado?</h2><p>O erro mais comum é comprar pela marca, pelo hype ou pelo preço mais baixo — sem entender o que cada especificação realmente significa na prática. Um celular com câmera de 108MP pode tirar fotos piores do que um de 12MP bem calibrado. Um processador "octa-core" desconhecido pode ser mais lento do que modelos de geração anterior.</p><h2>Os 5 critérios que realmente importam</h2><h3>1. Processador (chipset)</h3><p>É o coração do aparelho. Para uso geral, Snapdragon 7 series, Dimensity 900+ ou Apple A-series entregam excelente desempenho. Evite chipsets MediaTek entry-level em aparelhos acima de R$ 1.500.</p><h3>2. Bateria e carregamento</h3><p>Mínimo de 4.500 mAh para uso intenso. Carregamento rápido de 33W+ faz diferença real no dia a dia — recarregar de 20% a 80% em menos de 30 minutos muda a sua rotina.</p><h3>3. Sistema de câmera</h3><p>Ignore o número de megapixels. Observe o tamanho do sensor, a abertura (f/1.8 ou menor é melhor em baixa luz) e se há estabilização óptica (OIS). Testes reais valem mais que specs no papel.</p><h3>4. Durabilidade de software</h3><p>Quantos anos de atualização o fabricante garante? Samsung e Apple lideram (4-7 anos). Isso afeta segurança e valorização do aparelho no futuro.</p><h3>5. Custo-benefício real</h3><p>Compare sempre o preço histórico. Use o Histórico de Preços e o Zoom para verificar se a "promoção" é real. Muitos aparelhos são marcados para cima antes de saldões.</p><h2>Nossa recomendação final</h2><p>Antes de finalizar qualquer compra, liste suas 3 prioridades (bateria, câmera, performance?) e compare 2-3 modelos nessas categorias especificamente. Use os links verificados da TeckHome Store para garantir a melhor oferta disponível.</p>`
+    },
+    'guia-eletrodomesticos': {
+      slug: 'guia-eletrodomesticos',
+      title: 'Air fryer ou forno elétrico? A verdade que as marcas não te contam — e qual comprar em 2026',
+      category: 'Eletrodomésticos', categoryIcon: '🏠',
+      image: 'https://images.unsplash.com/photo-1585515320310-259814833e62?w=1200&q=80',
+      readTime: '7 min',
+      keywords: 'air fryer vs forno elétrico, melhor air fryer 2026, qual comprar',
+      excerpt: 'A air fryer se tornou febre no Brasil — mas será que ela é realmente superior ao forno elétrico, ou é apenas marketing bem feito?',
+      content: `<h2>A verdade sobre a air fryer</h2><p>A air fryer não frita de verdade — ela assa com circulação de ar quente em alta velocidade. O resultado é parecido com o forno, porém muito mais rápido e com menos óleo. Para alimentos congelados, batata frita e frango, ela é imbatível. Mas existem limitações importantes.</p><h2>Quando a air fryer vence</h2><ul><li><strong>Velocidade:</strong> Esquenta em 2-3 minutos vs. 10-15 do forno elétrico</li><li><strong>Consumo:</strong> 1.200-1.700W vs. 1.200-2.000W do forno — mas por menos tempo</li><li><strong>Crocância:</strong> Superior para frituras e reconquistamento de alimentos</li><li><strong>Espaço:</strong> Versões menores (3-4L) são compactas para cozinhas pequenas</li></ul><h2>Quando o forno elétrico vence</h2><ul><li><strong>Capacidade:</strong> Assar um frango inteiro, pizza grande ou vários itens ao mesmo tempo</li><li><strong>Versatilidade:</strong> Gratinar, tostar pão, fazer bolos, derreter queijo</li><li><strong>Custo:</strong> Fornos básicos custam R$ 150-300 vs. R$ 250-800 de uma boa air fryer</li></ul><h2>O veredicto da Equipe TeckHome</h2><p>Para solteiros ou casais sem filhos: <strong>air fryer de 4-5L</strong> cobre 90% das necessidades. Para famílias ou quem cozinha muito: <strong>forno elétrico de 44L+</strong> ou idealmente <strong>os dois aparelhos</strong>, pois se complementam perfeitamente. Aproveite as ofertas nos links da nossa loja para economizar na sua escolha.</p>`
+    },
+    'guia-refrigeracao': {
+      slug: 'guia-refrigeracao',
+      title: 'Ar-condicionado em 2026: split, portátil ou janela? O guia definitivo para escolher sem erro',
+      category: 'Refrigeração', categoryIcon: '❄️',
+      image: 'https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=1200&q=80',
+      readTime: '8 min',
+      keywords: 'ar condicionado split vs portátil, melhor ar condicionado 2026, BTU ideal',
+      excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz.',
+      content: `<h2>O erro que custa caro todos os meses</h2><p>Comprar um ar-condicionado subdimensionado faz o compressor trabalhar 100% do tempo sem conseguir atingir a temperatura desejada — consumindo mais energia e desgastando o equipamento prematuramente. Um superdimenionado liga e desliga constantemente, criando umidade e também desperdiçando energia.</p><h2>Como calcular o BTU ideal</h2><p>A fórmula básica: <strong>600 BTU por metro quadrado</strong> para pé-direito normal (2,7m), em clima quente. Ajuste:</p><ul><li>+10% para ambientes com muita exposição ao sol</li><li>+600 BTU para cada pessoa além de 2 que usam o ambiente</li><li>+1.000 BTU para computadores ou TVs grandes no espaço</li></ul><h2>Split x Portátil: a comparação honesta</h2><h3>Split inverter</h3><p>Pros: 30-40% mais econômico que convencional, silencioso, resfria de verdade qualquer ambiente. Cons: exige instalação profissional (R$ 300-600), furo na parede, e locatários podem ter restrições.</p><h3>Portátil</h3><p>Pros: sem instalação, move de cômodo para cômodo. Cons: <strong>muito menos eficiente</strong> (gasta 2-3x mais energia), barulhento, exige mangueira de exaustão — sem ela não funciona. Só compensa em aluguel ou se for usar poucos meses.</p><h2>Nossa recomendação</h2><p>Para uso permanente: <strong>split inverter</strong> sem dúvida. Para locação temporária ou quarto secundário: portátil de 12.000 BTU. Confira os splits selecionados pela Equipe TeckHome com os melhores preços verificados.</p>`
+    },
+    'guia-ferramentas': {
+      slug: 'guia-ferramentas',
+      title: 'As 7 ferramentas elétricas que todo proprietário de imóvel precisa ter em casa',
+      category: 'Ferramentas', categoryIcon: '🔧',
+      image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1200&q=80',
+      readTime: '6 min',
+      keywords: 'ferramentas elétricas essenciais, melhor parafusadeira 2026, kit ferramentas casa',
+      excerpt: 'Se você é proprietário de imóvel ou simplesmente gosta de resolver problemas em casa sem depender de terceiros, existem 7 ferramentas elétricas que vão transformar sua vida.',
+      content: `<h2>Por que montar seu kit de ferramentas?</h2><p>Chamar um técnico para apertar parafusos, instalar uma prateleira ou fazer pequenos reparos custa entre R$ 80 e R$ 250 por visita. Com um kit de ferramentas básico que custa entre R$ 400 e R$ 800, você recupera o investimento em 3-4 chamados evitados.</p><h2>As 7 ferramentas essenciais</h2><h3>1. Parafusadeira/furadeira elétrica</h3><p>A mais versátil. Procure modelos com torque ajustável (18+ configurações), bateria de 20V+ e kit com brocas. Bosch, Makita e Tramontina Pro entregam excelente custo-benefício.</p><h3>2. Nível a laser</h3><p>Instalar quadros, prateleiras e móveis nivelados sem gastar horas com fio de prumo. Modelos de linha cruzada a partir de R$ 80 já resolvem 95% das necessidades domésticas.</p><h3>3. Serra circular ou tico-tico</h3><p>Para cortes em madeira, MDF e PVC. A tico-tico é mais versátil para curvas; a circular para cortes longos e retos. Escolha conforme seu uso mais frequente.</p><h3>4. Esmerilhadeira angular</h3><p>Para cortar metal, cerâmica e pedra. Indispensável para obras e reformas. Modelos 4.5" são suficientes para uso doméstico.</p><h3>5. Pistola de silicone</h3><p>Elétrica ou a bateria, aplica selantes uniformemente sem esforço. Essencial para banheiros, janelas e qualquer rejuntamento.</p><h3>6. Soprador/aspirador térmico</h3><p>Remove tinta velha, dobra tubos de PVC, encolhe embalagens — muito mais útil do que parece na teoria.</p><h3>7. Medidor digital multifunção</h3><p>Detecta vigas, fiação elétrica e canos dentro de paredes antes de furar. Evita acidentes sérios e retrabalho caro.</p><h2>Onde comprar com segurança</h2><p>Use os links verificados da TeckHome Store para garantir produtos originais com garantia e melhor preço disponível.</p>`
+    }
+  }
+
+  // Tenta buscar no KV (artigos criados pelo admin)
+  const tryKv = async () => {
+    try {
+      const kv = c.env?.ARTICLES_KV
+      if (!kv) return null
+      const list = await kv.list({ prefix: 'article_' })
+      for (const k of list.keys) {
+        const val = await kv.get(k.name)
+        if (val) {
+          const art = JSON.parse(val)
+          if (art.slug === slug) return art
+        }
+      }
+    } catch { }
+    return null
+  }
+
+  const article = staticArticlesFull[slug] || await tryKv()
+  if (!article) return c.redirect('/')
+
+  return c.html(articlePage(article))
+})
+
 // === HTML PAGES ===
 
 function homePage(): string {
@@ -363,36 +434,87 @@ function homePage(): string {
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
-    .gradient-hero { background: linear-gradient(135deg, #0f0c29 0%, #1e1b4b 25%, #302b63 60%, #1a1a2e 100%); }
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+    /* ===== HERO ===== */
+    .hero-section {
+      position: relative;
+      background: #0b0920;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    .hero-bg-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      opacity: 0.30;
+      /* SEM animação — completamente estática */
+      transform: none !important;
+      animation: none !important;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(160deg,
+        rgba(11,9,32,0.93) 0%,
+        rgba(21,18,60,0.87) 35%,
+        rgba(38,33,90,0.80) 65%,
+        rgba(11,9,32,0.96) 100%
+      );
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 10; width: 100%; }
+    /* ===== CARDS ===== */
     .card-hover { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
     .card-hover:hover { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(99,102,241,0.18); }
     .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .featured-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    /* ===== CATEGORIAS ===== */
     .category-card:hover .category-icon { transform: scale(1.2) rotate(5deg); }
-    .category-icon { transition: transform 0.3s ease; display: inline-block; }
+    .category-icon { transition: transform 0.3s ease; display: inline-block; font-style: normal; }
+    /* ===== BUSCA ===== */
     .search-box:focus { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25); }
-    .pulse-dot { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    /* ===== ANIMAÇÕES ===== */
     @keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes floatAnim { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
     .fade-in-up { animation: fadeInUp 0.7s ease forwards; }
-    .float-anim { animation: floatAnim 4s ease-in-out infinite; }
-    .editorial-footer { background: linear-gradient(135deg, #f8faff, #eef2ff); border-top: 1px solid #e0e7ff; }
-    .editorial-footer:hover { background: linear-gradient(135deg, #eef2ff, #e0e7ff); }
+    /* ===== BLOG ===== */
     .blog-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(99,102,241,0.15); }
     .blog-card { transition: all 0.3s ease; }
+    /* ===== PRODUCT CARDS ===== */
+    .editorial-footer { background: linear-gradient(135deg, #f8faff, #eef2ff); border-top: 1px solid #e0e7ff; }
+    .editorial-footer:hover { background: linear-gradient(135deg, #eef2ff, #e0e7ff); }
     .trust-badge { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; }
+    /* ===== SCROLLBAR ===== */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
+    /* ===== NAVBAR ===== */
     .nav-link { position: relative; }
     .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #6366f1; transition: width 0.3s; }
     .nav-link:hover::after { width: 100%; }
-    .hero-glow { box-shadow: 0 0 80px rgba(99,102,241,0.4), 0 0 160px rgba(56,189,248,0.2); }
-    .stat-counter { background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); }
+    /* ===== STAT ===== */
+    .stat-counter { background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06)); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.18); }
+    /* ===== EMOJI / ÍCONES ===== */
+    .emoji-icon { font-style: normal; font-family: 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif !important; }
+    /* Força renderização correta dos ícones FontAwesome */
+    i.fas, i.fa, i.far { font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; font-style: normal !important; }
+    i.fab { font-family: 'Font Awesome 6 Brands' !important; font-weight: 400 !important; font-style: normal !important; }
+    /* Garante que ícones não herdem cor branca indesejada em fundos claros */
+    .text-indigo-500, .text-indigo-600, .text-indigo-700 { color: inherit; }
+    i.fas.text-indigo-500 { color: #6366f1 !important; }
+    i.fas.text-indigo-400 { color: #818cf8 !important; }
+    i.fas.text-white { color: #ffffff !important; }
+    i.fas.text-xs { font-size: 0.75rem !important; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -434,75 +556,84 @@ function homePage(): string {
   </nav>
 
   <!-- HERO -->
-  <section class="gradient-hero text-white py-20 md:py-28 px-4 relative overflow-hidden">
-    <!-- Efeitos de fundo -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute -top-32 -right-32 w-96 h-96 bg-indigo-500 rounded-full opacity-15 blur-3xl"></div>
-      <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600 rounded-full opacity-5 blur-3xl"></div>
-      <!-- Grid pattern -->
-      <div class="absolute inset-0 opacity-5" style="background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 50px 50px;"></div>
+  <section class="hero-section text-white">
+    <!-- Imagem de fundo ESTÁTICA — cobre toda a tela, sem animação -->
+    <img src="/static/logo.png"
+         alt=""
+         aria-hidden="true"
+         class="hero-bg-img"
+         draggable="false">
+    <!-- Overlay escuro para manter legibilidade -->
+    <div class="hero-overlay"></div>
+    <!-- Efeito de orbs decorativos (acima da overlay, abaixo do conteúdo) -->
+    <div class="absolute inset-0 pointer-events-none" style="z-index:3;" aria-hidden="true">
+      <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-indigo-600 rounded-full opacity-8 blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-purple-700 rounded-full opacity-6 blur-3xl"></div>
+      <!-- Grade sutil -->
+      <div class="absolute inset-0" style="opacity:0.04; background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px); background-size: 60px 60px;"></div>
     </div>
 
-    <div class="max-w-5xl mx-auto text-center relative z-10">
+    <!-- Conteúdo do hero -->
+    <div class="hero-content px-4 py-24 md:py-32">
+      <div class="max-w-5xl mx-auto text-center">
 
-      <!-- Badge de confiança -->
-      <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-full px-5 py-2 text-sm mb-8 border border-white/20 fade-in-up">
-        <span class="pulse-dot w-2 h-2 bg-green-400 rounded-full"></span>
-        <span class="font-medium">Reviews honestos · Análises imparciais · Atualizado 2026</span>
-      </div>
+        <!-- Título principal -->
+        <div class="fade-in-up mb-6">
+          <h1 class="text-6xl md:text-8xl font-black leading-none tracking-tighter drop-shadow-2xl">
+            Teck<span class="text-indigo-300">Home</span>
+          </h1>
+          <h2 class="text-4xl md:text-6xl font-black leading-none tracking-tighter text-white/90 drop-shadow-2xl mt-1">
+            Store
+          </h2>
+        </div>
 
-      <!-- Logo + Título -->
-      <div class="flex flex-col items-center gap-6 mb-8 fade-in-up">
-        <div class="relative float-anim">
-          <img src="/static/logo.png" alt="TeckHome Store — Reviews e Comparativos de Produtos" class="w-28 h-28 md:w-36 md:h-36 rounded-3xl object-cover shadow-2xl border-2 border-white/20 hero-glow">
-          <div class="absolute -bottom-2 -right-2 bg-green-400 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center">
-            <i class="fas fa-check text-white text-xs"></i>
+        <!-- Subtítulo persuasivo -->
+        <p class="text-lg md:text-2xl text-indigo-100/90 mb-10 max-w-2xl mx-auto leading-relaxed fade-in-up font-medium drop-shadow-lg">
+          Pare de desperdiçar dinheiro em produtos que decepcionam.<br class="hidden md:block">
+          Nossa equipe analisa e recomenda <strong class="text-white">somente o que realmente vale a pena.</strong>
+        </p>
+
+        <!-- Barra de busca -->
+        <div class="max-w-xl mx-auto relative mb-12 fade-in-up">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Buscar produtos, categorias..."
+            class="search-box w-full py-4 px-6 pr-16 rounded-2xl text-gray-800 text-sm font-medium bg-white shadow-2xl outline-none border-2 border-transparent focus:border-indigo-300"
+            oninput="handleSearch(this.value)"
+          >
+          <button class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-lg">
+            <i class="fas fa-search text-white text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Stats de confiança -->
+        <div class="grid grid-cols-3 gap-4 max-w-sm mx-auto fade-in-up">
+          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
+            <div class="text-3xl font-black text-white">7</div>
+            <div class="text-indigo-300 text-xs mt-1 font-semibold uppercase tracking-wider">Categorias</div>
+          </div>
+          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
+            <div class="text-3xl font-black text-white">100%</div>
+            <div class="text-indigo-300 text-xs mt-1 font-semibold uppercase tracking-wider">Imparcial</div>
+          </div>
+          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
+            <div class="text-xl font-black text-white mt-1">&#128274;</div>
+            <div class="text-indigo-300 text-xs mt-1 font-semibold uppercase tracking-wider">Verificado</div>
           </div>
         </div>
-        <div>
-          <h1 class="text-5xl md:text-7xl font-black leading-tight tracking-tight">
-            Teck<span class="text-indigo-300">Home</span> Store
-          </h1>
-          <p class="text-xl md:text-2xl text-indigo-200 font-semibold mt-3">Descubra antes de comprar. Escolha com confiança.</p>
+
+        <!-- CTAs -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10 fade-in-up">
+          <a href="#destaques" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl hover:shadow-indigo-500/30 text-base">
+            <i class="fas fa-star text-sm"></i> Ver Destaques
+          </a>
+          <a href="#categorias" class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-bold px-8 py-4 rounded-2xl transition-all text-base">
+            <i class="fas fa-th-large text-sm"></i> Explorar Categorias
+          </a>
         </div>
+
       </div>
-
-      <!-- Subtítulo persuasivo -->
-      <p class="text-base md:text-xl text-indigo-100/90 mb-10 max-w-2xl mx-auto leading-relaxed fade-in-up">
-        Pare de desperdiçar dinheiro em produtos que decepcionam. Nossa equipe analisa, compara e recomenda <strong class="text-white">somente o que realmente vale a pena</strong> — para você comprar com segurança.
-      </p>
-
-      <!-- Barra de busca -->
-      <div class="max-w-xl mx-auto relative mb-10 fade-in-up">
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="🔍  Buscar produtos, categorias..."
-          class="search-box w-full py-4 px-6 pr-16 rounded-2xl text-gray-800 text-sm font-medium bg-white shadow-2xl outline-none border-2 border-transparent focus:border-indigo-300"
-          oninput="handleSearch(this.value)"
-        >
-        <button class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-lg">
-          <i class="fas fa-search text-white text-sm"></i>
-        </button>
-      </div>
-
-      <!-- Stats de confiança -->
-      <div class="grid grid-cols-3 gap-3 max-w-md mx-auto fade-in-up">
-        <div class="stat-counter rounded-2xl px-3 py-3 text-center">
-          <div class="text-2xl font-black text-white">7</div>
-          <div class="text-indigo-300 text-xs mt-0.5 font-medium">Categorias</div>
-        </div>
-        <div class="stat-counter rounded-2xl px-3 py-3 text-center">
-          <div class="text-2xl font-black text-white">100%</div>
-          <div class="text-indigo-300 text-xs mt-0.5 font-medium">Imparcial</div>
-        </div>
-        <div class="stat-counter rounded-2xl px-3 py-3 text-center">
-          <div class="text-2xl font-black text-white">🔒</div>
-          <div class="text-indigo-300 text-xs mt-0.5 font-medium">Verificado</div>
-        </div>
-      </div>
-
     </div>
   </section>
 
@@ -886,15 +1017,15 @@ function homePage(): string {
       const grid = document.getElementById('categoriesGrid')
       grid.innerHTML = categories.map(cat => \`
         <a href="/categoria/\${cat.id}" class="category-card card-hover bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex flex-col items-start gap-3 cursor-pointer group">
-          <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background: \${cat.color}20">
-            <span class="category-icon">\${cat.icon}</span>
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, \${cat.color}22, \${cat.color}44); border: 2px solid \${cat.color}33;">
+            <span style="font-size:1.75rem; line-height:1; font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;">\${cat.icon}</span>
           </div>
           <div>
-            <h3 class="font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">\${cat.name}</h3>
+            <h3 class="font-bold text-gray-800 group-hover:text-indigo-600 transition-colors text-base">\${cat.name}</h3>
             <p class="text-gray-400 text-xs mt-0.5 line-clamp-2">\${cat.description}</p>
           </div>
-          <div class="flex items-center gap-1 text-indigo-600 text-xs font-medium mt-auto">
-            Ver produtos <i class="fas fa-arrow-right text-xs"></i>
+          <div class="flex items-center gap-1.5 mt-auto" style="color:\${cat.color}; font-size:0.75rem; font-weight:700;">
+            Ver produtos <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </a>
       \`).join('')
@@ -955,8 +1086,10 @@ function homePage(): string {
     const staticArticles = [
       {
         id: 'guia-eletronicos',
+        slug: 'guia-eletronicos',
+        url: '/artigo/guia-eletronicos',
         title: 'Como escolher o melhor smartphone em 2026: tudo que você precisa saber antes de comprar',
-        excerpt: 'Você está prestes a gastar centenas de reais em um celular — e pode cometer o mesmo erro que milhares de brasileiros cometem todo ano: comprar pelo nome da marca, e não pelo que o produto realmente entrega. Neste guia, revelamos os 5 critérios que profissionais de tecnologia usam para avaliar smartphones, e que vão mudar completamente a forma como você escolhe o próximo aparelho. Processador, câmera, bateria, custo-benefício e suporte pós-venda: cada detalhe analisado para você comprar com absoluta segurança.',
+        excerpt: 'Você está prestes a gastar centenas de reais em um celular — e pode cometer o mesmo erro que milhares de brasileiros cometem todo ano: comprar pelo nome da marca, e não pelo que o produto realmente entrega. Neste guia, revelamos os 5 critérios que profissionais de tecnologia usam para avaliar smartphones, e que vão mudar completamente a forma como você escolhe o próximo aparelho.',
         category: 'Eletrônicos',
         categoryIcon: '📱',
         image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80',
@@ -965,8 +1098,10 @@ function homePage(): string {
       },
       {
         id: 'guia-eletrodomesticos',
+        slug: 'guia-eletrodomesticos',
+        url: '/artigo/guia-eletrodomesticos',
         title: 'Air fryer ou forno elétrico? A verdade que as marcas não te contam — e qual comprar em 2026',
-        excerpt: 'A air fryer se tornou febre no Brasil — mas será que ela é realmente superior ao forno elétrico, ou é apenas marketing bem feito? Nossa equipe testou os dois aparelhos durante semanas em situações reais de uso: preparo diário, consumo de energia, limpeza, versatilidade e durabilidade. O resultado surpreendeu até nós. Antes de tomar qualquer decisão de compra, leia nossa análise completa e descubra qual opção realmente faz mais sentido para o seu estilo de vida, seu orçamento e o tamanho da sua cozinha.',
+        excerpt: 'A air fryer se tornou febre no Brasil — mas será que ela é realmente superior ao forno elétrico, ou é apenas marketing bem feito? Nossa equipe testou os dois aparelhos e a resposta vai surpreender você. Descubra qual realmente vale a pena para a sua cozinha antes de gastar seu dinheiro.',
         category: 'Eletrodomésticos',
         categoryIcon: '🏠',
         image: 'https://images.unsplash.com/photo-1585515320310-259814833e62?w=600&q=80',
@@ -975,8 +1110,10 @@ function homePage(): string {
       },
       {
         id: 'guia-refrigeracao',
+        slug: 'guia-refrigeracao',
+        url: '/artigo/guia-refrigeracao',
         title: 'Ar-condicionado em 2026: split, portátil ou janela? O guia definitivo para escolher sem erro',
-        excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz — sem contar os gastos com instalação e manutenção. A pergunta que todo mundo faz é: split ou portátil? Mas essa é só a ponta do iceberg. Neste guia completo, explicamos como calcular o BTU ideal para cada cômodo, qual modelo consome menos energia, quando o portátil compensa, e os 3 erros mais comuns que as pessoas cometem na hora de comprar. Não gaste um centavo antes de ler.',
+        excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz. Neste guia, calculamos o BTU ideal para cada ambiente e comparamos split, portátil e janela com dados reais de consumo.',
         category: 'Refrigeração',
         categoryIcon: '❄️',
         image: 'https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=600&q=80',
@@ -985,8 +1122,10 @@ function homePage(): string {
       },
       {
         id: 'guia-ferramentas',
+        slug: 'guia-ferramentas',
+        url: '/artigo/guia-ferramentas',
         title: 'As 7 ferramentas elétricas que todo proprietário de imóvel precisa ter em casa',
-        excerpt: 'Se você é proprietário de imóvel ou simplesmente gosta de resolver problemas em casa sem depender de terceiros, existem 7 ferramentas elétricas que vão transformar sua vida — e pagar o próprio custo em menos de 6 meses. Nossa equipe analisou dezenas de modelos disponíveis no mercado brasileiro e selecionou os que reúnem melhor custo-benefício, durabilidade e facilidade de uso para quem não é profissional. Do parafusadeira à esmerilhadeira, descubra o que realmente vale a pena comprar em 2026.',
+        excerpt: 'Com um kit de ferramentas básico que custa entre R$ 400 e R$ 800, você recupera o investimento em 3-4 chamados de técnico evitados. Veja quais são as 7 ferramentas essenciais que nossa equipe selecionou.',
         category: 'Ferramentas',
         categoryIcon: '🔧',
         image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&q=80',
@@ -1013,36 +1152,38 @@ function homePage(): string {
         return
       }
 
-      grid.innerHTML = allArticles.map(art => \`
-        <article class="blog-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col" itemscope itemtype="https://schema.org/Article">
-          <div class="relative h-48 overflow-hidden bg-gray-100">
+      grid.innerHTML = allArticles.map(art => {
+        const artUrl = art.url || (art.slug ? \`/artigo/\${art.slug}\` : '#blog')
+        return \`
+        <a href="\${artUrl}" class="blog-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col cursor-pointer no-underline" itemscope itemtype="https://schema.org/Article" style="text-decoration:none;">
+          <div class="relative h-52 overflow-hidden bg-gray-100">
             <img src="\${art.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'}"
               alt="\${art.title}"
-              class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
               onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'"
               itemprop="image">
             <div class="absolute top-3 left-3">
-              <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow">\${art.categoryIcon || '📝'} \${art.category || 'Geral'}</span>
+              <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow">\${art.categoryIcon || ''} \${art.category || 'Geral'}</span>
             </div>
             <div class="absolute top-3 right-3">
-              <span class="bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg"><i class="fas fa-clock text-xs mr-1"></i>\${art.readTime || '4 min'}</span>
+              <span class="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg font-medium">\${art.readTime || '4 min'} leitura</span>
             </div>
           </div>
           <div class="p-5 flex flex-col flex-1 gap-3">
-            <h3 class="font-black text-gray-900 text-base leading-snug line-clamp-2 hover:text-indigo-600 transition-colors" itemprop="headline">\${art.title}</h3>
-            <p class="text-gray-500 text-sm leading-relaxed line-clamp-3" itemprop="description">\${art.excerpt}</p>
-            <div class="mt-auto pt-3 border-t border-gray-100 flex items-center justify-between">
+            <h3 class="font-black text-gray-900 text-base leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors" itemprop="headline">\${art.title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 flex-1" itemprop="description">\${art.excerpt}</p>
+            <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-md flex items-center justify-center text-xs" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
+                <div class="w-6 h-6 rounded-md flex items-center justify-center text-xs" style="background: linear-gradient(135deg, #1e1b4b, #3730a3); color:white; font-size:10px;">TH</div>
                 <span class="text-xs text-gray-500 font-medium">Equipe TeckHome</span>
               </div>
-              <a href="\${art.url || '#blog'}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+              <span class="text-xs font-bold text-indigo-600 flex items-center gap-1">
                 Ler artigo <i class="fas fa-arrow-right text-xs"></i>
-              </a>
+              </span>
             </div>
           </div>
-        </article>
-      \`).join('')
+        </a>
+      \`}).join('')
     }
 
     async function init() {
@@ -1068,15 +1209,20 @@ function categoryPage(categoryId: string): string {
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
     .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     .card-hover:hover { transform: translateY(-8px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
     .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .featured-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .trust-badge { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; }
+    .editorial-footer { background: linear-gradient(135deg, #f8faff, #eef2ff); border-top: 1px solid #e0e7ff; }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
+    /* Fix FontAwesome icons */
+    i.fas, i.fa, i.far { font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; font-style: normal !important; }
+    i.fab { font-family: 'Font Awesome 6 Brands' !important; font-weight: 400 !important; font-style: normal !important; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -1432,7 +1578,7 @@ function adminPage(): string {
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
     .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; transform: translateX(200%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -1442,6 +1588,9 @@ function adminPage(): string {
     .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #6366f1; border-radius: 50%; width: 24px; height: 24px; animation: spin 0.8s linear infinite; display: inline-block; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .featured-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    /* Fix FontAwesome icons */
+    i.fas, i.fa, i.far { font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; font-style: normal !important; }
+    i.fab { font-family: 'Font Awesome 6 Brands' !important; font-weight: 400 !important; font-style: normal !important; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -2183,6 +2332,176 @@ function sharedFooter(): string {
       <p>© 2026 TeckHome Store</p>
     </div>
   </footer>`
+}
+
+// === PÁGINA DE ARTIGO DO BLOG ===
+function articlePage(article: any): string {
+  const title = article.title || 'Artigo TeckHome'
+  const excerpt = article.excerpt || ''
+  const content = article.content || `<p>${excerpt}</p>`
+  const image = article.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80'
+  const category = article.category || 'Geral'
+  const categoryIcon = article.categoryIcon || '📝'
+  const readTime = article.readTime || '5 min'
+  const keywords = article.keywords || ''
+  const productUrl = article.productUrl || ''
+  const store = article.store || ''
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title} — TeckHome Store</title>
+  <meta name="description" content="${excerpt.substring(0, 160)}">
+  ${keywords ? `<meta name="keywords" content="${keywords}">` : ''}
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${excerpt.substring(0, 200)}">
+  <meta property="og:image" content="${image}">
+  <meta property="og:type" content="article">
+  <link rel="canonical" href="https://teckhomestore.com/artigo/${article.slug}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .article-body h2 { font-size: 1.5rem; font-weight: 800; color: #111827; margin: 2rem 0 0.75rem; }
+    .article-body h3 { font-size: 1.15rem; font-weight: 700; color: #1f2937; margin: 1.5rem 0 0.5rem; }
+    .article-body p { color: #374151; line-height: 1.9; margin-bottom: 1rem; font-size: 1.05rem; }
+    .article-body ul, .article-body ol { margin: 0.75rem 0 1rem 1.5rem; }
+    .article-body li { color: #374151; line-height: 1.8; margin-bottom: 0.4rem; font-size: 1.05rem; }
+    .article-body ul { list-style: disc; }
+    .article-body ol { list-style: decimal; }
+    .article-body strong { color: #111827; font-weight: 700; }
+    .hero-article { position: relative; height: 420px; overflow: hidden; }
+    .hero-article img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-article-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%); }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
+    .fa, .fas { font-family: 'Font Awesome 6 Free' !important; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-2">
+          <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md">
+          <div>
+            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span> Store</span>
+            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
+          </div>
+        </a>
+        <div class="flex items-center gap-3">
+          <a href="/#blog" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
+            <i class="fas fa-newspaper text-xs"></i> Blog
+          </a>
+          <a href="/" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
+            <i class="fas fa-home text-xs"></i> Início
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO DO ARTIGO -->
+  <div class="hero-article">
+    <img src="${image}" alt="${title}" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80'">
+    <div class="hero-article-overlay"></div>
+    <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10 max-w-4xl mx-auto">
+      <nav class="text-sm text-white/70 mb-3 flex items-center gap-2">
+        <a href="/" class="hover:text-white">Início</a>
+        <i class="fas fa-chevron-right text-xs"></i>
+        <a href="/#blog" class="hover:text-white">Blog</a>
+        <i class="fas fa-chevron-right text-xs"></i>
+        <span class="text-white/90">${category}</span>
+      </nav>
+      <div class="flex items-center gap-2 mb-3">
+        <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">${categoryIcon} ${category}</span>
+        <span class="bg-black/40 text-white text-xs px-3 py-1 rounded-full"><i class="fas fa-clock mr-1"></i>${readTime}</span>
+      </div>
+      <h1 class="text-2xl md:text-4xl font-black text-white leading-tight drop-shadow-lg">${title}</h1>
+    </div>
+  </div>
+
+  <!-- CONTEÚDO DO ARTIGO -->
+  <main class="max-w-3xl mx-auto px-4 py-12">
+
+    <!-- Autor -->
+    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-gray-200">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);">🏠</div>
+      <div>
+        <p class="font-bold text-gray-900 text-sm">Equipe TeckHome</p>
+        <p class="text-gray-400 text-xs">Análise editorial independente · TeckHome Store</p>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+          <i class="fas fa-shield-alt text-xs"></i> Verificado
+        </span>
+      </div>
+    </div>
+
+    <!-- Excerpt destacado -->
+    <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-r-xl p-5 mb-8">
+      <p class="text-indigo-900 font-semibold text-lg leading-relaxed">${excerpt}</p>
+    </div>
+
+    <!-- Corpo do artigo -->
+    <div class="article-body">
+      ${content}
+    </div>
+
+    ${productUrl ? `
+    <!-- CTA de produto -->
+    <div class="mt-10 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-6 text-white text-center shadow-xl">
+      <p class="text-indigo-200 text-sm font-semibold uppercase tracking-wider mb-2">Pronto para comprar?</p>
+      <h3 class="text-xl font-black mb-4">Confira o melhor preço disponível agora</h3>
+      <a href="${productUrl}" target="_blank" rel="noopener noreferrer sponsored"
+        class="inline-flex items-center gap-2 bg-white text-indigo-700 font-black px-8 py-4 rounded-xl hover:bg-indigo-50 transition-all shadow-lg text-base">
+        <i class="fas fa-tag"></i> Ver Preço${store ? ` na ${store}` : ''}
+        <i class="fas fa-arrow-right text-sm"></i>
+      </a>
+    </div>` : ''}
+
+    <!-- Aviso editorial -->
+    <div class="mt-8 p-4 bg-gray-100 rounded-xl text-xs text-gray-500 leading-relaxed">
+      <i class="fas fa-info-circle text-gray-400 mr-1"></i>
+      <strong>Aviso de afiliados:</strong> Este artigo pode conter links de afiliados. Caso você realize uma compra através deles, recebemos uma comissão sem custo adicional para você. Isso não influencia nossas análises.
+    </div>
+
+    <!-- Navegar para mais artigos -->
+    <div class="mt-8 pt-8 border-t border-gray-200 flex items-center justify-between gap-4">
+      <a href="/#blog" class="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
+        <i class="fas fa-arrow-left text-sm"></i> Ver todos os artigos
+      </a>
+      <a href="/" class="flex items-center gap-2 text-gray-500 font-medium hover:text-gray-700 transition-colors">
+        Explorar produtos <i class="fas fa-arrow-right text-sm"></i>
+      </a>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-900 text-white py-8 px-4 mt-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
+      <div class="flex items-center gap-2">
+        <img src="/static/logo.png" alt="TeckHome Store" class="w-8 h-8 rounded-lg object-cover">
+        <span class="font-bold text-white">Teck<span class="text-indigo-400">Home</span> Store</span>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="/termos-de-uso" class="hover:text-white transition-colors">Termos</a>
+        <a href="/politica-de-privacidade" class="hover:text-white transition-colors">Privacidade</a>
+        <a href="/sobre" class="hover:text-white transition-colors">Sobre Nós</a>
+      </div>
+      <p>© 2026 TeckHome Store</p>
+    </div>
+  </footer>
+
+</body>
+</html>`
 }
 
 // === PÁGINA: TERMOS DE USO ===
