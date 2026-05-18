@@ -248,13 +248,11 @@ function homePage(): string {
   <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="/" class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <i class="fas fa-bolt text-white text-sm"></i>
-          </div>
+        <a href="/" class="flex items-center gap-2">
+          <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md">
           <div>
-            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span></span>
-            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Store Reviews</span>
+            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span> Store</span>
+            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
           </div>
         </a>
         <div class="hidden md:flex items-center gap-6">
@@ -292,11 +290,16 @@ function homePage(): string {
         <span class="pulse-dot w-2 h-2 bg-green-400 rounded-full"></span>
         <span>Reviews e recomendações atualizadas</span>
       </div>
-      <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight">
-        Os melhores produtos<br>
-        <span class="text-indigo-300">para sua casa</span>
-      </h1>
-      <p class="text-lg md:text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-5 mb-8">
+        <img src="/static/logo.png" alt="TeckHome Store" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover shadow-2xl border-2 border-white/20 flex-shrink-0">
+        <div class="text-center sm:text-left">
+          <h1 class="text-4xl md:text-6xl font-black leading-tight">
+            TeckHome Store
+          </h1>
+          <p class="text-xl md:text-2xl text-indigo-300 font-semibold mt-2">Descubra antes de comprar</p>
+        </div>
+      </div>
+      <p class="text-base md:text-lg text-indigo-100 mb-8 max-w-2xl mx-auto">
         Encontre os melhores produtos de tecnologia, eletrodomésticos e muito mais com reviews honestos e links diretos para compra.
       </p>
       <!-- Barra de busca -->
@@ -392,12 +395,12 @@ function homePage(): string {
     <div class="max-w-7xl mx-auto">
       <div class="flex flex-col md:flex-row justify-between items-center gap-6">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-            <i class="fas fa-bolt text-white"></i>
-          </div>
-          <div>
-            <span class="text-xl font-black">Teck<span class="text-indigo-400">Home</span> Store</span>
-            <p class="text-gray-400 text-xs mt-0.5">Reviews e recomendações de produtos</p>
+          <div class="flex items-center gap-2">
+            <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover">
+            <div>
+              <span class="text-xl font-black">Teck<span class="text-indigo-400">Home</span> Store</span>
+              <p class="text-gray-400 text-xs mt-0.5">Descubra antes de comprar</p>
+            </div>
           </div>
         </div>
         <div class="flex gap-6 text-sm text-gray-400">
@@ -587,13 +590,11 @@ function categoryPage(categoryId: string): string {
   <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="/" class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <i class="fas fa-bolt text-white text-sm"></i>
-          </div>
+        <a href="/" class="flex items-center gap-2">
+          <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md">
           <div>
-            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span></span>
-            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Store Reviews</span>
+            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span> Store</span>
+            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
           </div>
         </a>
         <div class="flex items-center gap-4">
@@ -828,12 +829,10 @@ function adminPage(): string {
   <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="/" class="flex items-center gap-3">
-          <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-            <i class="fas fa-bolt text-white text-sm"></i>
-          </div>
+        <a href="/" class="flex items-center gap-2">
+          <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md">
           <div>
-            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span></span>
+            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span> Store</span>
             <span class="text-xs text-gray-400 block leading-none -mt-0.5">Painel Admin</span>
           </div>
         </a>
@@ -1104,33 +1103,6 @@ function adminPage(): string {
       document.getElementById('urlPreview').classList.add('hidden')
     }
 
-    async function deleteProduct(categoryId, productId, title) {
-      if (!confirm(\`Remover "\${title}"?\`)) return
-      try {
-        const res = await fetch(\`/api/products/\${categoryId}/\${productId}\`, { method: 'DELETE' })
-        const data = await res.json()
-        if (data.success) {
-          showToast('Produto removido!', 'success')
-          await loadProducts()
-        }
-      } catch (e) {
-        showToast('Erro ao remover', 'error')
-      }
-    }
-
-    async function toggleFeatured(categoryId, productId) {
-      try {
-        const res = await fetch(\`/api/products/\${categoryId}/\${productId}/featured\`, { method: 'PATCH' })
-        const data = await res.json()
-        if (data.success) {
-          showToast(data.product.featured ? '⭐ Marcado como destaque!' : 'Removido dos destaques', 'success')
-          await loadProducts()
-        }
-      } catch (e) {
-        showToast('Erro ao alterar destaque', 'error')
-      }
-    }
-
     async function loadProducts() {
       const filterCat = document.getElementById('filterCategory').value
 
@@ -1173,7 +1145,7 @@ function adminPage(): string {
               </div>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
-              <button onclick="toggleFeatured('\${p.categoryId}', '\${p.id}')" 
+              <button data-action="featured" data-cat="\${p.categoryId}" data-id="\${p.id}"
                 class="p-2 rounded-xl border transition-all \${p.featured ? 'bg-yellow-50 border-yellow-200 text-yellow-500 hover:bg-yellow-100' : 'bg-gray-50 border-gray-200 text-gray-400 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-500'}"
                 title="\${p.featured ? 'Remover destaque' : 'Marcar como destaque'}">
                 <i class="fas fa-star text-sm"></i>
@@ -1183,7 +1155,7 @@ function adminPage(): string {
                 title="Abrir produto">
                 <i class="fas fa-external-link-alt text-sm"></i>
               </a>
-              <button onclick="deleteProduct('\${p.categoryId}', '\${p.id}', '\${p.title.replace(/'/g, "\\\\'")}')"
+              <button data-action="delete" data-cat="\${p.categoryId}" data-id="\${p.id}"
                 class="p-2 rounded-xl border bg-red-50 border-red-200 text-red-400 hover:bg-red-100 transition-all"
                 title="Remover produto">
                 <i class="fas fa-trash text-sm"></i>
@@ -1193,6 +1165,32 @@ function adminPage(): string {
         \`
       }).join('')
     }
+
+    // Event delegation para botões da lista de produtos
+    document.getElementById('productsList').addEventListener('click', async function(e) {
+      const btn = e.target.closest('button[data-action]')
+      if (!btn) return
+      const action = btn.dataset.action
+      const cat = btn.dataset.cat
+      const id = btn.dataset.id
+      if (action === 'delete') {
+        const found = allProducts.find(p => p.id === id)
+        const title = (found && found.title) || btn.dataset.title || 'este produto'
+        if (!confirm('Remover "' + title + '"?')) return
+        try {
+          const res = await fetch('/api/products/' + cat + '/' + id, { method: 'DELETE' })
+          const data = await res.json()
+          if (data.success) { showToast('Produto removido!', 'success'); await loadProducts() }
+          else showToast(data.error || 'Erro ao remover', 'error')
+        } catch(err) { showToast('Erro de conexão', 'error') }
+      } else if (action === 'featured') {
+        try {
+          const res = await fetch('/api/products/' + cat + '/' + id + '/featured', { method: 'PATCH' })
+          const data = await res.json()
+          if (data.success) { showToast(data.product.featured ? '⭐ Marcado como destaque!' : 'Removido dos destaques', 'success'); await loadProducts() }
+        } catch(err) { showToast('Erro de conexão', 'error') }
+      }
+    })
 
     async function init() {
       const res = await fetch('/api/categories')
