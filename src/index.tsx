@@ -2609,27 +2609,7 @@ function loginPage(erro?: string): string {
         ${erro}
       </div>` : ''}
 
-      <!-- Caixa de credenciais de acesso -->
-      <div class="credentials-box">
-        <p class="text-xs font-bold text-sky-700 mb-2 flex items-center gap-1.5">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0369a1" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          Suas credenciais de acesso:
-        </p>
-        <div class="space-y-1.5">
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-sky-600 font-semibold w-14 flex-shrink-0">Usuário:</span>
-            <code class="text-xs bg-white border border-sky-200 text-sky-800 font-mono px-2.5 py-1 rounded-lg select-all cursor-pointer" onclick="this.parentElement.nextElementSibling && navigator.clipboard && navigator.clipboard.writeText('teckhome_admin')" title="Clique para copiar">teckhome_admin</code>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-sky-600 font-semibold w-14 flex-shrink-0">Senha:</span>
-            <code class="text-xs bg-white border border-sky-200 text-sky-800 font-mono px-2.5 py-1 rounded-lg select-all cursor-pointer" onclick="navigator.clipboard && navigator.clipboard.writeText('TeckHome@2025#Store')" title="Clique para copiar">TeckHome@2025#Store</code>
-          </div>
-        </div>
-        <p class="text-xs text-sky-500 mt-2 flex items-center gap-1">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          Clique no código para copiar
-        </p>
-      </div>
+
 
       <form method="POST" action="/admin/login" class="space-y-4">
 
