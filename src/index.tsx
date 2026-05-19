@@ -2637,8 +2637,9 @@ function loginPage(erro?: string): string {
               type="text"
               name="username"
               id="username"
-              placeholder="teckhome_admin"
-              autocomplete="username"
+              value=""
+              placeholder="Digite seu usuário"
+              autocomplete="off"
               required
               class="input-field"
             >
@@ -2654,7 +2655,9 @@ function loginPage(erro?: string): string {
               type="password"
               name="password"
               id="passwordInput"
-              placeholder="••••••••••••••••••"
+              value=""
+              placeholder="Digite sua senha"
+              autocomplete="new-password"
               autocomplete="current-password"
               required
               class="input-field"
