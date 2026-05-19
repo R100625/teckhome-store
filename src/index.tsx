@@ -446,173 +446,190 @@ function homePage(): string {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+
     /* ===== HERO ===== */
-    .hero-section {
-      position: relative;
-      background: #0b0920;
-      overflow: hidden;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-    }
-    .hero-bg-img {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center center;
-      opacity: 0.38;
-      /* SEM animação — completamente estática */
-      transform: none !important;
-      animation: none !important;
-      transition: none !important;
-      pointer-events: none;
-      user-select: none;
-      z-index: 1;
-      display: block;
-    }
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      background: linear-gradient(160deg,
-        rgba(11,9,32,0.93) 0%,
-        rgba(21,18,60,0.87) 35%,
-        rgba(38,33,90,0.80) 65%,
-        rgba(11,9,32,0.96) 100%
-      );
-      pointer-events: none;
-    }
-    .hero-content { position: relative; z-index: 10; width: 100%; }
-    /* ===== CARDS ===== */
-    .card-hover { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-    .card-hover:hover { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(99,102,241,0.18); }
-    .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    .featured-badge { background: linear-gradient(135deg, #f59e0b, #ef4444); }
-    /* ===== CATEGORIAS ===== */
-    .category-card:hover .category-icon { transform: scale(1.2) rotate(5deg); }
-    .category-icon { transition: transform 0.3s ease; display: inline-block; font-style: normal; }
-    /* ===== BUSCA ===== */
-    .search-box:focus { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.25); }
-    /* ===== ANIMAÇÕES ===== */
-    @keyframes gradientMove { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    .fade-in-up { animation: fadeInUp 0.7s ease forwards; }
-    /* ===== BLOG ===== */
-    .blog-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(99,102,241,0.15); }
-    .blog-card { transition: all 0.3s ease; }
-    /* ===== PRODUCT CARDS ===== */
-    .editorial-footer { background: linear-gradient(135deg, #f8faff, #eef2ff); border-top: 1px solid #e0e7ff; }
-    .editorial-footer:hover { background: linear-gradient(135deg, #eef2ff, #e0e7ff); }
-    .trust-badge { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1px solid #bbf7d0; }
-    /* ===== SCROLLBAR ===== */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
+    .hero-section { position: relative; background: #0b0920; overflow: hidden; min-height: 100vh; display: flex; align-items: center; }
+    .hero-bg-img { position: absolute; top:0; left:0; right:0; bottom:0; width:100%; height:100%; object-fit:cover; object-position:center center; opacity:0.32; transform:none !important; animation:none !important; transition:none !important; pointer-events:none; user-select:none; z-index:1; display:block; }
+    .hero-overlay { position:absolute; inset:0; z-index:2; background:linear-gradient(160deg,rgba(11,9,32,0.95) 0%,rgba(21,18,60,0.88) 35%,rgba(38,33,90,0.82) 65%,rgba(11,9,32,0.97) 100%); pointer-events:none; }
+    .hero-content { position:relative; z-index:10; width:100%; }
+    .hero-eyebrow { display:inline-flex; align-items:center; gap:8px; background:rgba(99,102,241,0.18); border:1px solid rgba(99,102,241,0.35); color:#a5b4fc; font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:6px 16px; border-radius:100px; margin-bottom:24px; backdrop-filter:blur(8px); }
+    .hero-title { font-size:clamp(2.8rem,8vw,6rem); font-weight:900; line-height:1; letter-spacing:-0.03em; }
+    .hero-subtitle { font-size:clamp(1rem,2.5vw,1.25rem); color:rgba(199,210,254,0.88); line-height:1.7; max-width:600px; }
+    .hero-btn-primary { display:inline-flex; align-items:center; gap:10px; background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; font-weight:800; font-size:0.95rem; padding:14px 32px; border-radius:14px; border:none; cursor:pointer; text-decoration:none; transition:all 0.3s cubic-bezier(.4,0,.2,1); box-shadow:0 8px 32px rgba(99,102,241,0.45); }
+    .hero-btn-primary:hover { transform:translateY(-2px); box-shadow:0 16px 40px rgba(99,102,241,0.55); background:linear-gradient(135deg,#818cf8,#6366f1); }
+    .hero-btn-secondary { display:inline-flex; align-items:center; gap:10px; background:rgba(255,255,255,0.08); color:#fff; font-weight:700; font-size:0.95rem; padding:14px 32px; border-radius:14px; border:1px solid rgba(255,255,255,0.22); cursor:pointer; text-decoration:none; transition:all 0.3s; backdrop-filter:blur(8px); }
+    .hero-btn-secondary:hover { background:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.38); transform:translateY(-2px); }
+
     /* ===== NAVBAR ===== */
-    .nav-link { position: relative; }
-    .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: #6366f1; transition: width 0.3s; }
-    .nav-link:hover::after { width: 100%; }
-    /* ===== STAT ===== */
-    .stat-counter { background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06)); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.18); }
-    /* ===== EMOJI / ÍCONES ===== */
-    .emoji-icon { font-style: normal; font-family: 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif !important; }
-    /* Força renderização correta dos ícones FontAwesome */
-    i.fas, i.fa, i.far { font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; font-style: normal !important; }
-    i.fab { font-family: 'Font Awesome 6 Brands' !important; font-weight: 400 !important; font-style: normal !important; }
-    /* Garante que ícones não herdem cor branca indesejada em fundos claros */
-    .text-indigo-500, .text-indigo-600, .text-indigo-700 { color: inherit; }
-    i.fas.text-indigo-500 { color: #6366f1 !important; }
-    i.fas.text-indigo-400 { color: #818cf8 !important; }
-    i.fas.text-white { color: #ffffff !important; }
-    i.fas.text-xs { font-size: 0.75rem !important; }
+    .nav-link { position:relative; padding-bottom:2px; }
+    .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:2px; background:linear-gradient(90deg,#6366f1,#818cf8); border-radius:2px; transition:width 0.3s ease; }
+    .nav-link:hover::after { width:100%; }
+    .navbar-glass { background:rgba(255,255,255,0.97); backdrop-filter:blur(20px); border-bottom:1px solid rgba(99,102,241,0.1); box-shadow:0 1px 24px rgba(99,102,241,0.07); }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-label { display:inline-flex; align-items:center; gap:6px; background:linear-gradient(135deg,#eef2ff,#e0e7ff); color:#4f46e5; font-size:0.7rem; font-weight:800; letter-spacing:0.14em; text-transform:uppercase; padding:5px 14px; border-radius:100px; border:1px solid #c7d2fe; margin-bottom:12px; }
+    .section-title { font-size:clamp(1.6rem,4vw,2.4rem); font-weight:900; color:#111827; letter-spacing:-0.02em; line-height:1.15; }
+    .section-divider { width:48px; height:4px; background:linear-gradient(90deg,#6366f1,#818cf8); border-radius:4px; margin-top:12px; }
+
+    /* ===== CARDS ===== */
+    .card-hover { transition:all 0.32s cubic-bezier(.4,0,.2,1); }
+    .card-hover:hover { transform:translateY(-8px); box-shadow:0 24px 56px rgba(99,102,241,0.16); }
+    .shimmer { background:linear-gradient(90deg,#f3f4f6 25%,#e9eaec 50%,#f3f4f6 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:16px; }
+    @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+    .featured-badge { background:linear-gradient(135deg,#f59e0b,#ef4444); }
+
+    /* ===== CATEGORY CARDS ===== */
+    .category-card { position:relative; overflow:hidden; }
+    .category-card::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,transparent 60%,rgba(99,102,241,0.04) 100%); opacity:0; transition:opacity 0.3s; border-radius:inherit; }
+    .category-card:hover::before { opacity:1; }
+    .category-card:hover .cat-icon-wrap { transform:scale(1.08); }
+    .cat-icon-wrap { transition:transform 0.3s cubic-bezier(.4,0,.2,1); }
+
+    /* ===== BLOG CARDS ===== */
+    .blog-card { transition:all 0.3s cubic-bezier(.4,0,.2,1); }
+    .blog-card:hover { transform:translateY(-6px); box-shadow:0 20px 48px rgba(99,102,241,0.14); }
+    .blog-card-img { overflow:hidden; border-radius:12px 12px 0 0; }
+    .blog-card-img img { transition:transform 0.5s cubic-bezier(.4,0,.2,1); }
+    .blog-card:hover .blog-card-img img { transform:scale(1.05); }
+
+    /* ===== PRODUCT CARDS ===== */
+    .editorial-footer { background:linear-gradient(135deg,#f8faff,#eef2ff); border-top:1px solid #e0e7ff; }
+    .editorial-footer:hover { background:linear-gradient(135deg,#eef2ff,#e0e7ff); }
+    .trust-badge { background:linear-gradient(135deg,#f0fdf4,#dcfce7); border:1px solid #bbf7d0; }
+    .product-card-img { overflow:hidden; }
+    .product-card-img img { transition:transform 0.4s cubic-bezier(.4,0,.2,1); }
+    .card-hover:hover .product-card-img img { transform:scale(1.04); }
+
+    /* ===== STAT COUNTER ===== */
+    .stat-counter { background:linear-gradient(135deg,rgba(255,255,255,0.13),rgba(255,255,255,0.06)); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.18); transition:all 0.3s; }
+    .stat-counter:hover { background:linear-gradient(135deg,rgba(255,255,255,0.2),rgba(255,255,255,0.1)); border-color:rgba(255,255,255,0.3); transform:translateY(-2px); }
+
+    /* ===== BUSCA ===== */
+    .search-box { transition:all 0.3s; }
+    .search-box:focus { box-shadow:0 0 0 4px rgba(99,102,241,0.2); border-color:#6366f1 !important; }
+
+    /* ===== ANIMAÇÕES ===== */
+    @keyframes gradientMove { 0%{background-position:0% 0} 100%{background-position:200% 0} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeInDown { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .fade-in-up { animation:fadeInUp 0.7s ease forwards; }
+    .fade-in-up-2 { animation:fadeInUp 0.7s 0.15s ease both; }
+    .fade-in-up-3 { animation:fadeInUp 0.7s 0.3s ease both; }
+    .fade-in-up-4 { animation:fadeInUp 0.7s 0.45s ease both; }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#f1f1f1; }
+    ::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#6366f1,#818cf8); border-radius:6px; }
+
+    /* ===== TRUST STRIP ===== */
+    .trust-strip { background:linear-gradient(90deg,#1e1b4b,#312e81,#1e3a5f); }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; font-weight:700; padding:11px 24px; border-radius:12px; border:none; cursor:pointer; text-decoration:none; transition:all 0.3s; box-shadow:0 4px 16px rgba(99,102,241,0.35); font-size:0.875rem; }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(99,102,241,0.45); }
+    .btn-outline { display:inline-flex; align-items:center; gap:8px; background:transparent; color:#6366f1; font-weight:700; padding:10px 24px; border-radius:12px; border:2px solid #6366f1; cursor:pointer; text-decoration:none; transition:all 0.3s; font-size:0.875rem; }
+    .btn-outline:hover { background:#6366f1; color:#fff; transform:translateY(-2px); }
+
+    /* ===== FONTAWESOME ===== */
+    .emoji-icon { font-style:normal; font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif !important; }
+    i.fas, i.fa, i.far { font-family:'Font Awesome 6 Free' !important; font-weight:900 !important; font-style:normal !important; }
+    i.fab { font-family:'Font Awesome 6 Brands' !important; font-weight:400 !important; font-style:normal !important; }
+    i.fas.text-indigo-500 { color:#6366f1 !important; }
+    i.fas.text-indigo-400 { color:#818cf8 !important; }
+    i.fas.text-white { color:#ffffff !important; }
+    i.fas.text-xs { font-size:0.75rem !important; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
   <!-- NAVBAR -->
-  <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+  <nav class="navbar-glass sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="/" class="flex items-center gap-2">
-          <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md">
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="relative">
+            <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md group-hover:shadow-indigo-200 transition-shadow">
+            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+          </div>
           <div>
-            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span> Store</span>
-            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
+            <span class="text-lg font-black text-gray-900 tracking-tight">Teck<span class="text-indigo-600">Home</span> Store</span>
+            <span class="text-xs text-gray-400 block leading-none -mt-0.5 font-medium">Descubra antes de comprar</span>
           </div>
         </a>
-        <div class="hidden md:flex items-center gap-6">
-          <a href="/" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Início</a>
-          <a href="#destaques" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Destaques</a>
-          <a href="#categorias" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Categorias</a>
-          <a href="#blog" class="nav-link text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">Blog</a>
-          <a href="/admin" class="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2">
-            <i class="fas fa-plus text-xs"></i> Adicionar Produto
+        <div class="hidden md:flex items-center gap-7">
+          <a href="/" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Início</a>
+          <a href="#destaques" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Destaques</a>
+          <a href="#categorias" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Categorias</a>
+          <a href="#blog" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Blog</a>
+          <a href="/admin" class="btn-primary text-sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            Adicionar Produto
           </a>
         </div>
-        <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100">
-          <i class="fas fa-bars"></i>
+        <button id="mobileMenuBtn" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         </button>
       </div>
     </div>
     <!-- Mobile menu -->
-    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-100 bg-white px-4 pb-4">
-      <div class="flex flex-col gap-3 pt-3">
-        <a href="/" class="text-sm font-medium text-gray-700 py-2">Início</a>
-        <a href="#categorias" class="text-sm font-medium text-gray-700 py-2">Categorias</a>
-        <a href="#destaques" class="text-sm font-medium text-gray-700 py-2">Destaques</a>
-        <a href="/admin" class="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl text-center">+ Adicionar Produto</a>
+    <div id="mobileMenu" class="hidden md:hidden border-t border-gray-100 bg-white px-4 pb-5">
+      <div class="flex flex-col gap-1 pt-3">
+        <a href="/" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Início</a>
+        <a href="#categorias" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Categorias</a>
+        <a href="#destaques" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Destaques</a>
+        <a href="#blog" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Blog</a>
+        <a href="/admin" class="mt-2 btn-primary text-sm text-center justify-center">+ Adicionar Produto</a>
       </div>
     </div>
   </nav>
 
   <!-- HERO -->
-  <section class="hero-section text-white">
-    <!-- Imagem de fundo ESTÁTICA — cobre toda a tela, sem animação -->
-    <img src="/static/logo.png"
-         alt=""
-         aria-hidden="true"
-         class="hero-bg-img"
-         draggable="false">
-    <!-- Overlay escuro para manter legibilidade -->
+  <section class="hero-section text-white" aria-label="Seção principal">
+    <img src="/static/logo.png" alt="" aria-hidden="true" class="hero-bg-img" draggable="false">
     <div class="hero-overlay"></div>
-    <!-- Efeito de orbs decorativos (acima da overlay, abaixo do conteúdo) -->
+    <!-- Orbs decorativos -->
     <div class="absolute inset-0 pointer-events-none" style="z-index:3;" aria-hidden="true">
-      <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-indigo-600 rounded-full opacity-8 blur-3xl"></div>
-      <div class="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-purple-700 rounded-full opacity-6 blur-3xl"></div>
-      <!-- Grade sutil -->
-      <div class="absolute inset-0" style="opacity:0.04; background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px); background-size: 60px 60px;"></div>
+      <div class="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full" style="background:radial-gradient(circle,rgba(99,102,241,0.18) 0%,transparent 70%);"></div>
+      <div class="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full" style="background:radial-gradient(circle,rgba(139,92,246,0.14) 0%,transparent 70%);"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full" style="background:radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 60%);"></div>
+      <!-- Grid sutil -->
+      <div class="absolute inset-0" style="opacity:0.035;background-image:linear-gradient(rgba(255,255,255,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.1) 1px,transparent 1px);background-size:72px 72px;"></div>
     </div>
 
-    <!-- Conteúdo do hero -->
-    <div class="hero-content px-4 py-24 md:py-32">
-      <div class="max-w-5xl mx-auto text-center">
+    <div class="hero-content px-4 py-24 md:py-36">
+      <div class="max-w-4xl mx-auto text-center">
 
-        <!-- Título principal -->
-        <div class="fade-in-up mb-6">
-          <h1 class="text-6xl md:text-8xl font-black leading-none tracking-tighter drop-shadow-2xl">
-            Teck<span class="text-indigo-300">Home</span>
-          </h1>
-          <h2 class="text-4xl md:text-6xl font-black leading-none tracking-tighter text-white/90 drop-shadow-2xl mt-1">
-            Store
-          </h2>
+        <!-- Eyebrow label -->
+        <div class="fade-in-up flex justify-center mb-6">
+          <span class="hero-eyebrow">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Portal de Reviews Verificados
+          </span>
         </div>
 
-        <!-- Subtítulo persuasivo -->
-        <p class="text-lg md:text-2xl text-indigo-100/90 mb-10 max-w-2xl mx-auto leading-relaxed fade-in-up font-medium drop-shadow-lg">
-          Pare de desperdiçar dinheiro em produtos que decepcionam.<br class="hidden md:block">
-          Nossa equipe analisa e recomenda <strong class="text-white">somente o que realmente vale a pena.</strong>
+        <!-- Título principal -->
+        <div class="fade-in-up-2 mb-6">
+          <h1 class="hero-title drop-shadow-2xl">
+            <span class="block text-white">TECKHOME STORE</span>
+            <span class="block" style="background:linear-gradient(135deg,#a5b4fc,#818cf8,#c4b5fd);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">DESCUBRA ANTES DE COMPRAR</span>
+          </h1>
+        </div>
+
+        <!-- Subtítulo -->
+        <p class="hero-subtitle mx-auto mb-10 fade-in-up-3">
+          Reviews inteligentes, comparativos e recomendações para sua casa e tecnologia.<br class="hidden md:block">
+          <span class="text-white font-semibold">Análises imparciais para você comprar com confiança.</span>
         </p>
 
         <!-- Barra de busca -->
-        <div class="max-w-xl mx-auto relative mb-12 fade-in-up">
+        <div class="max-w-lg mx-auto relative mb-12 fade-in-up-3">
           <input
             id="searchInput"
             type="text"
-            placeholder="Buscar produtos, categorias..."
-            class="search-box w-full py-4 px-6 pr-16 rounded-2xl text-gray-800 text-sm font-medium bg-white shadow-2xl outline-none border-2 border-transparent focus:border-indigo-300"
+            placeholder="Buscar produtos, categorias, reviews..."
+            class="search-box w-full py-4 px-6 pr-16 rounded-2xl text-gray-800 text-sm font-medium bg-white shadow-2xl outline-none border-2 border-transparent"
             oninput="handleSearch(this.value)"
           >
           <button class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center hover:bg-indigo-700 transition-colors shadow-lg">
@@ -620,33 +637,41 @@ function homePage(): string {
           </button>
         </div>
 
-        <!-- Stats de confiança -->
-        <div class="grid grid-cols-3 gap-4 max-w-sm mx-auto fade-in-up">
-          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
-            <div class="text-3xl font-black text-white">7</div>
-            <div class="text-indigo-300 text-xs mt-1 font-semibold uppercase tracking-wider">Categorias</div>
-          </div>
-          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
-            <div class="text-3xl font-black text-white">100%</div>
-            <div class="text-indigo-300 text-xs mt-1 font-semibold uppercase tracking-wider">Imparcial</div>
-          </div>
-          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
-            <div class="text-xl font-black text-white mt-1">&#128274;</div>
-            <div class="text-indigo-300 text-xs mt-1 font-semibold uppercase tracking-wider">Verificado</div>
-          </div>
+        <!-- CTAs -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-14 fade-in-up-3">
+          <a href="#blog" class="hero-btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Ver Reviews
+          </a>
+          <a href="#categorias" class="hero-btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Explorar Categorias
+          </a>
         </div>
 
-        <!-- CTAs -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10 fade-in-up">
-          <a href="#destaques" class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl transition-all shadow-xl hover:shadow-indigo-500/30 text-base">
-            <i class="fas fa-star text-sm"></i> Ver Destaques
-          </a>
-          <a href="#categorias" class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-bold px-8 py-4 rounded-2xl transition-all text-base">
-            <i class="fas fa-th-large text-sm"></i> Explorar Categorias
-          </a>
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto fade-in-up-4">
+          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
+            <div class="text-2xl font-black text-white">7</div>
+            <div class="text-indigo-300 text-xs mt-1 font-bold uppercase tracking-wider">Categorias</div>
+          </div>
+          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
+            <div class="text-2xl font-black text-white">100%</div>
+            <div class="text-indigo-300 text-xs mt-1 font-bold uppercase tracking-wider">Imparcial</div>
+          </div>
+          <div class="stat-counter rounded-2xl px-3 py-4 text-center">
+            <svg class="mx-auto mb-1" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div class="text-indigo-300 text-xs font-bold uppercase tracking-wider">Verificado</div>
+          </div>
         </div>
 
       </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-50" aria-hidden="true">
+      <span class="text-white text-xs font-medium tracking-widest uppercase">Explorar</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" class="animate-bounce"><path d="M7 10l5 5 5-5"/></svg>
     </div>
   </section>
 
@@ -660,68 +685,103 @@ function homePage(): string {
     </div>
   </div>
 
+  <!-- TRUST STRIP -->
+  <div class="trust-strip py-3 px-4 overflow-hidden">
+    <div class="max-w-7xl mx-auto flex items-center justify-center gap-8 text-white/80 text-xs font-semibold uppercase tracking-wider flex-wrap gap-y-2">
+      <span class="flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Reviews Verificados</span>
+      <span class="text-white/30">·</span>
+      <span class="flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Análises Imparciais</span>
+      <span class="text-white/30">·</span>
+      <span class="flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Atualizado 2026</span>
+      <span class="text-white/30">·</span>
+      <span class="flex items-center gap-2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Foco no Lar</span>
+    </div>
+  </div>
+
   <!-- DESTAQUES -->
-  <section id="destaques" class="bg-white py-16 px-4">
+  <section id="destaques" class="bg-white py-20 px-4">
     <div class="max-w-7xl mx-auto">
-      <div class="flex items-center justify-between mb-10">
+      <div class="flex items-end justify-between mb-12">
         <div>
-          <h2 class="text-3xl font-black text-gray-900 mb-1">Produtos em Destaque</h2>
-          <p class="text-gray-500">Os mais recomendados pela nossa equipe</p>
+          <span class="section-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Em Destaque</span>
+          <h2 class="section-title">Produtos Recomendados</h2>
+          <p class="text-gray-500 mt-2 text-sm">Os mais bem avaliados pela nossa equipe editorial</p>
+          <div class="section-divider"></div>
         </div>
-        <a href="/admin" class="hidden md:flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors text-sm">
-          <i class="fas fa-plus"></i> Adicionar
+        <a href="/admin" class="hidden md:flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors text-sm border border-indigo-200 px-4 py-2 rounded-xl hover:bg-indigo-50">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Adicionar
         </a>
       </div>
       <div id="featuredGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div class="shimmer rounded-2xl h-80"></div>
-        <div class="shimmer rounded-2xl h-80"></div>
-        <div class="shimmer rounded-2xl h-80"></div>
-        <div class="shimmer rounded-2xl h-80"></div>
+        <div class="shimmer h-80"></div>
+        <div class="shimmer h-80"></div>
+        <div class="shimmer h-80"></div>
+        <div class="shimmer h-80"></div>
       </div>
-      <div id="noFeatured" class="hidden text-center py-16 text-gray-400">
-        <i class="fas fa-star text-5xl mb-4 opacity-30"></i>
-        <p class="text-lg font-medium mb-2">Nenhum produto em destaque ainda</p>
-        <a href="/admin" class="text-indigo-600 font-medium hover:underline">Adicionar produtos agora →</a>
+      <div id="noFeatured" class="hidden text-center py-20">
+        <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <p class="text-gray-500 font-medium mb-3">Nenhum produto em destaque ainda</p>
+        <a href="/admin" class="btn-primary inline-flex">Adicionar produtos agora</a>
       </div>
     </div>
   </section>
 
   <!-- CATEGORIAS -->
-  <section id="categorias" class="max-w-7xl mx-auto px-4 py-16">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-black text-gray-900 mb-3">Explore por Categoria</h2>
-      <p class="text-gray-500 text-lg">Encontre exatamente o que você precisa</p>
-    </div>
-    <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
-      <div class="shimmer rounded-2xl h-36"></div>
+  <section id="categorias" class="px-4 py-20" style="background:linear-gradient(135deg,#f8faff 0%,#f0f4ff 50%,#f8faff 100%);">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="section-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Categorias
+        </span>
+        <h2 class="section-title">Explore por Categoria</h2>
+        <p class="text-gray-500 mt-3 max-w-md mx-auto">Encontre exatamente o produto que você procura, organizado por categoria</p>
+        <div class="section-divider mx-auto"></div>
+      </div>
+      <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+        <div class="shimmer h-36"></div>
+        <div class="shimmer h-36"></div>
+        <div class="shimmer h-36"></div>
+        <div class="shimmer h-36"></div>
+        <div class="shimmer h-36"></div>
+        <div class="shimmer h-36"></div>
+        <div class="shimmer h-36"></div>
+      </div>
     </div>
   </section>
 
-
   <!-- BLOG -->
-  <section id="blog" class="max-w-7xl mx-auto px-4 py-16">
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12">
-      <div>
-        <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3">Blog TeckHome</span>
-        <h2 class="text-3xl font-black text-gray-900 mb-2">Artigos e Guias de Compra</h2>
-        <p class="text-gray-500 max-w-xl">Conteúdo especializado para ajudar você a fazer a melhor escolha antes de comprar.</p>
+  <section id="blog" class="bg-white px-4 py-20">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-14">
+        <div>
+          <span class="section-label">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Blog & Reviews
+          </span>
+          <h2 class="section-title">Artigos e Guias de Compra</h2>
+          <p class="text-gray-500 mt-2 max-w-lg">Conteúdo editorial especializado para você tomar a melhor decisão antes de comprar.</p>
+          <div class="section-divider"></div>
+        </div>
+        <a href="#blog" class="btn-outline hidden md:inline-flex flex-shrink-0">
+          Ver todos os artigos
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
       </div>
-    </div>
-    <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="shimmer rounded-2xl h-80"></div>
-      <div class="shimmer rounded-2xl h-80"></div>
-      <div class="shimmer rounded-2xl h-80"></div>
-    </div>
-    <div id="noBlog" class="hidden text-center py-16 text-gray-400">
-      <i class="fas fa-newspaper text-5xl mb-4 opacity-30"></i>
-      <p class="text-lg font-medium mb-2">Nenhum artigo publicado ainda</p>
-      <a href="/admin" class="text-indigo-600 font-medium hover:underline">Criar primeiro artigo →</a>
+      <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+        <div class="shimmer h-80"></div>
+        <div class="shimmer h-80"></div>
+        <div class="shimmer h-80"></div>
+      </div>
+      <div id="noBlog" class="hidden text-center py-20">
+        <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <p class="text-gray-500 font-medium mb-3">Nenhum artigo publicado ainda</p>
+        <a href="/admin" class="btn-primary inline-flex">Criar primeiro artigo</a>
+      </div>
     </div>
   </section>
 
@@ -1055,17 +1115,19 @@ function homePage(): string {
       
       const grid = document.getElementById('categoriesGrid')
       grid.innerHTML = categories.map(cat => \`
-        <a href="/categoria/\${cat.id}" class="category-card card-hover bg-white rounded-2xl p-6 shadow-md border border-gray-100 flex flex-col items-start gap-3 cursor-pointer group" style="text-decoration:none;">
-          <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, \${cat.color}18, \${cat.color}35); border: 2px solid \${cat.color}40;">
+        <a href="/categoria/\${cat.id}" class="category-card card-hover bg-white rounded-2xl p-5 border border-gray-100 flex flex-col items-start gap-4 cursor-pointer group" style="text-decoration:none; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+          <div class="cat-icon-wrap w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,\${cat.color}15,\${cat.color}30); border:1.5px solid \${cat.color}30;">
             \${getCatSvg(cat.id, cat.color)}
           </div>
-          <div>
-            <h3 class="font-bold text-gray-800 group-hover:text-indigo-600 transition-colors text-base">\${cat.name}</h3>
-            <p class="text-gray-400 text-xs mt-0.5 line-clamp-2">\${cat.description}</p>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-black text-gray-800 group-hover:text-indigo-600 transition-colors text-sm tracking-tight mb-1">\${cat.name}</h3>
+            <p class="text-gray-400 text-xs leading-relaxed line-clamp-2">\${cat.description}</p>
           </div>
-          <div class="flex items-center gap-1.5 mt-auto" style="color:\${cat.color}; font-size:0.75rem; font-weight:700;">
-            Ver produtos 
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="\${cat.color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="w-full flex items-center justify-between pt-2 border-t" style="border-color:\${cat.color}20;">
+            <span style="color:\${cat.color}; font-size:0.72rem; font-weight:800; letter-spacing:0.04em; text-transform:uppercase;">Ver produtos</span>
+            <div class="w-6 h-6 rounded-lg flex items-center justify-center" style="background:\${cat.color}15;">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M7 3l3 3-3 3" stroke="\${cat.color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
           </div>
         </a>
       \`).join('')
@@ -1192,33 +1254,43 @@ function homePage(): string {
         return
       }
 
-      grid.innerHTML = allArticles.map(art => {
+      grid.innerHTML = allArticles.map((art, i) => {
         const artUrl = art.url || (art.slug ? \`/artigo/\${art.slug}\` : '#blog')
+        const isFirst = i === 0
         return \`
-        <a href="\${artUrl}" class="blog-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col cursor-pointer no-underline" itemscope itemtype="https://schema.org/Article" style="text-decoration:none;">
-          <div class="relative h-52 overflow-hidden bg-gray-100">
+        <a href="\${artUrl}" class="blog-card bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col cursor-pointer" style="text-decoration:none; box-shadow:0 2px 16px rgba(99,102,241,0.07);" itemscope itemtype="https://schema.org/Article">
+          <div class="blog-card-img relative bg-gray-100" style="height:\${isFirst ? '220px' : '200px'}">
             <img src="\${art.image || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'}"
               alt="\${art.title}"
-              class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+              class="w-full h-full object-cover"
+              loading="lazy"
               onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'"
               itemprop="image">
+            <!-- Gradient overlay -->
+            <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.45) 0%,transparent 55%);"></div>
             <div class="absolute top-3 left-3">
-              <span class="bg-indigo-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg shadow">\${art.categoryIcon || ''} \${art.category || 'Geral'}</span>
+              <span class="bg-indigo-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full shadow">\${art.category || 'Review'}</span>
             </div>
             <div class="absolute top-3 right-3">
-              <span class="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-lg font-medium">\${art.readTime || '4 min'} leitura</span>
+              <span class="bg-black/50 backdrop-blur-sm text-white/90 text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                \${art.readTime || '4 min'}
+              </span>
             </div>
           </div>
-          <div class="p-5 flex flex-col flex-1 gap-3">
-            <h3 class="font-black text-gray-900 text-base leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors" itemprop="headline">\${art.title}</h3>
-            <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 flex-1" itemprop="description">\${art.excerpt}</p>
+          <div class="p-5 flex flex-col flex-1">
+            <h3 class="font-black text-gray-900 text-base leading-snug mb-2 line-clamp-2" style="letter-spacing:-0.01em;" itemprop="headline">\${art.title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed line-clamp-3 flex-1 mb-4" itemprop="description">\${art.excerpt}</p>
             <div class="pt-3 border-t border-gray-100 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-md flex items-center justify-center text-xs" style="background: linear-gradient(135deg, #1e1b4b, #3730a3); color:white; font-size:10px;">TH</div>
-                <span class="text-xs text-gray-500 font-medium">Equipe TeckHome</span>
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-black" style="background:linear-gradient(135deg,#4f46e5,#3730a3);">TH</div>
+                <div>
+                  <div class="text-xs font-bold text-gray-700">Equipe TeckHome</div>
+                  <div class="text-xs text-gray-400">Editorial</div>
+                </div>
               </div>
-              <span class="text-xs font-bold text-indigo-600 flex items-center gap-1">
-                Ler artigo <i class="fas fa-arrow-right text-xs"></i>
+              <span class="text-xs font-black text-indigo-600 flex items-center gap-1.5 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">
+                Ler <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </span>
             </div>
           </div>
@@ -2426,21 +2498,42 @@ function articlePage(article: any): string {
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
-    .article-body h2 { font-size: 1.5rem; font-weight: 800; color: #111827; margin: 2rem 0 0.75rem; }
-    .article-body h3 { font-size: 1.15rem; font-weight: 700; color: #1f2937; margin: 1.5rem 0 0.5rem; }
-    .article-body p { color: #374151; line-height: 1.9; margin-bottom: 1rem; font-size: 1.05rem; }
-    .article-body ul, .article-body ol { margin: 0.75rem 0 1rem 1.5rem; }
-    .article-body li { color: #374151; line-height: 1.8; margin-bottom: 0.4rem; font-size: 1.05rem; }
-    .article-body ul { list-style: disc; }
-    .article-body ol { list-style: decimal; }
-    .article-body strong { color: #111827; font-weight: 700; }
-    .hero-article { position: relative; height: 420px; overflow: hidden; }
-    .hero-article img { width: 100%; height: 100%; object-fit: cover; }
-    .hero-article-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%); }
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
-    .fa, .fas { font-family: 'Font Awesome 6 Free' !important; }
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+
+    /* Reading progress bar */
+    #readingProgress { position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg,#6366f1,#818cf8,#38bdf8); z-index:9999; transition:width 0.1s linear; }
+
+    /* Article body typography */
+    .article-body h2 { font-size:1.6rem; font-weight:900; color:#111827; margin:2.5rem 0 0.75rem; padding-left:16px; border-left:4px solid #6366f1; line-height:1.3; }
+    .article-body h3 { font-size:1.2rem; font-weight:800; color:#1f2937; margin:1.75rem 0 0.6rem; }
+    .article-body p { color:#374151; line-height:1.95; margin-bottom:1.25rem; font-size:1.07rem; }
+    .article-body ul, .article-body ol { margin:0.75rem 0 1.25rem 1.75rem; }
+    .article-body li { color:#374151; line-height:1.85; margin-bottom:0.5rem; font-size:1.05rem; }
+    .article-body ul { list-style:disc; }
+    .article-body ol { list-style:decimal; }
+    .article-body strong { color:#111827; font-weight:800; }
+    .article-body a { color:#6366f1; text-decoration:underline; }
+
+    /* Hero article */
+    .hero-article { position:relative; height:480px; overflow:hidden; }
+    .hero-article img { width:100%; height:100%; object-fit:cover; }
+    .hero-article-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.35) 40%,rgba(0,0,0,0.82) 100%); }
+
+    /* Navbar article */
+    .navbar-article { background:rgba(255,255,255,0.97); backdrop-filter:blur(20px); border-bottom:1px solid rgba(99,102,241,0.1); box-shadow:0 1px 20px rgba(99,102,241,0.07); }
+
+    /* Related cards */
+    .related-card { transition:all 0.3s cubic-bezier(.4,0,.2,1); }
+    .related-card:hover { transform:translateY(-5px); box-shadow:0 20px 48px rgba(99,102,241,0.14); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:#f1f1f1; }
+    ::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#6366f1,#818cf8); border-radius:6px; }
+
+    /* FA fix */
+    i.fas, i.fa, i.far { font-family:'Font Awesome 6 Free' !important; font-weight:900 !important; font-style:normal !important; }
+    i.fab { font-family:'Font Awesome 6 Brands' !important; font-weight:400 !important; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
