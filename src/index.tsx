@@ -2637,9 +2637,10 @@ function loginPage(erro?: string): string {
               type="text"
               name="username"
               id="username"
-              value=""
-              placeholder="Digite seu usuário"
+              placeholder=""
               autocomplete="off"
+              readonly
+              onfocus="this.removeAttribute('readonly')"
               required
               class="input-field"
             >
@@ -2655,10 +2656,10 @@ function loginPage(erro?: string): string {
               type="password"
               name="password"
               id="passwordInput"
-              value=""
-              placeholder="Digite sua senha"
-              autocomplete="new-password"
-              autocomplete="current-password"
+              placeholder=""
+              autocomplete="off"
+              readonly
+              onfocus="this.removeAttribute('readonly')"
               required
               class="input-field"
             >
