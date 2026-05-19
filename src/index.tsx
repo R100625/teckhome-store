@@ -227,12 +227,22 @@ app.get('/admin', (c) => {
 })
 
 app.post('/admin/login', async (c) => {
-  const body = await c.req.parseBody()
-  const username = body['username'] as string
-  const password = body['password'] as string
+  let username = ''
+  let password = ''
+  try {
+    const body = await c.req.parseBody()
+    username = (body['username'] as string || '').trim()
+    password = (body['password'] as string || '').trim()
+  } catch {
+    // fallback: tenta ler como texto
+    const text = await c.req.text()
+    const params = new URLSearchParams(text)
+    username = (params.get('username') || '').trim()
+    password = (params.get('password') || '').trim()
+  }
   if (username === ADMIN_USER && password === ADMIN_PASS) {
     const res = c.redirect('/admin')
-    res.headers.set('Set-Cookie', `${COOKIE_NAME}=${COOKIE_VALUE}; Path=/; HttpOnly; Max-Age=86400; SameSite=Strict`)
+    res.headers.set('Set-Cookie', `${COOKIE_NAME}=${COOKIE_VALUE}; Path=/; HttpOnly; Max-Age=86400; SameSite=Lax; Secure`)
     return res
   }
   return c.html(loginPage('Usuário ou senha inválidos. Tente novamente.'))
