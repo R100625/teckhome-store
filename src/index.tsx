@@ -563,10 +563,7 @@ function homePage(): string {
           <a href="#destaques" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Destaques</a>
           <a href="#categorias" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Categorias</a>
           <a href="#blog" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Blog</a>
-          <a href="/admin" class="btn-primary text-sm">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
-            Adicionar Produto
-          </a>
+
         </div>
         <button id="mobileMenuBtn" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
@@ -580,7 +577,7 @@ function homePage(): string {
         <a href="#categorias" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Categorias</a>
         <a href="#destaques" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Destaques</a>
         <a href="#blog" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Blog</a>
-        <a href="/admin" class="mt-2 btn-primary text-sm text-center justify-center">+ Adicionar Produto</a>
+
       </div>
     </div>
   </nav>
@@ -708,9 +705,7 @@ function homePage(): string {
           <p class="text-gray-500 mt-2 text-sm">Os mais bem avaliados pela nossa equipe editorial</p>
           <div class="section-divider"></div>
         </div>
-        <a href="/admin" class="hidden md:flex items-center gap-2 text-indigo-600 font-semibold hover:text-indigo-800 transition-colors text-sm border border-indigo-200 px-4 py-2 rounded-xl hover:bg-indigo-50">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg> Adicionar
-        </a>
+
       </div>
       <div id="featuredGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <div class="shimmer h-80"></div>
@@ -723,7 +718,6 @@ function homePage(): string {
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         </div>
         <p class="text-gray-500 font-medium mb-3">Nenhum produto em destaque ainda</p>
-        <a href="/admin" class="btn-primary inline-flex">Adicionar produtos agora</a>
       </div>
     </div>
   </section>
@@ -780,7 +774,6 @@ function homePage(): string {
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </div>
         <p class="text-gray-500 font-medium mb-3">Nenhum artigo publicado ainda</p>
-        <a href="/admin" class="btn-primary inline-flex">Criar primeiro artigo</a>
       </div>
     </div>
   </section>
@@ -935,7 +928,7 @@ function homePage(): string {
             <li><a href="#destaques" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-star text-xs text-indigo-400"></i> Destaques</a></li>
             <li><a href="#categorias" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-th-large text-xs text-indigo-400"></i> Categorias</a></li>
             <li><a href="#equipe-teckhome" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-users text-xs text-indigo-400"></i> Equipe TeckHome</a></li>
-            <li><a href="/admin" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-lock text-xs text-indigo-400"></i> Painel Admin</a></li>
+
           </ul>
         </div>
 
@@ -1355,9 +1348,7 @@ function categoryPage(categoryId: string): string {
           <a href="/" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition-colors flex items-center gap-1">
             <i class="fas fa-home text-xs"></i> Início
           </a>
-          <a href="/admin" class="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2">
-            <i class="fas fa-plus text-xs"></i> Adicionar
-          </a>
+
         </div>
       </div>
     </div>
@@ -1407,10 +1398,7 @@ function categoryPage(categoryId: string): string {
       </div>
       <h3 class="text-xl font-bold text-gray-600 mb-2">Nenhum produto nesta categoria ainda</h3>
       <p class="text-gray-400 mb-6">Seja o primeiro a adicionar um produto!</p>
-      <a href="/admin" class="bg-indigo-600 text-white font-semibold px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors inline-flex items-center gap-2">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Adicionar Produto
-      </a>
+
     </div>
   </main>
 
@@ -1431,7 +1419,7 @@ function categoryPage(categoryId: string): string {
     <div id="noBlog" class="hidden text-center py-16 text-gray-400">
       <i class="fas fa-newspaper text-5xl mb-4 opacity-30"></i>
       <p class="text-lg font-medium mb-2">Nenhum artigo publicado ainda</p>
-      <a href="/admin" class="text-indigo-600 font-medium hover:underline">Criar primeiro artigo →</a>
+
     </div>
   </section>
 
