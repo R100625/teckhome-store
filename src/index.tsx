@@ -345,7 +345,7 @@ app.get('/artigo/:slug', async (c) => {
     'guia-eletronicos': {
       slug: 'guia-eletronicos',
       title: 'Como escolher o melhor smartphone em 2026: tudo que você precisa saber antes de comprar',
-      category: 'Eletrônicos', categoryIcon: '📱',
+      category: 'Eletrônicos', categoryIcon: '📱', categoryId: 'eletronicos',
       image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=1200&q=80',
       readTime: '6 min',
       keywords: 'melhor smartphone 2026, como escolher celular, review celular custo-benefício',
@@ -355,7 +355,7 @@ app.get('/artigo/:slug', async (c) => {
     'guia-eletrodomesticos': {
       slug: 'guia-eletrodomesticos',
       title: 'Air fryer ou forno elétrico? A verdade que as marcas não te contam — e qual comprar em 2026',
-      category: 'Eletrodomésticos', categoryIcon: '🏠',
+      category: 'Eletrodomésticos', categoryIcon: '🏠', categoryId: 'eletrodomesticos',
       image: 'https://images.unsplash.com/photo-1585515320310-259814833e62?w=1200&q=80',
       readTime: '7 min',
       keywords: 'air fryer vs forno elétrico, melhor air fryer 2026, qual comprar',
@@ -365,7 +365,7 @@ app.get('/artigo/:slug', async (c) => {
     'guia-refrigeracao': {
       slug: 'guia-refrigeracao',
       title: 'Ar-condicionado em 2026: split, portátil ou janela? O guia definitivo para escolher sem erro',
-      category: 'Refrigeração', categoryIcon: '❄️',
+      category: 'Refrigeração', categoryIcon: '❄️', categoryId: 'refrigeracao',
       image: 'https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=1200&q=80',
       readTime: '8 min',
       keywords: 'ar condicionado split vs portátil, melhor ar condicionado 2026, BTU ideal',
@@ -375,7 +375,7 @@ app.get('/artigo/:slug', async (c) => {
     'guia-ferramentas': {
       slug: 'guia-ferramentas',
       title: 'As 7 ferramentas elétricas que todo proprietário de imóvel precisa ter em casa',
-      category: 'Ferramentas', categoryIcon: '🔧',
+      category: 'Ferramentas', categoryIcon: '🔧', categoryId: 'ferramentas',
       image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1200&q=80',
       readTime: '6 min',
       keywords: 'ferramentas elétricas essenciais, melhor parafusadeira 2026, kit ferramentas casa',
@@ -2391,6 +2391,8 @@ function articlePage(article: any): string {
   const keywords = article.keywords || ''
   const productUrl = article.productUrl || ''
   const store = article.store || ''
+  const categoryId = article.categoryId || ''
+  const categoryUrl = categoryId ? `/categoria/${categoryId}` : '/#categorias'
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -2499,17 +2501,23 @@ function articlePage(article: any): string {
       ${content}
     </div>
 
-    ${productUrl ? `
-    <!-- CTA de produto -->
+    <!-- CTA de categoria (sempre visível) -->
     <div class="mt-10 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-6 text-white text-center shadow-xl">
       <p class="text-indigo-200 text-sm font-semibold uppercase tracking-wider mb-2">Pronto para comprar?</p>
-      <h3 class="text-xl font-black mb-4">Confira o melhor preço disponível agora</h3>
-      <a href="${productUrl}" target="_blank" rel="noopener noreferrer sponsored"
+      <h3 class="text-xl font-black mb-4">Veja os melhores produtos de ${category} com os melhores preços</h3>
+      <a href="${categoryUrl}"
         class="inline-flex items-center gap-2 bg-white text-indigo-700 font-black px-8 py-4 rounded-xl hover:bg-indigo-50 transition-all shadow-lg text-base">
-        <i class="fas fa-tag"></i> Ver Preço${store ? ` na ${store}` : ''}
+        <i class="fas fa-tag"></i> Ver produtos de ${category}
         <i class="fas fa-arrow-right text-sm"></i>
       </a>
-    </div>` : ''}
+      ${productUrl ? `
+      <div class="mt-4">
+        <a href="${productUrl}" target="_blank" rel="noopener noreferrer sponsored"
+          class="inline-flex items-center gap-2 bg-indigo-500/50 hover:bg-indigo-500/70 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-sm">
+          <i class="fas fa-external-link-alt text-xs"></i> Ver oferta específica${store ? ` na ${store}` : ''}
+        </a>
+      </div>` : ''}
+    </div>
 
     <!-- Aviso editorial -->
     <div class="mt-8 p-4 bg-gray-100 rounded-xl text-xs text-gray-500 leading-relaxed">
@@ -2522,8 +2530,8 @@ function articlePage(article: any): string {
       <a href="/#blog" class="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
         <i class="fas fa-arrow-left text-sm"></i> Ver todos os artigos
       </a>
-      <a href="/" class="flex items-center gap-2 text-gray-500 font-medium hover:text-gray-700 transition-colors">
-        Explorar produtos <i class="fas fa-arrow-right text-sm"></i>
+      <a href="${categoryUrl}" class="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
+        Ver produtos de ${category} <i class="fas fa-arrow-right text-sm"></i>
       </a>
     </div>
 
@@ -3158,5 +3166,64 @@ function sobrePage(): string {
 </body>
 </html>`
 }
+
+// === SITEMAP.XML ===
+app.get('/sitemap.xml', (c) => {
+  const base = 'https://teckhomestore.com'
+  const now = new Date().toISOString().split('T')[0]
+
+  const staticPages = [
+    { loc: '/', priority: '1.0', changefreq: 'daily' },
+    { loc: '/sobre', priority: '0.6', changefreq: 'monthly' },
+    { loc: '/termos-de-uso', priority: '0.4', changefreq: 'yearly' },
+    { loc: '/politica-de-privacidade', priority: '0.4', changefreq: 'yearly' },
+  ]
+
+  const categories = [
+    'eletronicos', 'eletrodomesticos', 'ferramentas',
+    'refrigeracao', 'cama-mesa', 'ventilacao', 'jardim'
+  ]
+
+  const articles = [
+    'guia-eletronicos',
+    'guia-eletrodomesticos',
+    'guia-refrigeracao',
+    'guia-ferramentas',
+  ]
+
+  const urls = [
+    ...staticPages.map(p => `
+  <url>
+    <loc>${base}${p.loc}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`),
+    ...categories.map(cat => `
+  <url>
+    <loc>${base}/categoria/${cat}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`),
+    ...articles.map(slug => `
+  <url>
+    <loc>${base}/artigo/${slug}</loc>
+    <lastmod>${now}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>`),
+  ].join('')
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+          http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+${urls}
+</urlset>`
+
+  return c.text(xml, 200, { 'Content-Type': 'application/xml; charset=utf-8' })
+})
 
 export default app
