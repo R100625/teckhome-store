@@ -211,8 +211,8 @@ app.get('/categoria/:id', (c) => {
 })
 
 // === AUTH ADMIN ===
-const ADMIN_USER = 'teckhome_admin'
-const ADMIN_PASS = 'TeckHome@2025#Store'
+const ADMIN_USER = 'admin'
+const ADMIN_PASS = 'teckhome2026'
 const COOKIE_NAME = 'teckhome_auth'
 const COOKIE_VALUE = 'granted'
 
