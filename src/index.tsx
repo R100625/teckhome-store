@@ -2538,23 +2538,28 @@ function articlePage(article: any): string {
 </head>
 <body class="bg-gray-50 min-h-screen">
 
+  <!-- BARRA DE PROGRESSO DE LEITURA -->
+  <div id="readingProgress"></div>
+
   <!-- NAVBAR -->
-  <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+  <nav class="navbar-article sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="/" class="flex items-center gap-2">
-          <img src="/static/logo.png" alt="TeckHome Store" class="w-10 h-10 rounded-xl object-cover shadow-md">
+        <a href="/" class="flex items-center gap-2.5 group">
+          <img src="/static/logo.png" alt="TeckHome Store" class="w-9 h-9 rounded-xl object-cover shadow-md group-hover:shadow-indigo-200 transition-shadow">
           <div>
-            <span class="text-xl font-black text-gray-900">Teck<span class="text-indigo-600">Home</span> Store</span>
+            <span class="text-lg font-black text-gray-900 tracking-tight">Teck<span class="text-indigo-600">Home</span> Store</span>
             <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
           </div>
         </a>
-        <div class="flex items-center gap-3">
-          <a href="/#blog" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
-            <i class="fas fa-newspaper text-xs"></i> Blog
+        <div class="flex items-center gap-4">
+          <a href="/#blog" class="text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Blog
           </a>
-          <a href="/" class="text-sm font-medium text-gray-600 hover:text-indigo-600 flex items-center gap-1">
-            <i class="fas fa-home text-xs"></i> Início
+          <a href="${categoryUrl}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+            ${category}
           </a>
         </div>
       </div>
@@ -2565,100 +2570,155 @@ function articlePage(article: any): string {
   <div class="hero-article">
     <img src="${image}" alt="${title}" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80'">
     <div class="hero-article-overlay"></div>
-    <div class="absolute bottom-0 left-0 right-0 p-6 md:p-10 max-w-4xl mx-auto">
-      <nav class="text-sm text-white/70 mb-3 flex items-center gap-2">
-        <a href="/" class="hover:text-white">Início</a>
-        <i class="fas fa-chevron-right text-xs"></i>
-        <a href="/#blog" class="hover:text-white">Blog</a>
-        <i class="fas fa-chevron-right text-xs"></i>
-        <span class="text-white/90">${category}</span>
-      </nav>
-      <div class="flex items-center gap-2 mb-3">
-        <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">${categoryIcon} ${category}</span>
-        <span class="bg-black/40 text-white text-xs px-3 py-1 rounded-full"><i class="fas fa-clock mr-1"></i>${readTime}</span>
+    <div class="absolute bottom-0 left-0 right-0 p-6 md:p-12">
+      <div class="max-w-4xl mx-auto">
+        <nav aria-label="Breadcrumb" class="text-sm text-white/70 mb-4 flex items-center gap-2">
+          <a href="/" class="hover:text-white transition-colors">Início</a>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          <a href="/#blog" class="hover:text-white transition-colors">Blog</a>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="text-white/90">${category}</span>
+        </nav>
+        <div class="flex items-center gap-2 mb-4">
+          <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">${category}</span>
+          <span class="bg-black/50 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${readTime} de leitura
+          </span>
+        </div>
+        <h1 class="text-2xl md:text-4xl lg:text-5xl font-black text-white leading-tight drop-shadow-2xl max-w-3xl">${title}</h1>
       </div>
-      <h1 class="text-2xl md:text-4xl font-black text-white leading-tight drop-shadow-lg">${title}</h1>
     </div>
   </div>
 
   <!-- CONTEÚDO DO ARTIGO -->
-  <main class="max-w-3xl mx-auto px-4 py-12">
+  <main id="articleMain" class="max-w-3xl mx-auto px-4 py-12">
 
-    <!-- Autor -->
-    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-gray-200">
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #1e1b4b, #3730a3);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
-      <div>
-        <p class="font-bold text-gray-900 text-sm">Equipe TeckHome</p>
-        <p class="text-gray-400 text-xs">Análise editorial independente · TeckHome Store</p>
+    <!-- Autor + Meta -->
+    <div class="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100">
+      <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md" style="background:linear-gradient(135deg,#1e1b4b,#3730a3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </div>
-      <div class="ml-auto flex items-center gap-2">
-        <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
-          <i class="fas fa-shield-alt text-xs"></i> Verificado
+      <div class="flex-1">
+        <p class="font-black text-gray-900 text-sm">Equipe TeckHome</p>
+        <p class="text-gray-400 text-xs mt-0.5">Análise editorial independente · TeckHome Store · 2026</p>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <span class="bg-green-50 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-green-100">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Verificado
+        </span>
+        <span class="bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-full border border-indigo-100">
+          ${readTime}
         </span>
       </div>
     </div>
 
     <!-- Excerpt destacado -->
-    <div class="bg-indigo-50 border-l-4 border-indigo-500 rounded-r-xl p-5 mb-8">
+    <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border-l-4 border-indigo-500 rounded-r-2xl p-6 mb-10 shadow-sm">
       <p class="text-indigo-900 font-semibold text-lg leading-relaxed">${excerpt}</p>
     </div>
 
     <!-- Corpo do artigo -->
-    <div class="article-body">
+    <article class="article-body">
       ${content}
+    </article>
+
+    <!-- CTA de categoria -->
+    <div class="mt-12 rounded-3xl overflow-hidden shadow-2xl" style="background:linear-gradient(135deg,#1e1b4b 0%,#3730a3 50%,#1e3a5f 100%);">
+      <div class="p-8 text-center">
+        <span class="inline-block text-indigo-300 text-xs font-bold uppercase tracking-widest mb-3">Pronto para comprar?</span>
+        <h3 class="text-2xl font-black text-white mb-2">Melhores produtos de ${category}</h3>
+        <p class="text-indigo-200 text-sm mb-6">Seleção curada pela Equipe TeckHome com os melhores preços verificados</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="${categoryUrl}" class="inline-flex items-center justify-center gap-2 bg-white text-indigo-700 font-black px-8 py-4 rounded-2xl hover:bg-indigo-50 transition-all shadow-lg text-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Ver produtos de ${category}
+          </a>
+          ${productUrl ? `
+          <a href="${productUrl}" target="_blank" rel="noopener noreferrer sponsored"
+            class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-6 py-4 rounded-2xl transition-all text-sm border border-white/20">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Ver oferta${store ? ` na ${store}` : ''}
+          </a>` : ''}
+        </div>
+      </div>
     </div>
 
-    <!-- CTA de categoria (sempre visível) -->
-    <div class="mt-10 bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-6 text-white text-center shadow-xl">
-      <p class="text-indigo-200 text-sm font-semibold uppercase tracking-wider mb-2">Pronto para comprar?</p>
-      <h3 class="text-xl font-black mb-4">Veja os melhores produtos de ${category} com os melhores preços</h3>
-      <a href="${categoryUrl}"
-        class="inline-flex items-center gap-2 bg-white text-indigo-700 font-black px-8 py-4 rounded-xl hover:bg-indigo-50 transition-all shadow-lg text-base">
-        <i class="fas fa-tag"></i> Ver produtos de ${category}
-        <i class="fas fa-arrow-right text-sm"></i>
-      </a>
-      ${productUrl ? `
-      <div class="mt-4">
-        <a href="${productUrl}" target="_blank" rel="noopener noreferrer sponsored"
-          class="inline-flex items-center gap-2 bg-indigo-500/50 hover:bg-indigo-500/70 text-white font-semibold px-6 py-2.5 rounded-xl transition-all text-sm">
-          <i class="fas fa-external-link-alt text-xs"></i> Ver oferta específica${store ? ` na ${store}` : ''}
+    <!-- Artigos Relacionados -->
+    <div class="mt-12 pt-10 border-t border-gray-100">
+      <h3 class="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Artigos Relacionados
+      </h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href="/artigo/guia-eletronicos" class="related-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 group" style="text-decoration:none;">
+          <div class="h-28 overflow-hidden"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&q=70" alt="Eletrônicos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>
+          <div class="p-4"><span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Eletrônicos</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Como escolher o melhor smartphone em 2026</p></div>
         </a>
-      </div>` : ''}
+        <a href="/artigo/guia-eletrodomesticos" class="related-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 group" style="text-decoration:none;">
+          <div class="h-28 overflow-hidden"><img src="https://images.unsplash.com/photo-1585515320310-259814833e62?w=400&q=70" alt="Eletrodomésticos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>
+          <div class="p-4"><span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">Eletrodomésticos</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Air fryer ou forno elétrico? A verdade</p></div>
+        </a>
+        <a href="/artigo/guia-refrigeracao" class="related-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 group" style="text-decoration:none;">
+          <div class="h-28 overflow-hidden"><img src="https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=400&q=70" alt="Refrigeração" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>
+          <div class="p-4"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Refrigeração</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Ar-condicionado 2026: guia definitivo</p></div>
+        </a>
+      </div>
     </div>
 
     <!-- Aviso editorial -->
-    <div class="mt-8 p-4 bg-gray-100 rounded-xl text-xs text-gray-500 leading-relaxed">
-      <i class="fas fa-info-circle text-gray-400 mr-1"></i>
-      <strong>Aviso de afiliados:</strong> Este artigo pode conter links de afiliados. Caso você realize uma compra através deles, recebemos uma comissão sem custo adicional para você. Isso não influencia nossas análises.
+    <div class="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-2xl text-xs text-gray-500 leading-relaxed flex items-start gap-3">
+      <svg class="flex-shrink-0 mt-0.5" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span><strong class="text-gray-600">Aviso de afiliados:</strong> Este artigo pode conter links de afiliados. Caso você realize uma compra através deles, recebemos uma comissão sem custo adicional para você. Isso não influencia nossas análises.</span>
     </div>
 
-    <!-- Navegar para mais artigos -->
-    <div class="mt-8 pt-8 border-t border-gray-200 flex items-center justify-between gap-4">
-      <a href="/#blog" class="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
-        <i class="fas fa-arrow-left text-sm"></i> Ver todos os artigos
+    <!-- Navegação inferior -->
+    <div class="mt-8 pt-8 border-t border-gray-100 flex items-center justify-between gap-4">
+      <a href="/#blog" class="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors text-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Ver todos os artigos
       </a>
-      <a href="${categoryUrl}" class="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
-        Ver produtos de ${category} <i class="fas fa-arrow-right text-sm"></i>
+      <a href="${categoryUrl}" class="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-800 transition-colors text-sm">
+        Ver produtos de ${category}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
     </div>
 
   </main>
 
   <!-- FOOTER -->
-  <footer class="bg-gray-900 text-white py-8 px-4 mt-8">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
-      <div class="flex items-center gap-2">
-        <img src="/static/logo.png" alt="TeckHome Store" class="w-8 h-8 rounded-lg object-cover">
-        <span class="font-bold text-white">Teck<span class="text-indigo-400">Home</span> Store</span>
+  <footer class="bg-gray-900 text-white py-10 px-4 mt-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-gray-400">
+      <div class="flex items-center gap-3">
+        <img src="/static/logo.png" alt="TeckHome Store" class="w-9 h-9 rounded-xl object-cover shadow-lg">
+        <div>
+          <span class="font-black text-white">Teck<span class="text-indigo-400">Home</span> Store</span>
+          <p class="text-gray-500 text-xs mt-0.5">Portal de Reviews</p>
+        </div>
       </div>
-      <div class="flex flex-wrap justify-center gap-4">
+      <div class="flex flex-wrap justify-center gap-5">
+        <a href="/#blog" class="hover:text-white transition-colors">Blog</a>
         <a href="/termos-de-uso" class="hover:text-white transition-colors">Termos</a>
         <a href="/politica-de-privacidade" class="hover:text-white transition-colors">Privacidade</a>
         <a href="/sobre" class="hover:text-white transition-colors">Sobre Nós</a>
       </div>
-      <p>© 2026 TeckHome Store</p>
+      <p class="text-gray-500">© 2026 TeckHome Store</p>
     </div>
   </footer>
+
+  <script>
+    // Barra de progresso de leitura
+    const bar = document.getElementById('readingProgress')
+    const main = document.getElementById('articleMain')
+    window.addEventListener('scroll', () => {
+      const rect = main.getBoundingClientRect()
+      const total = main.offsetHeight - window.innerHeight
+      const scrolled = Math.max(0, -rect.top)
+      const pct = Math.min(100, total > 0 ? (scrolled / total) * 100 : 0)
+      bar.style.width = pct + '%'
+    }, { passive: true })
+  </script>
 
 </body>
 </html>`
