@@ -2562,11 +2562,16 @@ function loginPage(erro?: string): string {
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
     .gradient-bg { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #1e3a5f 100%); }
+    .input-field { width:100%; padding: 12px 44px 12px 40px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 14px; outline: none; transition: all 0.2s; background: #fafafa; }
+    .input-field:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.12); background: #fff; }
+    .btn-eye { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; padding:4px; color:#9ca3af; transition:color 0.2s; }
+    .btn-eye:hover { color:#6366f1; }
+    .credentials-box { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 1px solid #bae6fd; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; }
   </style>
 </head>
-<body class="gradient-bg min-h-screen flex items-center justify-center px-4">
+<body class="gradient-bg min-h-screen flex items-center justify-center px-4 py-8">
 
   <div class="w-full max-w-sm">
 
@@ -2581,8 +2586,8 @@ function loginPage(erro?: string): string {
     <div class="bg-white rounded-3xl shadow-2xl p-8">
 
       <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-          <i class="fas fa-lock text-indigo-600"></i>
+        <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
         <div>
           <h2 class="font-black text-gray-900 text-lg">Acesso Restrito</h2>
@@ -2592,50 +2597,94 @@ function loginPage(erro?: string): string {
 
       ${erro ? `
       <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl mb-5 flex items-center gap-2">
-        <i class="fas fa-exclamation-circle"></i> ${erro}
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        ${erro}
       </div>` : ''}
+
+      <!-- Caixa de credenciais de acesso -->
+      <div class="credentials-box">
+        <p class="text-xs font-bold text-sky-700 mb-2 flex items-center gap-1.5">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0369a1" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Suas credenciais de acesso:
+        </p>
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-sky-600 font-semibold w-14 flex-shrink-0">Usuário:</span>
+            <code class="text-xs bg-white border border-sky-200 text-sky-800 font-mono px-2.5 py-1 rounded-lg select-all cursor-pointer" onclick="this.parentElement.nextElementSibling && navigator.clipboard && navigator.clipboard.writeText('teckhome_admin')" title="Clique para copiar">teckhome_admin</code>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-sky-600 font-semibold w-14 flex-shrink-0">Senha:</span>
+            <code class="text-xs bg-white border border-sky-200 text-sky-800 font-mono px-2.5 py-1 rounded-lg select-all cursor-pointer" onclick="navigator.clipboard && navigator.clipboard.writeText('TeckHome@2025#Store')" title="Clique para copiar">TeckHome@2025#Store</code>
+          </div>
+        </div>
+        <p class="text-xs text-sky-500 mt-2 flex items-center gap-1">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Clique no código para copiar
+        </p>
+      </div>
 
       <form method="POST" action="/admin/login" class="space-y-4">
 
+        <!-- Campo Usuário -->
         <div>
           <label class="text-sm font-semibold text-gray-700 block mb-1.5">Usuário</label>
           <div class="relative">
-            <i class="fas fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
             <input
               type="text"
               name="username"
-              placeholder="Digite seu usuário"
+              id="username"
+              placeholder="teckhome_admin"
+              autocomplete="username"
               required
-              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+              class="input-field"
             >
           </div>
         </div>
 
+        <!-- Campo Senha com botão olho -->
         <div>
           <label class="text-sm font-semibold text-gray-700 block mb-1.5">Senha</label>
           <div class="relative">
-            <i class="fas fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <input
               type="password"
               name="password"
-              placeholder="Digite sua senha"
+              id="passwordInput"
+              placeholder="••••••••••••••••••"
+              autocomplete="current-password"
               required
-              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+              class="input-field"
             >
+            <!-- Botão olho — mostra/oculta senha -->
+            <button type="button" class="btn-eye" id="togglePassword" onclick="togglePass()" title="Mostrar/ocultar senha" aria-label="Mostrar senha">
+              <!-- Olho fechado (padrão quando senha está oculta) -->
+              <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
           </div>
+          <p class="text-xs text-gray-400 mt-1.5 flex items-center gap-1">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Clique no olho para revelar a senha digitada
+          </p>
         </div>
 
         <button
           type="submit"
-          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2 mt-2">
-          <i class="fas fa-sign-in-alt"></i> Entrar
+          class="w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 mt-2 shadow-lg shadow-indigo-200">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Entrar no Painel
         </button>
 
       </form>
 
       <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-        <a href="/" class="text-sm text-gray-400 hover:text-indigo-600 transition-colors flex items-center justify-center gap-1">
-          <i class="fas fa-arrow-left text-xs"></i> Voltar ao site
+        <a href="/" class="text-sm text-gray-400 hover:text-indigo-600 transition-colors flex items-center justify-center gap-1.5">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Voltar ao site
         </a>
       </div>
 
@@ -2643,6 +2692,37 @@ function loginPage(erro?: string): string {
 
     <p class="text-center text-indigo-300/50 text-xs mt-6">© 2026 TeckHome Store</p>
   </div>
+
+  <script>
+    // Toggle mostrar/ocultar senha
+    function togglePass() {
+      const input = document.getElementById('passwordInput')
+      const icon  = document.getElementById('eyeIcon')
+      const isHidden = input.type === 'password'
+      input.type = isHidden ? 'text' : 'password'
+
+      // Olho aberto (senha visível)
+      const eyeOpen = \`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>\`
+      // Olho fechado (senha oculta)
+      const eyeClosed = \`<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>\`
+
+      icon.innerHTML = isHidden ? eyeOpen : eyeClosed
+      document.getElementById('togglePassword').style.color = isHidden ? '#6366f1' : '#9ca3af'
+    }
+
+    // Copia ao clicar nos códigos
+    document.querySelectorAll('code[title="Clique para copiar"]').forEach(el => {
+      el.addEventListener('click', () => {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(el.textContent.trim())
+          const orig = el.style.background
+          el.style.background = '#dcfce7'
+          el.style.borderColor = '#86efac'
+          setTimeout(() => { el.style.background = ''; el.style.borderColor = '' }, 1200)
+        }
+      })
+    })
+  </script>
 
 </body>
 </html>`
