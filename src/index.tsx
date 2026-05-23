@@ -1760,6 +1760,11 @@ function adminPage(): string {
         class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-indigo-600 -mb-px transition-all flex items-center gap-2">
         <i class="fas fa-newspaper text-xs"></i> Blog / Artigos
       </button>
+      <button onclick="switchTab('destaques')" id="tab-destaques"
+        class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-yellow-500 -mb-px transition-all flex items-center gap-2">
+        <i class="fas fa-star text-xs"></i> Destaques
+        <span id="destaquesCount" class="hidden bg-yellow-400 text-white text-xs font-black rounded-full w-5 h-5 flex items-center justify-center">0</span>
+      </button>
     </div>
   </div>
 
@@ -1890,6 +1895,85 @@ function adminPage(): string {
           <p class="text-sm mt-1">Use o formulário ao lado para adicionar produtos</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- TAB: DESTAQUES -->
+  <div id="section-destaques" class="hidden max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Cabeçalho da seção -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-black text-gray-900 flex items-center gap-3">
+          <span class="w-10 h-10 bg-yellow-400 rounded-xl flex items-center justify-center shadow-md">
+            <i class="fas fa-star text-white text-sm"></i>
+          </span>
+          Gerenciar Destaques
+        </h2>
+        <p class="text-gray-400 text-sm mt-1 ml-13">Produtos em destaque aparecem na seção principal da página inicial</p>
+      </div>
+      <button onclick="loadDestaques()" class="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 font-semibold bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition-colors border border-indigo-200">
+        <i class="fas fa-sync text-xs"></i> Atualizar
+      </button>
+    </div>
+
+    <!-- Info banner -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-6 flex items-start gap-3">
+      <i class="fas fa-lightbulb text-yellow-500 mt-0.5 flex-shrink-0"></i>
+      <div class="text-sm text-yellow-800">
+        <strong>Como funciona:</strong> Os produtos marcados com ⭐ aparecem automaticamente na seção "Em Destaque" da página inicial. Você pode ativar ou desativar o destaque de qualquer produto aqui, ou ao adicionar um novo produto marque a opção <em>"Marcar como Destaque"</em> no formulário da aba Produtos.
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+
+      <!-- COLUNA ESQUERDA: Produtos em destaque -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-black text-gray-800 flex items-center gap-2">
+            <i class="fas fa-star text-yellow-400"></i>
+            Em Destaque
+            <span id="featuredCountBadge" class="text-xs bg-yellow-400 text-white font-black px-2 py-0.5 rounded-full">0</span>
+          </h3>
+        </div>
+
+        <div id="featuredList" class="space-y-3">
+          <div class="shimmer rounded-2xl h-20"></div>
+          <div class="shimmer rounded-2xl h-20"></div>
+        </div>
+
+        <div id="emptyFeatured" class="hidden text-center py-14 bg-white rounded-2xl border-2 border-dashed border-yellow-200">
+          <div class="text-5xl mb-3">⭐</div>
+          <p class="text-gray-500 font-semibold">Nenhum produto em destaque</p>
+          <p class="text-gray-400 text-sm mt-1">Selecione produtos na coluna ao lado para destacar</p>
+        </div>
+      </div>
+
+      <!-- COLUNA DIREITA: Todos os produtos (para adicionar ao destaque) -->
+      <div>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-black text-gray-800 flex items-center gap-2">
+            <i class="fas fa-box text-indigo-400"></i>
+            Todos os Produtos
+          </h3>
+          <select id="destaqueCatFilter" onchange="loadDestaques()" class="text-sm px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 bg-white">
+            <option value="">Todas as categorias</option>
+          </select>
+        </div>
+
+        <div id="allProductsForFeatured" class="space-y-3">
+          <div class="shimmer rounded-2xl h-20"></div>
+          <div class="shimmer rounded-2xl h-20"></div>
+          <div class="shimmer rounded-2xl h-20"></div>
+        </div>
+
+        <div id="emptyAllProducts" class="hidden text-center py-14 bg-white rounded-2xl border-2 border-dashed border-gray-200">
+          <div class="text-5xl mb-3">📦</div>
+          <p class="text-gray-500 font-semibold">Nenhum produto cadastrado</p>
+          <p class="text-gray-400 text-sm mt-1">Adicione produtos na aba Produtos primeiro</p>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2048,13 +2132,18 @@ function adminPage(): string {
     function switchTab(tab) {
       document.getElementById('section-produtos').classList.toggle('hidden', tab !== 'produtos')
       document.getElementById('section-blog').classList.toggle('hidden', tab !== 'blog')
+      document.getElementById('section-destaques').classList.toggle('hidden', tab !== 'destaques')
       document.getElementById('tab-produtos').className = tab === 'produtos'
         ? 'tab-btn px-5 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 -mb-px transition-all flex items-center gap-2'
         : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-indigo-600 -mb-px transition-all flex items-center gap-2'
       document.getElementById('tab-blog').className = tab === 'blog'
         ? 'tab-btn px-5 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 -mb-px transition-all flex items-center gap-2'
         : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-indigo-600 -mb-px transition-all flex items-center gap-2'
+      document.getElementById('tab-destaques').className = tab === 'destaques'
+        ? 'tab-btn px-5 py-3 text-sm font-bold text-yellow-500 border-b-2 border-yellow-400 -mb-px transition-all flex items-center gap-2'
+        : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-yellow-500 -mb-px transition-all flex items-center gap-2'
       if (tab === 'blog') loadArticles()
+      if (tab === 'destaques') loadDestaques()
     }
 
     // ======= TOAST =======
@@ -2397,15 +2486,115 @@ function adminPage(): string {
       } catch { showToast('Erro de conexão', 'error') }
     }
 
+    // ======= DESTAQUES =======
+    async function loadDestaques() {
+      const catFilter = document.getElementById('destaqueCatFilter').value
+      const url = catFilter ? \`/api/products/\${catFilter}\` : '/api/products'
+      const res = await fetch(url)
+      const products = res.ok ? await res.json() : []
+
+      const catMap = {}
+      categories.forEach(c => catMap[c.id] = c)
+
+      // Lista de destaques
+      const featured = products.filter(p => p.featured)
+      const featuredList = document.getElementById('featuredList')
+      const emptyFeatured = document.getElementById('emptyFeatured')
+      const badge = document.getElementById('featuredCountBadge')
+      const tabBadge = document.getElementById('destaquesCount')
+
+      badge.textContent = featured.length
+      if (featured.length > 0) {
+        tabBadge.textContent = featured.length
+        tabBadge.classList.remove('hidden')
+      } else {
+        tabBadge.classList.add('hidden')
+      }
+
+      if (featured.length === 0) {
+        featuredList.innerHTML = ''
+        emptyFeatured.classList.remove('hidden')
+      } else {
+        emptyFeatured.classList.add('hidden')
+        featuredList.innerHTML = featured.map(p => {
+          const cat = catMap[p.categoryId] || { name: p.categoryId, icon: '📦', color: '#6366f1' }
+          const img = p.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=f59e0b&color=fff&size=80\`
+          return \`
+            <div class="bg-white rounded-2xl border-2 border-yellow-200 shadow-sm p-4 flex items-center gap-4 card-admin">
+              <div class="relative flex-shrink-0">
+                <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=f59e0b&color=fff&size=80'">
+                <span class="absolute -top-1.5 -right-1.5 text-base">⭐</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background:\${cat.color}">\${cat.icon} \${cat.name}</span>
+                <h4 class="font-bold text-gray-800 text-sm line-clamp-1 mt-1">\${p.title}</h4>
+                \${p.store ? \`<p class="text-xs text-gray-400 mt-0.5">\${p.store}</p>\` : ''}
+              </div>
+              <button onclick="toggleDestaqueProd('\${p.categoryId}','\${p.id}')" class="flex-shrink-0 flex items-center gap-1.5 bg-yellow-50 hover:bg-red-50 border border-yellow-200 hover:border-red-200 text-yellow-600 hover:text-red-500 text-xs font-bold px-3 py-2 rounded-xl transition-all">
+                <i class="fas fa-star"></i> Remover
+              </button>
+            </div>
+          \`
+        }).join('')
+      }
+
+      // Lista de todos os produtos
+      const allList = document.getElementById('allProductsForFeatured')
+      const emptyAll = document.getElementById('emptyAllProducts')
+
+      if (products.length === 0) {
+        allList.innerHTML = ''
+        emptyAll.classList.remove('hidden')
+      } else {
+        emptyAll.classList.add('hidden')
+        allList.innerHTML = products.map(p => {
+          const cat = catMap[p.categoryId] || { name: p.categoryId, icon: '📦', color: '#6366f1' }
+          const img = p.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80\`
+          const isFeatured = p.featured
+          return \`
+            <div class="bg-white rounded-2xl border \${isFeatured ? 'border-yellow-300 bg-yellow-50' : 'border-gray-100'} shadow-sm p-4 flex items-center gap-4 card-admin">
+              <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background:\${cat.color}">\${cat.icon} \${cat.name}</span>
+                  \${isFeatured ? '<span class="text-xs bg-yellow-400 text-white px-2 py-0.5 rounded-full font-bold">⭐ Destaque</span>' : ''}
+                </div>
+                <h4 class="font-bold text-gray-800 text-sm line-clamp-1">\${p.title}</h4>
+                \${p.store ? \`<p class="text-xs text-gray-400 mt-0.5">\${p.store}</p>\` : ''}
+              </div>
+              <button onclick="toggleDestaqueProd('\${p.categoryId}','\${p.id}')" class="flex-shrink-0 flex items-center gap-1.5 \${isFeatured ? 'bg-yellow-400 hover:bg-yellow-500 text-white border-yellow-400' : 'bg-gray-50 hover:bg-yellow-50 text-gray-400 hover:text-yellow-500 border-gray-200 hover:border-yellow-300'} border text-xs font-bold px-3 py-2 rounded-xl transition-all whitespace-nowrap">
+                <i class="fas fa-star"></i>\${isFeatured ? ' Destacado' : ' Destacar'}
+              </button>
+            </div>
+          \`
+        }).join('')
+      }
+    }
+
+    async function toggleDestaqueProd(categoryId, productId) {
+      try {
+        const res = await fetch(\`/api/products/\${categoryId}/\${productId}/featured\`, { method: 'PATCH' })
+        const data = await res.json()
+        if (data.success) {
+          showToast(data.product.featured ? '⭐ Produto adicionado aos destaques!' : 'Produto removido dos destaques', data.product.featured ? 'success' : 'info')
+          await loadDestaques()
+        } else {
+          showToast('Erro ao atualizar destaque', 'error')
+        }
+      } catch { showToast('Erro de conexão', 'error') }
+    }
+
     // ======= INIT =======
     async function init() {
       const res = await fetch('/api/categories')
       categories = await res.json()
       const catSelect = document.getElementById('categoryId')
       const filterSelect = document.getElementById('filterCategory')
+      const destaqueFilter = document.getElementById('destaqueCatFilter')
       categories.forEach(cat => {
         catSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
         filterSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
+        destaqueFilter.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
       })
       await loadProducts()
     }
