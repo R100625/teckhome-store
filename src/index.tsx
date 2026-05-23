@@ -705,7 +705,7 @@ function homePage(): string {
       <div class="flex items-end justify-between mb-12">
         <div>
           <span class="section-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Em Destaque</span>
-          <h2 class="section-title">Produtos Recomendados</h2>
+          <h2 class="section-title" id="featuredSectionTitle">Produtos Recomendados</h2>
           <p class="text-gray-500 mt-2 text-sm">Os mais bem avaliados pela nossa equipe editorial</p>
           <div class="section-divider"></div>
         </div>
@@ -1136,17 +1136,28 @@ function homePage(): string {
     async function loadFeatured(categories) {
       const res = await fetch('/api/products')
       allProductsCache = await res.json()
-      const featured = allProductsCache.filter(p => p.featured).slice(0, 8)
-      
+
+      // Tenta pegar os marcados como destaque; se não houver, usa os 4 mais recentes
+      let featured = allProductsCache.filter(p => p.featured).slice(0, 8)
+      const usingFallback = featured.length === 0 && allProductsCache.length > 0
+      if (usingFallback) featured = allProductsCache.slice(0, 4)
+
       const grid = document.getElementById('featuredGrid')
       const noFeatured = document.getElementById('noFeatured')
-      
+      const sectionTitle = document.getElementById('featuredSectionTitle')
+
       if (featured.length === 0) {
         grid.innerHTML = ''
         noFeatured.classList.remove('hidden')
         return
       }
-      
+
+      noFeatured.classList.add('hidden')
+      // Atualiza título se estiver usando fallback
+      if (usingFallback && sectionTitle) {
+        sectionTitle.textContent = 'Produtos Adicionados Recentemente'
+      }
+
       const catMap = {}
       categories.forEach(c => catMap[c.id] = c)
       grid.innerHTML = featured.map(p => createProductCard(p, catMap[p.categoryId])).join('')
