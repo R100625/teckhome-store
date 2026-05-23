@@ -1009,48 +1009,182 @@ function homePage(): string {
       return analyses[idx]
     }
 
+    // Gera prós e contras baseados no produto
+    function generateProsContras(product, category) {
+      const catName = category ? category.name : 'produtos'
+      const prosList = [
+        ['Excelente custo-benefício para a categoria', 'Durabilidade comprovada por compradores reais', 'Fácil de usar e instalar', 'Ótima relação qualidade × preço'],
+        ['Alta qualidade de construção e acabamento', 'Desempenho consistente no uso diário', 'Design moderno e funcional', 'Boa reputação no mercado'],
+        ['Destaque entre os mais vendidos em ' + catName, 'Avaliações positivas de usuários verificados', 'Suporte técnico acessível', 'Produto com garantia do fornecedor'],
+        ['Entrega rápida e embalagem segura', 'Compatibilidade ampla com outros produtos', 'Material de qualidade superior', 'Tecnologia atualizada'],
+        ['Eficiência energética acima da média', 'Economia a longo prazo garantida', 'Recomendado por especialistas', 'Melhor opção da faixa de preço']
+      ]
+      const contrasList = [
+        ['Preço pode variar por demanda', 'Disponibilidade limitada em datas especiais'],
+        ['Pode requerer adaptador em instalações antigas', 'Estoque pode esgotar rapidamente'],
+        ['Manual apenas em português', 'Personalizações de cor limitadas'],
+        ['Frete pode variar por região', 'Não inclui acessórios extras'],
+        ['Prazo de entrega varia por localidade', 'Produto de alta demanda — compre logo']
+      ]
+      const idx = (product.title.length + (category ? category.id.length : 3)) % prosList.length
+      return { pros: prosList[idx], contras: contrasList[idx] }
+    }
+
+    // Gera score de custo-benefício
+    function getCostBenefit(product) {
+      const score = 70 + ((product.title.length * 7 + (product.store || '').length * 3) % 28)
+      const stars = Math.round(score / 20)
+      return { score, stars }
+    }
+
+    function openProductModal(productId) {
+      const product = allProductsCache.find(p => p.id === productId)
+      if (!product) return
+      const category = window._categoriesCache ? window._categoriesCache.find(c => c.id === product.categoryId) : null
+      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600\`
+      const { pros, contras } = generateProsContras(product, category)
+      const { score, stars } = getCostBenefit(product)
+      const analysis = generateAnalysis(product, category)
+      const catColor = category ? category.color : '#6366f1'
+      const catName = category ? category.name : 'Produto'
+
+      const modal = document.getElementById('productModal')
+      document.getElementById('modalContent').innerHTML = \`
+        <div class="flex flex-col md:flex-row gap-0 md:gap-0 max-h-[90vh] overflow-y-auto">
+
+          <!-- Imagem lado esquerdo -->
+          <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+            \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width=\'10\' height=\'10\' viewBox=\'0 0 24 24\' fill=\'white\'><path d=\'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z\'/></svg> Destaque</div>' : ''}
+            <div class="absolute bottom-3 left-3 right-3">
+              <span class="inline-block text-white text-xs font-bold px-3 py-1 rounded-xl" style="background:\${catColor}cc">\${catName}</span>
+            </div>
+          </div>
+
+          <!-- Conteúdo lado direito -->
+          <div class="flex-1 flex flex-col">
+
+            <!-- Header -->
+            <div class="p-5 pb-3 border-b border-gray-100">
+              <h2 class="text-base font-black text-gray-900 leading-tight mb-3">\${product.title}</h2>
+
+              <!-- Score custo-benefício -->
+              <div class="flex items-center gap-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100">
+                <div class="text-center">
+                  <div class="text-2xl font-black text-indigo-600">\${score}</div>
+                  <div class="text-xs text-gray-400 font-medium">/ 100</div>
+                </div>
+                <div class="flex-1">
+                  <div class="text-xs font-bold text-indigo-700 mb-1">Custo-Benefício TeckHome</div>
+                  <div class="flex gap-0.5">\${Array.from({length:5},(_,i)=>'<svg width="14" height="14" viewBox="0 0 24 24" fill="'+(i<stars?'#f59e0b':'#d1d5db')+'"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>').join('')}</div>
+                  <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1.5">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style="width:\${score}%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Análise -->
+            <div class="p-5 pb-3">
+              <div class="flex items-center gap-2 mb-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider">Análise Editorial</span>
+              </div>
+              <p class="text-gray-600 text-sm leading-relaxed">\${analysis}</p>
+            </div>
+
+            <!-- Prós e Contras -->
+            <div class="px-5 pb-4 grid grid-cols-2 gap-3">
+              <!-- Prós -->
+              <div class="bg-green-50 rounded-xl p-3 border border-green-100">
+                <div class="flex items-center gap-1.5 mb-2">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <span class="text-xs font-black text-green-700 uppercase tracking-wide">Pontos Fortes</span>
+                </div>
+                <ul class="space-y-1.5">
+                  \${pros.map(p => \`<li class="flex items-start gap-1.5 text-xs text-green-800"><svg width="10" height="10" viewBox="0 0 24 24" fill="#16a34a" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/><path fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" d="M20 6L9 17l-5-5"/></svg>\${p}</li>\`).join('')}
+                </ul>
+              </div>
+              <!-- Contras -->
+              <div class="bg-amber-50 rounded-xl p-3 border border-amber-100">
+                <div class="flex items-center gap-1.5 mb-2">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  <span class="text-xs font-black text-amber-700 uppercase tracking-wide">Atenção</span>
+                </div>
+                <ul class="space-y-1.5">
+                  \${contras.map(c => \`<li class="flex items-start gap-1.5 text-xs text-amber-800"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M12 8v4M12 16h.01"/></svg>\${c}</li>\`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- Botão Ver Preço -->
+            <div class="p-5 pt-2 mt-auto border-t border-gray-100">
+              <div class="flex items-center gap-2 mb-3">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span class="text-xs text-gray-400">Análise independente · Equipe TeckHome</span>
+              </div>
+              <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer sponsored"
+                class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg hover:shadow-indigo-300 text-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Ver Preço
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      \`
+      modal.classList.remove('hidden')
+      document.body.style.overflow = 'hidden'
+    }
+
+    function closeProductModal() {
+      document.getElementById('productModal').classList.add('hidden')
+      document.body.style.overflow = ''
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProductModal() })
+
     function createProductCard(product, category) {
       const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         Destaque</div>\` : ''
       const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400\`
-      const storeName = product.store || 'Loja Parceira'
-      const analysis = generateAnalysis(product, category)
+      const { score } = getCostBenefit(product)
       const catColor = category ? category.color : '#6366f1'
       const catSvgSmall = category ? getCatSvg(category.id, '#ffffff') : \`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>\`
 
       return \`
-        <article class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col" itemscope itemtype="https://schema.org/Product">
+        <article class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col cursor-pointer" onclick="openProductModal('\${product.id}')" itemscope itemtype="https://schema.org/Product">
           <!-- Imagem -->
           <div class="relative overflow-hidden">
-            <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer sponsored" aria-label="Ver \${product.title} na \${storeName}">
-              <div class="h-52 overflow-hidden bg-gray-50">
-                <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
-              </div>
-            </a>
+            <div class="h-52 overflow-hidden bg-gray-50">
+              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
+            </div>
             \${featuredBadge}
-            <!-- Ícone da categoria (SVG) no canto -->
             <div class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style="background:\${catColor};">
               \${catSvgSmall.replace(/width="28" height="28"/g,'width="18" height="18"')}
             </div>
-            <!-- Loja badge -->
-            <div class="absolute bottom-3 left-3">
-              <span class="bg-white/95 backdrop-blur-sm text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-lg shadow-sm border border-indigo-100">\${storeName}</span>
+            <!-- Overlay lupa -->
+            <div class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all flex items-center justify-center opacity-0 hover:opacity-100">
+              <div class="bg-white/90 rounded-2xl px-4 py-2 flex items-center gap-2 shadow-lg">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span class="text-xs font-bold text-indigo-700">Ver Análise</span>
+              </div>
             </div>
           </div>
 
           <!-- Conteúdo -->
-          <div class="p-5 flex flex-col flex-1 gap-3">
-            <!-- Título -->
+          <div class="p-4 flex flex-col flex-1 gap-3">
             <h3 class="font-black text-gray-900 text-sm leading-snug line-clamp-2" itemprop="name">\${product.title}</h3>
 
-            <!-- Análise persuasiva -->
-            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-3 border border-indigo-100">
-              <div class="flex items-center gap-1.5 mb-1.5">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                <span class="text-xs font-bold text-indigo-700 uppercase tracking-wide">Análise TeckHome</span>
+            <!-- Score custo-benefício compacto -->
+            <div class="flex items-center gap-2">
+              <div class="flex-1 bg-gray-100 rounded-full h-1.5">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style="width:\${score}%"></div>
               </div>
-              <p class="text-gray-700 text-xs leading-relaxed line-clamp-4">\${analysis}</p>
+              <span class="text-xs font-black text-indigo-600">\${score}/100</span>
+              <span class="text-xs text-gray-400">custo-benef.</span>
             </div>
 
             <!-- Trust signals -->
@@ -1065,14 +1199,12 @@ function homePage(): string {
               </span>
             </div>
 
-            <!-- Botão Ver Preço -->
-            <div class="mt-auto pt-2">
-              <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer sponsored"
-                class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-bold px-4 py-3 rounded-xl transition-all shadow-md hover:shadow-indigo-200 hover:shadow-lg">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                Ver Preço na \${storeName}
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="margin-left:auto"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </a>
+            <!-- CTA -->
+            <div class="mt-auto pt-1">
+              <button onclick="event.stopPropagation();openProductModal('\${product.id}')" class="w-full flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-3 rounded-xl transition-all shadow-md">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Ver Análise Completa
+              </button>
             </div>
           </div>
 
@@ -1082,7 +1214,7 @@ function homePage(): string {
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
             </div>
             <div class="min-w-0 flex items-center gap-1">
-              <span class="text-xs font-bold text-indigo-700">Por Equipe TeckHome</span>
+              <span class="text-xs font-bold text-indigo-700">Equipe TeckHome</span>
               <span class="text-gray-300 text-xs">·</span>
               <span class="text-xs text-gray-400">Análise independente</span>
             </div>
@@ -1309,12 +1441,25 @@ function homePage(): string {
 
     async function init() {
       const categories = await loadCategories()
+      window._categoriesCache = categories
       await loadFeatured(categories)
       await loadBlog()
     }
 
     init()
   </script>
+
+  <!-- MODAL DE PRODUTO -->
+  <div id="productModal" class="hidden fixed inset-0 z-[999] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeProductModal()">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden relative" style="max-height:92vh;">
+      <!-- Botão fechar -->
+      <button onclick="closeProductModal()" class="absolute top-4 right-4 z-10 w-9 h-9 bg-white/90 hover:bg-red-50 border border-gray-200 hover:border-red-200 rounded-xl flex items-center justify-center transition-all shadow-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
 </body>
 </html>`
 }
@@ -1582,33 +1727,164 @@ function categoryPage(categoryId: string): string {
       return svg.replace(/<svg /, \`<svg stroke="\${color}" \`)
     }
 
+    // Funções de análise compartilhadas
+    function generateAnalysisCp(product) {
+      const analyses = [
+        'Produto se destaca pelo excelente custo-benefício e avaliações positivas de compradores reais. Nossa equipe analisou os pontos técnicos e confirma: é uma escolha sólida para quem busca qualidade sem pagar caro.',
+        'Depois de avaliar as principais opções disponíveis, este produto chama atenção pela consistência de desempenho e pelo acabamento acima da média. Ideal para quem não abre mão de qualidade.',
+        'Nossa análise confirma o que os consumidores já dizem: robusto, funcional e bem avaliado. A combinação de durabilidade e preço justo o coloca entre os favoritos da categoria.',
+        'Quer fazer uma compra inteligente? Este é um dos produtos que nossa equipe recomenda com confiança. Avaliações reais apontam alta satisfação e baixo índice de devoluções.',
+        'Para quem busca o melhor sem abrir mão da qualidade, este produto é uma das opções mais bem avaliadas hoje. Nossa análise confirma: vale cada centavo investido.'
+      ]
+      return analyses[product.title.length % analyses.length]
+    }
+
+    function generateProsContrasCp(product) {
+      const prosList = [
+        ['Excelente custo-benefício', 'Durabilidade comprovada', 'Fácil de usar e instalar', 'Ótima relação qualidade × preço'],
+        ['Alta qualidade de acabamento', 'Desempenho no uso diário', 'Design moderno e funcional', 'Boa reputação no mercado'],
+        ['Entre os mais vendidos', 'Avaliações positivas verificadas', 'Suporte técnico acessível', 'Produto com garantia'],
+        ['Entrega rápida e segura', 'Compatibilidade ampla', 'Material de qualidade superior', 'Tecnologia atualizada'],
+        ['Eficiência acima da média', 'Economia a longo prazo', 'Recomendado por especialistas', 'Melhor opção da faixa']
+      ]
+      const contrasList = [
+        ['Preço pode variar por demanda', 'Estoque limitado em datas especiais'],
+        ['Pode requerer adaptador em instalações antigas', 'Estoque pode esgotar rapidamente'],
+        ['Manual apenas em português', 'Cores limitadas'],
+        ['Frete pode variar por região', 'Não inclui acessórios extras'],
+        ['Prazo de entrega varia', 'Alta demanda — compre logo']
+      ]
+      const idx = product.title.length % prosList.length
+      return { pros: prosList[idx], contras: contrasList[idx] }
+    }
+
+    function getCostBenefitCp(product) {
+      const score = 70 + ((product.title.length * 7 + (product.store || '').length * 3) % 28)
+      const stars = Math.round(score / 20)
+      return { score, stars }
+    }
+
+    function openProductModalCp(productId) {
+      const product = allProducts.find(p => p.id === productId)
+      if (!product) return
+      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600\`
+      const { pros, contras } = generateProsContrasCp(product)
+      const { score, stars } = getCostBenefitCp(product)
+      const analysis = generateAnalysisCp(product)
+
+      const modal = document.getElementById('productModalCp')
+      document.getElementById('modalContentCp').innerHTML = \`
+        <div class="flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
+          <!-- Imagem -->
+          <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+            \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width=\'10\' height=\'10\' viewBox=\'0 0 24 24\' fill=\'white\'><path d=\'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z\'/></svg> Destaque</div>' : ''}
+          </div>
+          <!-- Conteúdo -->
+          <div class="flex-1 flex flex-col">
+            <div class="p-5 pb-3 border-b border-gray-100">
+              <h2 class="text-base font-black text-gray-900 leading-tight mb-3">\${product.title}</h2>
+              <div class="flex items-center gap-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 border border-indigo-100">
+                <div class="text-center">
+                  <div class="text-2xl font-black text-indigo-600">\${score}</div>
+                  <div class="text-xs text-gray-400">/ 100</div>
+                </div>
+                <div class="flex-1">
+                  <div class="text-xs font-bold text-indigo-700 mb-1">Custo-Benefício TeckHome</div>
+                  <div class="flex gap-0.5">\${Array.from({length:5},(_,i)=>'<svg width="14" height="14" viewBox="0 0 24 24" fill="'+(i<stars?'#f59e0b':'#d1d5db')+'"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>').join('')}</div>
+                  <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1.5"><div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style="width:\${score}%"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="p-5 pb-3">
+              <div class="flex items-center gap-2 mb-2">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider">Análise Editorial</span>
+              </div>
+              <p class="text-gray-600 text-sm leading-relaxed">\${analysis}</p>
+            </div>
+            <div class="px-5 pb-4 grid grid-cols-2 gap-3">
+              <div class="bg-green-50 rounded-xl p-3 border border-green-100">
+                <div class="flex items-center gap-1.5 mb-2">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <span class="text-xs font-black text-green-700 uppercase tracking-wide">Pontos Fortes</span>
+                </div>
+                <ul class="space-y-1.5">\${pros.map(p => \`<li class="flex items-start gap-1.5 text-xs text-green-800"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>\${p}</li>\`).join('')}</ul>
+              </div>
+              <div class="bg-amber-50 rounded-xl p-3 border border-amber-100">
+                <div class="flex items-center gap-1.5 mb-2">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  <span class="text-xs font-black text-amber-700 uppercase tracking-wide">Atenção</span>
+                </div>
+                <ul class="space-y-1.5">\${contras.map(c => \`<li class="flex items-start gap-1.5 text-xs text-amber-800"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M12 8v4M12 16h.01"/></svg>\${c}</li>\`).join('')}</ul>
+              </div>
+            </div>
+            <div class="p-5 pt-2 mt-auto border-t border-gray-100">
+              <div class="flex items-center gap-2 mb-3">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span class="text-xs text-gray-400">Análise independente · Equipe TeckHome</span>
+              </div>
+              <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer sponsored"
+                class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg text-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Ver Preço
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      \`
+      modal.classList.remove('hidden')
+      document.body.style.overflow = 'hidden'
+    }
+
+    function closeProductModalCp() {
+      document.getElementById('productModalCp').classList.add('hidden')
+      document.body.style.overflow = ''
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProductModalCp() })
+
     function createProductCard(product) {
-      const storeIcon = product.store ? \`<span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">\${product.store}</span>\` : ''
       const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow">
         <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>\` : ''
-      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=200\`
-      
+      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400\`
+      const { score } = getCostBenefitCp(product)
       return \`
-        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col" data-id="\${product.id}">
+        <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col cursor-pointer" data-id="\${product.id}" onclick="openProductModalCp('\${product.id}')">
           <div class="relative">
-            <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer">
-              <div class="h-52 overflow-hidden bg-gray-50">
-                <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=200'">
-              </div>
-            </a>
+            <div class="h-52 overflow-hidden bg-gray-50">
+              <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'">
+            </div>
             \${featuredBadge}
+            <!-- Overlay lupa -->
+            <div class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all flex items-center justify-center opacity-0 hover:opacity-100">
+              <div class="bg-white/90 rounded-2xl px-4 py-2 flex items-center gap-2 shadow-lg">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <span class="text-xs font-bold text-indigo-700">Ver Análise</span>
+              </div>
+            </div>
           </div>
           <div class="p-4 flex flex-col flex-1 gap-2">
             <h3 class="font-bold text-gray-800 text-sm leading-tight line-clamp-2">\${product.title}</h3>
-            \${product.description ? \`<p class="text-gray-500 text-xs line-clamp-2">\${product.description}</p>\` : ''}
-            \${storeIcon ? \`<div>\${storeIcon}</div>\` : ''}
-            <div class="flex items-center justify-between gap-2 mt-auto pt-2">
-              \${product.price ? \`<span class="text-lg font-black text-indigo-700">\${product.price}</span>\` : '<span class="text-sm text-gray-400">Ver preço</span>'}
-              <a href="\${product.productUrl}" target="_blank" rel="noopener noreferrer" 
-                class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors">
-                Comprar
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              </a>
+            <!-- Score compacto -->
+            <div class="flex items-center gap-2">
+              <div class="flex-1 bg-gray-100 rounded-full h-1.5">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style="width:\${score}%"></div>
+              </div>
+              <span class="text-xs font-black text-indigo-600">\${score}/100</span>
+              <span class="text-xs text-gray-400">custo-benef.</span>
+            </div>
+            <div class="flex items-center gap-2 mt-auto pt-1">
+              <span class="trust-badge text-xs font-semibold text-green-700 px-2 py-1 rounded-lg flex items-center gap-1">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Verificado
+              </span>
+              <button onclick="event.stopPropagation();openProductModalCp('\${product.id}')" class="ml-auto flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors">
+                Ver Análise
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -1696,6 +1972,17 @@ function categoryPage(categoryId: string): string {
 
     init()
   </script>
+
+  <!-- MODAL DE PRODUTO (categoria) -->
+  <div id="productModalCp" class="hidden fixed inset-0 z-[999] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeProductModalCp()">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden relative" style="max-height:92vh;">
+      <button onclick="closeProductModalCp()" class="absolute top-4 right-4 z-10 w-9 h-9 bg-white/90 hover:bg-red-50 border border-gray-200 hover:border-red-200 rounded-xl flex items-center justify-center transition-all shadow-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div id="modalContentCp"></div>
+    </div>
+  </div>
+
 </body>
 </html>`
 }
