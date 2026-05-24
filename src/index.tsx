@@ -215,11 +215,30 @@ const ADMIN_USER = 'admin'
 const ADMIN_PASS = 'teckhome2026'
 const COOKIE_NAME = 'teckhome_auth'
 const COOKIE_VALUE = 'granted'
+const MAINTENANCE_KEY = 'site:maintenance'
 
 function isAuthenticated(c: any): boolean {
   const cookieHeader = c.req.header('Cookie') || ''
   return cookieHeader.includes(`${COOKIE_NAME}=${COOKIE_VALUE}`)
 }
+
+// Middleware de manutenção — bloqueia páginas públicas quando admin está logado
+app.use('*', async (c, next) => {
+  const path = new URL(c.req.url).pathname
+  const isAdminPath = path.startsWith('/admin') || path.startsWith('/api/') || path.startsWith('/static') || path === '/favicon.ico' || path === '/sitemap.xml'
+  if (isAdminPath) return next()
+  // Verifica flag de manutenção no KV
+  try {
+    const kv = c.env?.PRODUCTS_KV
+    if (kv) {
+      const maint = await kv.get(MAINTENANCE_KEY)
+      if (maint === '1') {
+        return c.html(maintenancePage(), 503)
+      }
+    }
+  } catch {}
+  return next()
+})
 
 app.get('/admin', (c) => {
   if (!isAuthenticated(c)) return c.html(loginPage())
@@ -234,7 +253,6 @@ app.post('/admin/login', async (c) => {
     username = (body['username'] as string || '').trim()
     password = (body['password'] as string || '').trim()
   } catch {
-    // fallback: tenta ler como texto
     const text = await c.req.text()
     const params = new URLSearchParams(text)
     username = (params.get('username') || '').trim()
@@ -248,10 +266,120 @@ app.post('/admin/login', async (c) => {
   return c.html(loginPage('Usuário ou senha inválidos. Tente novamente.'))
 })
 
-app.get('/admin/logout', (c) => {
+app.get('/admin/logout', async (c) => {
+  // Desativar modo manutenção ao sair do admin
+  try {
+    const kv = c.env?.PRODUCTS_KV
+    if (kv) await kv.put(MAINTENANCE_KEY, '0')
+  } catch {}
   const res = c.redirect('/')
   res.headers.set('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; SameSite=Strict`)
   return res
+})
+
+// === API: MANUTENÇÃO ===
+app.post('/api/admin/maintenance', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  const kv = c.env?.PRODUCTS_KV
+  let maintenance = false
+  if (kv) {
+    let body: any = {}
+    try { body = await c.req.json() } catch {}
+    if (body.force === true) {
+      // Sempre ativar (chamado ao abrir o painel)
+      await kv.put(MAINTENANCE_KEY, '1')
+      maintenance = true
+    } else {
+      // Toggle
+      const current = await kv.get(MAINTENANCE_KEY)
+      maintenance = current !== '1'
+      await kv.put(MAINTENANCE_KEY, maintenance ? '1' : '0')
+    }
+  }
+  return c.json({ success: true, maintenance })
+})
+
+app.get('/api/admin/maintenance', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  const kv = c.env?.PRODUCTS_KV
+  let maintenance = false
+  if (kv) { const v = await kv.get(MAINTENANCE_KEY); maintenance = v === '1' }
+  return c.json({ maintenance })
+})
+
+// === API: COMPARATIVOS ===
+app.get('/api/comparativos', async (c) => {
+  try {
+    const kv = c.env?.ARTICLES_KV
+    if (!kv) return c.json([])
+    const data = await kv.get('comparativos:list')
+    return c.json(data ? JSON.parse(data) : [])
+  } catch { return c.json([]) }
+})
+
+app.get('/api/comparativos/:id', async (c) => {
+  try {
+    const kv = c.env?.ARTICLES_KV
+    if (!kv) return c.json({ error: 'not found' }, 404)
+    const id = c.req.param('id')
+    const data = await kv.get(`comparativo:${id}`)
+    if (!data) return c.json({ error: 'not found' }, 404)
+    return c.json(JSON.parse(data))
+  } catch { return c.json({ error: 'error' }, 500) }
+})
+
+app.post('/api/comparativos', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  try {
+    const kv = c.env?.ARTICLES_KV
+    const body = await c.req.json()
+    const id = `cmp_${Date.now()}_${Math.random().toString(36).slice(2,7)}`
+    const comparativo = { id, ...body, createdAt: new Date().toISOString() }
+    if (kv) {
+      await kv.put(`comparativo:${id}`, JSON.stringify(comparativo))
+      const listData = await kv.get('comparativos:list')
+      const list = listData ? JSON.parse(listData) : []
+      const meta = { id, title: comparativo.title, category: comparativo.category, status: comparativo.status || 'active', products: (comparativo.products||[]).map((p:any)=>({id:p.id,name:p.name,image:p.image,price:p.price,rating:p.rating,badge:p.badge,affiliateUrl:p.affiliateUrl,pros:p.pros,cons:p.cons})), createdAt: comparativo.createdAt }
+      list.unshift(meta)
+      await kv.put('comparativos:list', JSON.stringify(list))
+    }
+    return c.json({ success: true, comparativo }, 201)
+  } catch (e) { return c.json({ error: String(e) }, 500) }
+})
+
+app.put('/api/comparativos/:id', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  try {
+    const kv = c.env?.ARTICLES_KV
+    const id = c.req.param('id')
+    const body = await c.req.json()
+    const comparativo = { id, ...body, updatedAt: new Date().toISOString() }
+    if (kv) {
+      await kv.put(`comparativo:${id}`, JSON.stringify(comparativo))
+      const listData = await kv.get('comparativos:list')
+      const list = listData ? JSON.parse(listData) : []
+      const idx = list.findIndex((x: any) => x.id === id)
+      const meta = { id, title: comparativo.title, category: comparativo.category, status: comparativo.status || 'active', products: (comparativo.products||[]).map((p:any)=>({id:p.id,name:p.name,image:p.image,price:p.price,rating:p.rating,badge:p.badge,affiliateUrl:p.affiliateUrl,pros:p.pros,cons:p.cons})), createdAt: comparativo.createdAt, updatedAt: comparativo.updatedAt }
+      if (idx >= 0) list[idx] = meta; else list.unshift(meta)
+      await kv.put('comparativos:list', JSON.stringify(list))
+    }
+    return c.json({ success: true, comparativo })
+  } catch (e) { return c.json({ error: String(e) }, 500) }
+})
+
+app.delete('/api/comparativos/:id', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  try {
+    const kv = c.env?.ARTICLES_KV
+    const id = c.req.param('id')
+    if (kv) {
+      await kv.delete(`comparativo:${id}`)
+      const listData = await kv.get('comparativos:list')
+      const list = listData ? JSON.parse(listData) : []
+      await kv.put('comparativos:list', JSON.stringify(list.filter((x: any) => x.id !== id)))
+    }
+    return c.json({ success: true })
+  } catch (e) { return c.json({ error: String(e) }, 500) }
 })
 
 // === API: ARTIGOS DO BLOG ===
@@ -418,6 +546,64 @@ app.get('/artigo/:slug', async (c) => {
 })
 
 // === HTML PAGES ===
+
+function maintenancePage(): string {
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/static/logo.png">
+  <title>TeckHome Store — Em Manutenção</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    @keyframes pulse2 { 0%,100%{opacity:1} 50%{opacity:.5} }
+    .pulse { animation: pulse2 2s infinite; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .spin { animation: spin 3s linear infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+    .float { animation: float 3s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 via-indigo-900 to-purple-900 min-h-screen flex items-center justify-center p-4">
+  <div class="text-center max-w-lg mx-auto">
+    <!-- Logo flutuando -->
+    <div class="float mb-8">
+      <img src="/static/logo.png" alt="TeckHome" class="w-24 h-24 rounded-3xl mx-auto shadow-2xl shadow-indigo-500/30 object-cover">
+    </div>
+    <!-- Ícone de manutenção girando -->
+    <div class="w-20 h-20 rounded-full border-4 border-indigo-400/30 border-t-indigo-400 spin mx-auto mb-8"></div>
+    <!-- Título -->
+    <h1 class="text-3xl font-black text-white mb-3">Site em Manutenção</h1>
+    <p class="text-indigo-200 text-lg mb-2 font-medium">Estamos melhorando sua experiência.</p>
+    <p class="text-indigo-300/70 text-sm mb-10">Nossa equipe está trabalhando para trazer novidades. Voltamos em breve!</p>
+    <!-- Status -->
+    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/20 mb-8">
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <div class="w-2.5 h-2.5 rounded-full bg-yellow-400 pulse"></div>
+        <span class="text-white font-bold text-sm">Manutenção em andamento</span>
+      </div>
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-indigo-200 text-xs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Site seguro e protegido
+        </div>
+        <div class="flex items-center gap-2 text-indigo-200 text-xs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Previsão: retorno em breve
+        </div>
+      </div>
+    </div>
+    <!-- Contato -->
+    <p class="text-indigo-400 text-xs">
+      Dúvidas? <a href="mailto:contato@teckhomestore.com" class="text-indigo-300 hover:text-white underline transition-colors">contato@teckhomestore.com</a>
+    </p>
+    <p class="text-indigo-600 text-xs mt-6">© 2026 TeckHome Store</p>
+  </div>
+</body>
+</html>`
+}
 
 function homePage(): string {
   return `<!DOCTYPE html>
@@ -1968,10 +2154,150 @@ function categoryPage(categoryId: string): string {
       const prodRes = await fetch(\`/api/products/\${CATEGORY_ID}\`)
       allProducts = await prodRes.json()
       renderProducts()
+
+      // Carregar comparativos da categoria
+      loadComparativosSection()
+    }
+
+    async function loadComparativosSection() {
+      try {
+        const res = await fetch('/api/comparativos')
+        const all = await res.json()
+        const catComps = all.filter(c => c.status === 'active' && c.category === CATEGORY_ID)
+        if (!catComps.length) return
+        const section = document.getElementById('comparativosSection')
+        if (section) section.classList.remove('hidden')
+        const container = document.getElementById('comparativosContainer')
+        if (!container) return
+        container.innerHTML = catComps.map(cmp => renderComparativoCard(cmp)).join('')
+      } catch(e) { console.log('Comparativos não carregados:', e) }
+    }
+
+    function renderComparativoCard(cmp) {
+      const prods = cmp.products || []
+      if (prods.length < 2) return ''
+
+      const starsHtml = (r) => {
+        const v = parseFloat(r) || 0
+        return Array.from({length:5}, (_,i) =>
+          \`<svg width="12" height="12" viewBox="0 0 24 24" fill="\${i<Math.floor(v)?'#f59e0b':i<v?'#fcd34d':'#e5e7eb'}" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>\`
+        ).join('')
+      }
+
+      const badgeHtml = (p) => {
+        if (p.badge === 'best') return '<span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:0.3px;white-space:nowrap;">🏆 MELHOR ESCOLHA</span>'
+        if (p.badge === 'costbenefit') return '<span style="background:linear-gradient(135deg,#059669,#10b981);color:white;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;letter-spacing:0.3px;white-space:nowrap;">💚 CUSTO-BENEFÍCIO</span>'
+        return ''
+      }
+
+      const faqHtml = cmp.faq ? \`
+        <div style="background:#f8fafc;border-radius:16px;padding:20px;margin-top:24px;">
+          <h4 style="font-size:15px;font-weight:800;color:#1f2937;margin:0 0 14px;display:flex;align-items:center;gap:8px;"><span style="color:#6366f1;">❓</span> Perguntas Frequentes</h4>
+          \${cmp.faq.split(/\\n\\n+/).map(block => {
+            const lines = block.split('\\n')
+            const q = lines[0]||''
+            const a = lines.slice(1).join(' ')
+            return q ? \`<div style="margin-bottom:12px;"><p style="font-size:13px;font-weight:700;color:#374151;margin:0 0 3px;">\${q}</p><p style="font-size:13px;color:#6b7280;margin:0;">\${a}</p></div>\` : ''
+          }).join('')}
+        </div>
+      \` : ''
+
+      return \`
+        <div style="background:white;border-radius:20px;border:1px solid #e5e7eb;padding:24px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);" itemscope itemtype="https://schema.org/ItemList">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:linear-gradient(135deg,#7c3aed,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:18px;">⚖️</span>
+            <span style="font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:1px;background:#f3f0ff;padding:3px 10px;border-radius:20px;">Comparativo</span>
+          </div>
+          <h2 style="font-size:20px;font-weight:900;color:#111827;margin:0 0 6px;line-height:1.3;" itemprop="name">\${cmp.title}</h2>
+          \${cmp.summary ? \`<p style="font-size:14px;color:#6b7280;margin:0 0 20px;line-height:1.7;">\${cmp.summary}</p>\` : ''}
+
+          <!-- TABELA COMPARATIVA -->
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:20px;">
+            <table style="width:100%;border-collapse:collapse;min-width:480px;">
+              <thead>
+                <tr style="background:linear-gradient(135deg,#f3f0ff,#ede9fe);">
+                  <th style="padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:#7c3aed;border-radius:10px 0 0 10px;">Produto</th>
+                  <th style="padding:10px 14px;text-align:center;font-size:12px;font-weight:700;color:#7c3aed;">Preço</th>
+                  <th style="padding:10px 14px;text-align:center;font-size:12px;font-weight:700;color:#7c3aed;">Avaliação</th>
+                  <th style="padding:10px 14px;text-align:center;font-size:12px;font-weight:700;color:#7c3aed;border-radius:0 10px 10px 0;">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                \${prods.map((p, i) => \`
+                  <tr style="border-bottom:1px solid #f3f4f6;\${p.badge==='best'?'background:linear-gradient(90deg,#faf5ff,white);':''}" itemscope itemtype="https://schema.org/Product">
+                    <td style="padding:12px 14px;">
+                      <div style="display:flex;align-items:center;gap:10px;">
+                        \${p.image ? \`<img src="\${p.image}" alt="\${p.name}" style="width:44px;height:44px;object-fit:cover;border-radius:10px;border:1px solid #f3f4f6;" loading="lazy">\` : \`<div style="width:44px;height:44px;background:#f3f0ff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">📦</div>\`}
+                        <div>
+                          <p style="font-size:13px;font-weight:800;color:#1f2937;margin:0 0 3px;line-height:1.3;" itemprop="name">\${p.name || 'Produto'}</p>
+                          <div>\${badgeHtml(p)}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td style="padding:12px 14px;text-align:center;">
+                      <span style="font-size:14px;font-weight:800;color:#059669;">\${p.price || '—'}</span>
+                    </td>
+                    <td style="padding:12px 14px;text-align:center;">
+                      <div style="display:flex;justify-content:center;gap:1px;">\${starsHtml(p.rating)}</div>
+                      \${p.rating ? \`<span style="font-size:11px;color:#6b7280;">\${p.rating}/5</span>\` : '<span style="font-size:11px;color:#9ca3af;">—</span>'}
+                    </td>
+                    <td style="padding:12px 14px;text-align:center;">
+                      \${p.affiliateUrl ? \`<a href="\${p.affiliateUrl}" target="_blank" rel="noopener sponsored" style="display:inline-block;background:\${p.badge==='best'?'linear-gradient(135deg,#7c3aed,#6366f1)':'#6366f1'};color:white;font-size:12px;font-weight:700;padding:7px 14px;border-radius:10px;text-decoration:none;white-space:nowrap;">Ver Preço</a>\` : '<span style="font-size:12px;color:#9ca3af;">—</span>'}
+                    </td>
+                  </tr>
+                \`).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CARDS COM PRÓS E CONTRAS -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;">
+            \${prods.map(p => \`
+              <div style="background:#fafafa;border:1px solid #f3f4f6;border-radius:14px;padding:14px;position:relative;\${p.badge==='best'?'border-color:#c4b5fd;background:linear-gradient(135deg,#faf5ff,#fafafa);':''}">
+                \${p.badge ? \`<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;">\${badgeHtml(p)}</div>\` : ''}
+                <p style="font-size:12px;font-weight:800;color:#1f2937;margin:\${p.badge?'10px':'0'} 0 10px;text-align:center;line-height:1.3;">\${p.name || 'Produto'}</p>
+                \${(p.pros||[]).length ? \`
+                  <div style="margin-bottom:8px;">
+                    \${(p.pros||[]).map(pro => \`<div style="font-size:11px;color:#059669;display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;"><span style="flex-shrink:0;margin-top:1px;">✓</span><span>\${pro}</span></div>\`).join('')}
+                  </div>
+                \` : ''}
+                \${(p.cons||[]).length ? \`
+                  <div>
+                    \${(p.cons||[]).map(con => \`<div style="font-size:11px;color:#ef4444;display:flex;align-items:flex-start;gap:5px;margin-bottom:3px;"><span style="flex-shrink:0;margin-top:1px;">✗</span><span>\${con}</span></div>\`).join('')}
+                  </div>
+                \` : ''}
+              </div>
+            \`).join('')}
+          </div>
+
+          \${cmp.conclusion ? \`
+            <div style="background:linear-gradient(135deg,#f3f0ff,#ede9fe);border-radius:14px;padding:16px;margin-bottom:16px;border-left:4px solid #7c3aed;">
+              <p style="font-size:13px;font-weight:700;color:#7c3aed;margin:0 0 6px;display:flex;align-items:center;gap:6px;">💡 Conclusão</p>
+              <p style="font-size:14px;color:#374151;margin:0;line-height:1.7;">\${cmp.conclusion}</p>
+            </div>
+          \` : ''}
+
+          \${faqHtml}
+        </div>
+      \`
     }
 
     init()
   </script>
+
+  <!-- SEÇÃO COMPARATIVOS -->
+  <section id="comparativosSection" class="hidden" aria-label="Comparativo de produtos">
+    <div class="max-w-7xl mx-auto px-4 pb-12">
+      <div class="flex items-center gap-3 mb-6 pt-2">
+        <div style="background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:white;font-size:16px;">⚖️</div>
+        <div>
+          <h2 class="text-xl font-black text-gray-900 leading-tight">Comparativo entre Produtos Similares</h2>
+          <p class="text-sm text-gray-500">Análise completa para você decidir melhor</p>
+        </div>
+      </div>
+      <div id="comparativosContainer"></div>
+    </div>
+  </section>
 
   <!-- MODAL DE PRODUTO (categoria) -->
   <div id="productModalCp" class="hidden fixed inset-0 z-[999] flex items-center justify-center p-4" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);" onclick="if(event.target===this)closeProductModalCp()">
@@ -2062,6 +2388,14 @@ function adminPage(): string {
         class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-yellow-500 -mb-px transition-all flex items-center gap-2">
         <i class="fas fa-star text-xs"></i> Destaques
         <span id="destaquesCount" class="hidden bg-yellow-400 text-white text-xs font-black rounded-full w-5 h-5 flex items-center justify-center">0</span>
+      </button>
+      <button onclick="switchTab('comparativos')" id="tab-comparativos"
+        class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-purple-600 -mb-px transition-all flex items-center gap-2">
+        <i class="fas fa-balance-scale text-xs"></i> Comparativos
+      </button>
+      <button onclick="switchTab('config')" id="tab-config"
+        class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-600 -mb-px transition-all flex items-center gap-2">
+        <i class="fas fa-cog text-xs"></i> Config
       </button>
     </div>
   </div>
@@ -2421,6 +2755,175 @@ function adminPage(): string {
     </div>
   </div>
 
+  <!-- TAB: COMPARATIVOS -->
+  <div id="section-comparativos" class="hidden max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-5 gap-8">
+      <!-- FORMULÁRIO -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+          <h2 class="text-xl font-black text-gray-900 mb-1 flex items-center gap-2">
+            <i class="fas fa-balance-scale text-purple-600"></i> <span id="cmpFormTitle">Novo Comparativo</span>
+          </h2>
+          <p class="text-gray-400 text-sm mb-5">Compare produtos similares e gere textos com IA</p>
+          <input type="hidden" id="cmpEditId" value="">
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Título do Comparativo</label>
+            <input id="cmpTitle" type="text" placeholder="Ex: Melhor Aspirador de Pó 2025" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 transition-all">
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Categoria</label>
+            <select id="cmpCategory" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all">
+              <option value="">Selecione a categoria...</option>
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Produtos Comparados</label>
+            <div id="cmpProductsList" class="space-y-2 min-h-12 bg-gray-50 rounded-xl p-3 border border-dashed border-gray-200">
+              <p class="text-gray-400 text-xs text-center py-2">Nenhum produto adicionado</p>
+            </div>
+            <select id="cmpAddProductSelect" class="w-full mt-2 px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all">
+              <option value="">+ Adicionar produto ao comparativo...</option>
+            </select>
+            <button onclick="addCmpProduct()" class="w-full mt-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-sm font-semibold py-2 rounded-xl transition-all flex items-center justify-center gap-2">
+              <i class="fas fa-plus-circle"></i> Adicionar Produto
+            </button>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+            <select id="cmpStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all">
+              <option value="active">Ativo (visível no site)</option>
+              <option value="inactive">Inativo (oculto)</option>
+            </select>
+          </div>
+
+          <div class="mb-5">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Observações (interno)</label>
+            <textarea id="cmpNotes" rows="2" placeholder="Notas internas sobre este comparativo..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all resize-none"></textarea>
+          </div>
+
+          <!-- Gerador de IA -->
+          <div class="border-t border-gray-100 pt-4 mb-4">
+            <p class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-2"><i class="fas fa-robot text-purple-500"></i> Gerador de Texto com IA</p>
+            <button onclick="generateComparativoAI()" id="btnGenAI" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md">
+              <i class="fas fa-magic"></i> Gerar Textos Automáticos
+            </button>
+            <p class="text-xs text-gray-400 mt-1 text-center">Cria título, resumo, conclusão, FAQ e meta descrição SEO</p>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Resumo</label>
+            <textarea id="cmpSummary" rows="3" placeholder="Resumo gerado pela IA ou escrito manualmente..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all resize-none"></textarea>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Conclusão</label>
+            <textarea id="cmpConclusion" rows="3" placeholder="Conclusão e recomendação final..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all resize-none"></textarea>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">FAQ (perguntas frequentes)</label>
+            <textarea id="cmpFaq" rows="4" placeholder="P: Qual produto é melhor?&#10;R: Depende do seu perfil..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all resize-none"></textarea>
+          </div>
+          <div class="mb-5">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Meta Descrição SEO</label>
+            <textarea id="cmpMetaDesc" rows="2" placeholder="Descrição para mecanismos de busca (máx 160 caracteres)..." class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-purple-400 transition-all resize-none"></textarea>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="saveComparativo()" id="btnSaveCmp" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+              <i class="fas fa-save"></i> Salvar
+            </button>
+            <button onclick="openNewComparativo()" class="px-4 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-semibold py-3 rounded-xl transition-all">
+              <i class="fas fa-plus"></i> Novo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA -->
+      <div class="lg:col-span-3">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-black text-gray-900">Comparativos Cadastrados</h2>
+          <span id="cmpCount" class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full">0 total</span>
+        </div>
+        <div id="cmpList" class="space-y-4">
+          <div class="text-center py-16 text-gray-400">
+            <i class="fas fa-balance-scale text-5xl mb-4 opacity-30"></i>
+            <p class="text-lg font-medium">Carregando comparativos...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: CONFIG -->
+  <div id="section-config" class="hidden max-w-7xl mx-auto px-4 py-8">
+    <div class="max-w-2xl mx-auto">
+      <h2 class="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
+        <i class="fas fa-cog text-gray-600"></i> Configurações do Site
+      </h2>
+
+      <!-- Modo Manutenção -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
+              <i class="fas fa-hard-hat text-orange-500"></i> Modo Manutenção
+            </h3>
+            <p class="text-gray-500 text-sm mt-1 leading-relaxed">
+              Quando ativado, visitantes verão uma tela de manutenção ao acessar o site. O painel admin permanece acessível normalmente.
+            </p>
+            <div id="maintenanceStatusBadge" class="mt-3">
+              <span class="bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1.5 rounded-full">Verificando...</span>
+            </div>
+          </div>
+          <button id="btnToggleMaintenance" onclick="toggleMaintenance()" class="ml-4 flex-shrink-0 px-5 py-3 bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 border border-gray-200 font-bold text-sm rounded-xl transition-all flex items-center gap-2">
+            <i class="fas fa-power-off"></i> Alternar
+          </button>
+        </div>
+
+        <div class="mt-4 bg-orange-50 border border-orange-100 rounded-xl p-4">
+          <p class="text-orange-700 text-xs font-medium flex items-start gap-2">
+            <i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i>
+            <span>O modo manutenção é ativado automaticamente ao acessar o painel admin e desativado ao fazer logout. Você também pode alternar manualmente aqui.</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Info do Sistema -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h3 class="text-base font-black text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-info-circle text-blue-500"></i> Informações do Sistema
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between py-2 border-b border-gray-50">
+            <span class="text-gray-500">Plataforma</span>
+            <span class="font-semibold text-gray-700">Cloudflare Pages</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-50">
+            <span class="text-gray-500">Framework</span>
+            <span class="font-semibold text-gray-700">Hono + TypeScript</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-50">
+            <span class="text-gray-500">Storage</span>
+            <span class="font-semibold text-gray-700">Cloudflare KV</span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-gray-500">Versão</span>
+            <span class="font-semibold text-gray-700">2.0.0</span>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <a href="/admin/logout" class="flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors">
+            <i class="fas fa-sign-out-alt"></i> Fazer Logout do Admin
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     let categories = []
     let allProducts = []
@@ -2428,9 +2931,10 @@ function adminPage(): string {
 
     // ======= TABS =======
     function switchTab(tab) {
-      document.getElementById('section-produtos').classList.toggle('hidden', tab !== 'produtos')
-      document.getElementById('section-blog').classList.toggle('hidden', tab !== 'blog')
-      document.getElementById('section-destaques').classList.toggle('hidden', tab !== 'destaques')
+      ['produtos','blog','destaques','comparativos','config'].forEach(t => {
+        const el = document.getElementById('section-' + t)
+        if (el) el.classList.toggle('hidden', tab !== t)
+      })
       document.getElementById('tab-produtos').className = tab === 'produtos'
         ? 'tab-btn px-5 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 -mb-px transition-all flex items-center gap-2'
         : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-indigo-600 -mb-px transition-all flex items-center gap-2'
@@ -2440,8 +2944,16 @@ function adminPage(): string {
       document.getElementById('tab-destaques').className = tab === 'destaques'
         ? 'tab-btn px-5 py-3 text-sm font-bold text-yellow-500 border-b-2 border-yellow-400 -mb-px transition-all flex items-center gap-2'
         : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-yellow-500 -mb-px transition-all flex items-center gap-2'
+      document.getElementById('tab-comparativos').className = tab === 'comparativos'
+        ? 'tab-btn px-5 py-3 text-sm font-bold text-purple-600 border-b-2 border-purple-500 -mb-px transition-all flex items-center gap-2'
+        : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-purple-600 -mb-px transition-all flex items-center gap-2'
+      document.getElementById('tab-config').className = tab === 'config'
+        ? 'tab-btn px-5 py-3 text-sm font-bold text-gray-700 border-b-2 border-gray-500 -mb-px transition-all flex items-center gap-2'
+        : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-600 -mb-px transition-all flex items-center gap-2'
       if (tab === 'blog') loadArticles()
       if (tab === 'destaques') loadDestaques()
+      if (tab === 'comparativos') loadComparativos()
+      if (tab === 'config') loadConfig()
     }
 
     // ======= TOAST =======
@@ -2882,6 +3394,357 @@ function adminPage(): string {
       } catch { showToast('Erro de conexão', 'error') }
     }
 
+    // ======= CONFIG / MAINTENANCE =======
+    async function loadConfig() {
+      await updateMaintenanceStatus()
+    }
+
+    async function updateMaintenanceStatus() {
+      try {
+        const res = await fetch('/api/admin/maintenance')
+        const data = await res.json()
+        const badge = document.getElementById('maintenanceStatusBadge')
+        const btn = document.getElementById('btnToggleMaintenance')
+        if (data.maintenance) {
+          badge.innerHTML = '<span class="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5"><i class="fas fa-hard-hat"></i> Modo Manutenção ATIVO — site offline para visitantes</span>'
+          btn.className = 'ml-4 flex-shrink-0 px-5 py-3 bg-orange-500 text-white hover:bg-orange-600 border border-orange-500 font-bold text-sm rounded-xl transition-all flex items-center gap-2'
+          btn.innerHTML = '<i class="fas fa-power-off"></i> Desativar Manutenção'
+        } else {
+          badge.innerHTML = '<span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5"><i class="fas fa-check-circle"></i> Site Online — visitantes podem acessar normalmente</span>'
+          btn.className = 'ml-4 flex-shrink-0 px-5 py-3 bg-gray-100 text-gray-600 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 border border-gray-200 font-bold text-sm rounded-xl transition-all flex items-center gap-2'
+          btn.innerHTML = '<i class="fas fa-power-off"></i> Ativar Manutenção'
+        }
+      } catch(e) {
+        console.error('Erro ao buscar status manutenção', e)
+      }
+    }
+
+    async function toggleMaintenance() {
+      try {
+        const btn = document.getElementById('btnToggleMaintenance')
+        btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span>'
+        btn.disabled = true
+        const res = await fetch('/api/admin/maintenance', { method: 'POST' })
+        const data = await res.json()
+        showToast(data.maintenance ? 'Modo manutenção ATIVADO — site offline' : 'Site voltou ao ar!', data.maintenance ? 'info' : 'success')
+        await updateMaintenanceStatus()
+        btn.disabled = false
+      } catch(e) {
+        showToast('Erro ao alternar manutenção', 'error')
+        document.getElementById('btnToggleMaintenance').disabled = false
+      }
+    }
+
+    // ======= COMPARATIVOS =======
+    let cmpProducts = [] // produtos no comparativo atual
+
+    async function loadComparativos() {
+      const list = document.getElementById('cmpList')
+      const countEl = document.getElementById('cmpCount')
+      list.innerHTML = '<div class="text-center py-8 text-gray-400"><span class="spinner"></span><p class="mt-3 text-sm">Carregando...</p></div>'
+      try {
+        const res = await fetch('/api/comparativos')
+        const data = await res.json()
+        countEl.textContent = (data.length || 0) + ' total'
+        if (!data.length) {
+          list.innerHTML = '<div class="text-center py-16 text-gray-400"><i class="fas fa-balance-scale text-5xl mb-4 opacity-30"></i><p class="text-lg font-medium">Nenhum comparativo cadastrado ainda</p><p class="text-sm mt-1">Use o formulário ao lado para criar o primeiro</p></div>'
+          return
+        }
+        list.innerHTML = data.map(cmp => \`
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 card-admin">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded-full \${cmp.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">\${cmp.status === 'active' ? 'Ativo' : 'Inativo'}</span>
+                  <span class="text-xs text-gray-400">\${cmp.category || 'Sem categoria'}</span>
+                </div>
+                <h3 class="font-black text-gray-900 text-base leading-tight truncate">\${cmp.title}</h3>
+                <p class="text-xs text-gray-400 mt-1">\${(cmp.products || []).length} produto(s) comparado(s)</p>
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                  \${(cmp.products || []).slice(0,3).map(p => \`<span class="bg-purple-50 text-purple-700 text-xs px-2 py-0.5 rounded-lg font-medium">\${p.name ? p.name.substring(0,25)+'...' : p.id}</span>\`).join('')}
+                </div>
+              </div>
+              <div class="flex flex-col gap-2 flex-shrink-0">
+                <button onclick="editComparativo('\${cmp.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+                <button onclick="deleteComparativo('\${cmp.id}', '\${cmp.title.replace(/'/g,\\"\\\\\\\\'\\")}' )" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                  <i class="fas fa-trash"></i> Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        \`).join('')
+      } catch(e) {
+        list.innerHTML = '<div class="text-center py-8 text-red-400"><i class="fas fa-times-circle text-3xl mb-3"></i><p>Erro ao carregar comparativos</p></div>'
+      }
+    }
+
+    function openNewComparativo() {
+      document.getElementById('cmpEditId').value = ''
+      document.getElementById('cmpFormTitle').textContent = 'Novo Comparativo'
+      document.getElementById('cmpTitle').value = ''
+      document.getElementById('cmpCategory').value = ''
+      document.getElementById('cmpStatus').value = 'active'
+      document.getElementById('cmpSummary').value = ''
+      document.getElementById('cmpConclusion').value = ''
+      document.getElementById('cmpFaq').value = ''
+      document.getElementById('cmpMetaDesc').value = ''
+      document.getElementById('cmpNotes').value = ''
+      cmpProducts = []
+      renderCmpProducts()
+      populateCmpProductSelect()
+    }
+
+    async function editComparativo(id) {
+      try {
+        const res = await fetch('/api/comparativos/' + id)
+        const cmp = await res.json()
+        document.getElementById('cmpEditId').value = cmp.id
+        document.getElementById('cmpFormTitle').textContent = 'Editar Comparativo'
+        document.getElementById('cmpTitle').value = cmp.title || ''
+        document.getElementById('cmpCategory').value = cmp.category || ''
+        document.getElementById('cmpStatus').value = cmp.status || 'active'
+        document.getElementById('cmpSummary').value = cmp.summary || ''
+        document.getElementById('cmpConclusion').value = cmp.conclusion || ''
+        document.getElementById('cmpFaq').value = cmp.faq || ''
+        document.getElementById('cmpMetaDesc').value = cmp.metaDesc || ''
+        document.getElementById('cmpNotes').value = cmp.notes || ''
+        cmpProducts = cmp.products || []
+        renderCmpProducts()
+        populateCmpProductSelect()
+        switchTab('comparativos')
+        document.getElementById('cmpTitle').scrollIntoView({ behavior: 'smooth', block: 'center' })
+        showToast('Comparativo carregado para edição', 'info')
+      } catch(e) {
+        showToast('Erro ao carregar comparativo', 'error')
+      }
+    }
+
+    function renderCmpProducts() {
+      const container = document.getElementById('cmpProductsList')
+      if (!cmpProducts.length) {
+        container.innerHTML = '<p class="text-gray-400 text-xs text-center py-2">Nenhum produto adicionado</p>'
+        return
+      }
+      container.innerHTML = cmpProducts.map((p, i) => \`
+        <div class="bg-white border border-gray-200 rounded-xl p-3 flex items-start gap-2" id="cmpProd-\${i}">
+          <div class="flex flex-col gap-1 flex-shrink-0">
+            <button onclick="moveCmpProduct(\${i},-1)" class="w-6 h-5 bg-gray-100 hover:bg-gray-200 rounded text-gray-500 text-xs transition-all" \${i===0?'disabled':''}>▲</button>
+            <button onclick="moveCmpProduct(\${i},1)" class="w-6 h-5 bg-gray-100 hover:bg-gray-200 rounded text-gray-500 text-xs transition-all" \${i===cmpProducts.length-1?'disabled':''}>▼</button>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-gray-800 truncate">\${p.name || p.id}</p>
+            <div class="grid grid-cols-2 gap-1.5 mt-2">
+              <div>
+                <label class="text-xs text-gray-400">Preço</label>
+                <input type="text" value="\${p.price||''}" onchange="updateCmpProduct(\${i},'price',this.value)" placeholder="R$ 0,00" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-purple-400">
+              </div>
+              <div>
+                <label class="text-xs text-gray-400">Avaliação</label>
+                <input type="number" min="0" max="5" step="0.1" value="\${p.rating||''}" onchange="updateCmpProduct(\${i},'rating',this.value)" placeholder="4.5" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-purple-400">
+              </div>
+              <div>
+                <label class="text-xs text-gray-400">Link Afiliado</label>
+                <input type="url" value="\${p.affiliateUrl||''}" onchange="updateCmpProduct(\${i},'affiliateUrl',this.value)" placeholder="https://..." class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-purple-400">
+              </div>
+              <div>
+                <label class="text-xs text-gray-400">Destaque</label>
+                <select onchange="updateCmpProduct(\${i},'badge',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-purple-400">
+                  <option value="" \${!p.badge?'selected':''}>Nenhum</option>
+                  <option value="best" \${p.badge==='best'?'selected':''}>Melhor Escolha</option>
+                  <option value="costbenefit" \${p.badge==='costbenefit'?'selected':''}>Custo-Benefício</option>
+                </select>
+              </div>
+            </div>
+            <div class="mt-1.5">
+              <label class="text-xs text-gray-400">Vantagens (1 por linha)</label>
+              <textarea rows="2" onchange="updateCmpProduct(\${i},'pros',this.value)" placeholder="Potente&#10;Silencioso" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-purple-400 resize-none">\${(p.pros||[]).join('\\n')}</textarea>
+            </div>
+            <div class="mt-1.5">
+              <label class="text-xs text-gray-400">Desvantagens (1 por linha)</label>
+              <textarea rows="2" onchange="updateCmpProduct(\${i},'cons',this.value)" placeholder="Caro&#10;Pesado" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-purple-400 resize-none">\${(p.cons||[]).join('\\n')}</textarea>
+            </div>
+          </div>
+          <button onclick="removeCmpProduct(\${i})" class="flex-shrink-0 text-red-400 hover:text-red-600 transition-colors text-xs mt-1">
+            <i class="fas fa-times-circle text-base"></i>
+          </button>
+        </div>
+      \`).join('')
+    }
+
+    function updateCmpProduct(index, field, value) {
+      if (!cmpProducts[index]) return
+      if (field === 'pros' || field === 'cons') {
+        cmpProducts[index][field] = value.split('\\n').map(s => s.trim()).filter(Boolean)
+      } else {
+        cmpProducts[index][field] = value
+      }
+    }
+
+    function populateCmpProductSelect() {
+      const sel = document.getElementById('cmpAddProductSelect')
+      const existing = cmpProducts.map(p => p.id)
+      sel.innerHTML = '<option value="">+ Selecionar produto para adicionar...</option>'
+      allProducts.forEach(p => {
+        if (!existing.includes(p.id)) {
+          sel.innerHTML += \`<option value="\${p.id}">\${p.title ? p.title.substring(0,50) : p.id}</option>\`
+        }
+      })
+    }
+
+    function addCmpProduct() {
+      const sel = document.getElementById('cmpAddProductSelect')
+      const id = sel.value
+      if (!id) { showToast('Selecione um produto primeiro', 'info'); return }
+      const prod = allProducts.find(p => p.id === id)
+      if (!prod) { showToast('Produto não encontrado', 'error'); return }
+      cmpProducts.push({
+        id: prod.id,
+        name: prod.title || prod.name || id,
+        image: prod.imageUrl || prod.image || '',
+        price: prod.price || '',
+        rating: prod.rating || '',
+        affiliateUrl: prod.url || prod.affiliateUrl || '',
+        badge: '',
+        pros: prod.pros || [],
+        cons: prod.cons || []
+      })
+      renderCmpProducts()
+      populateCmpProductSelect()
+      sel.value = ''
+      showToast('Produto adicionado ao comparativo!', 'success')
+    }
+
+    function removeCmpProduct(index) {
+      cmpProducts.splice(index, 1)
+      renderCmpProducts()
+      populateCmpProductSelect()
+    }
+
+    function moveCmpProduct(index, direction) {
+      const newIndex = index + direction
+      if (newIndex < 0 || newIndex >= cmpProducts.length) return
+      const tmp = cmpProducts[index]
+      cmpProducts[index] = cmpProducts[newIndex]
+      cmpProducts[newIndex] = tmp
+      renderCmpProducts()
+    }
+
+    async function generateComparativoAI() {
+      if (cmpProducts.length < 2) { showToast('Adicione pelo menos 2 produtos para gerar textos', 'info'); return }
+      const btn = document.getElementById('btnGenAI')
+      btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span> Gerando...'
+      btn.disabled = true
+
+      const prodNames = cmpProducts.map(p => p.name || p.id)
+      const cat = document.getElementById('cmpCategory')
+      const catName = cat.options[cat.selectedIndex]?.text || 'produto'
+      const bestProd = cmpProducts.find(p => p.badge === 'best') || cmpProducts[0]
+      const cbProd = cmpProducts.find(p => p.badge === 'costbenefit') || cmpProducts[cmpProducts.length > 1 ? 1 : 0]
+
+      // Gerar título
+      const titulo = \`\${prodNames[0]} vs \${prodNames.slice(1).join(' vs ')}: Qual é o Melhor \${catName.replace(/[🏠🌡️💨🧹🫧💧⚡🌙🎯🏷️]/g,'')} em 2025?\`
+      document.getElementById('cmpTitle').value = titulo
+
+      // Gerar meta descrição SEO
+      const metaDesc = \`Descubra a diferença entre \${prodNames.slice(0,2).join(' e ')}. Comparativo completo com preço, qualidade, avaliações e qual vale mais a pena comprar em 2025.\`
+      document.getElementById('cmpMetaDesc').value = metaDesc.substring(0, 160)
+
+      // Gerar resumo humanizado
+      const ratings = cmpProducts.map(p => p.rating ? \`\${p.name || p.id} com nota \${p.rating}\` : null).filter(Boolean)
+      const ratingsText = ratings.length ? \` Em avaliações de usuários, \${ratings.join(', ')}.\` : ''
+      const prices = cmpProducts.map(p => p.price ? \`o \${p.name || p.id} custa \${p.price}\` : null).filter(Boolean)
+      const pricesText = prices.length ? \` Quando falamos de preço, \${prices.join(' enquanto ')}.\` : ''
+
+      const summaryParts = [
+        \`Escolher entre \${prodNames.join(', ')} pode ser difícil sem uma análise aprofundada. Cada modelo tem características próprias que se encaixam melhor em perfis diferentes de usuário.\`,
+        pricesText,
+        ratingsText,
+        \`Neste comparativo, analisamos os principais critérios — preço, desempenho, custo-benefício e experiência do usuário — para ajudar você a tomar a melhor decisão.\`
+      ]
+      document.getElementById('cmpSummary').value = summaryParts.filter(Boolean).join(' ')
+
+      // Gerar conclusão
+      const conclusionParts = []
+      if (bestProd) conclusionParts.push(\`Se você busca a melhor performance e está disposto a investir mais, o \${bestProd.name || bestProd.id} é nossa principal recomendação — ele se destaca em qualidade e durabilidade.\`)
+      if (cbProd && cbProd.id !== bestProd?.id) conclusionParts.push(\`Para quem quer uma excelente relação qualidade-preço sem gastar demais, o \${cbProd.name || cbProd.id} é a escolha inteligente.\`)
+      if (cmpProducts.length > 2) conclusionParts.push(\`As demais opções também atendem bem nichos específicos, como quem prioriza \${catName.toLowerCase()} compacto ou design diferenciado.\`)
+      conclusionParts.push(\`No final, a melhor escolha depende do seu orçamento, das suas necessidades diárias e da frequência de uso. Avalie bem antes de decidir!\`)
+      document.getElementById('cmpConclusion').value = conclusionParts.join(' ')
+
+      // Gerar FAQ
+      const faqItems = [
+        \`P: Qual é o melhor \${catName.replace(/[🏠🌡️💨🧹🫧💧⚡🌙🎯🏷️]/g,'').trim()} entre \${prodNames.slice(0,2).join(' e ')}?\nR: Para uso intenso e performance máxima, recomendamos o \${bestProd.name || bestProd.id}. Para custo-benefício, o \${cbProd.name || cbProd.id} é a escolha mais inteligente.\`,
+        \`P: Vale a pena pagar mais caro por um \${catName.replace(/[🏠🌡️💨🧹🫧💧⚡🌙🎯🏷️]/g,'').trim()} premium?\nR: Depende da frequência de uso. Para uso diário intenso, o investimento se paga em durabilidade e eficiência. Para uso ocasional, um modelo intermediário já atende muito bem.\`,
+        \`P: Qual tem a melhor garantia?\nR: Verifique sempre as condições de garantia diretamente com o fabricante, pois políticas mudam com frequência. Geralmente modelos premium oferecem garantia estendida.\`,
+        \`P: Onde comprar com o melhor preço?\nR: Recomendamos verificar os links de afiliados deste comparativo, que direcionam para as melhores ofertas disponíveis no momento.\`
+      ]
+      document.getElementById('cmpFaq').value = faqItems.join('\\n\\n')
+
+      await new Promise(r => setTimeout(r, 600)) // pequeno delay para efeito de carregamento
+      btn.innerHTML = '<i class="fas fa-magic"></i> Gerar Textos Automáticos'
+      btn.disabled = false
+      showToast('Textos gerados com sucesso!', 'success')
+    }
+
+    async function saveComparativo() {
+      const title = document.getElementById('cmpTitle').value.trim()
+      if (!title) { showToast('Informe o título do comparativo', 'info'); return }
+      if (cmpProducts.length < 2) { showToast('Adicione pelo menos 2 produtos', 'info'); return }
+
+      const btn = document.getElementById('btnSaveCmp')
+      btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span>'
+      btn.disabled = true
+
+      const editId = document.getElementById('cmpEditId').value
+      const payload = {
+        title,
+        category: document.getElementById('cmpCategory').value,
+        status: document.getElementById('cmpStatus').value,
+        summary: document.getElementById('cmpSummary').value,
+        conclusion: document.getElementById('cmpConclusion').value,
+        faq: document.getElementById('cmpFaq').value,
+        metaDesc: document.getElementById('cmpMetaDesc').value,
+        notes: document.getElementById('cmpNotes').value,
+        products: cmpProducts
+      }
+
+      try {
+        const url = editId ? '/api/comparativos/' + editId : '/api/comparativos'
+        const method = editId ? 'PUT' : 'POST'
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        const data = await res.json()
+        if (data.success) {
+          showToast(editId ? 'Comparativo atualizado!' : 'Comparativo criado!', 'success')
+          openNewComparativo()
+          await loadComparativos()
+        } else {
+          showToast(data.error || 'Erro ao salvar', 'error')
+        }
+      } catch(e) {
+        showToast('Erro ao salvar comparativo', 'error')
+      }
+      btn.innerHTML = '<i class="fas fa-save"></i> Salvar'
+      btn.disabled = false
+    }
+
+    async function deleteComparativo(id, title) {
+      if (!confirm(\`Excluir o comparativo "\${title}"? Esta ação não pode ser desfeita.\`)) return
+      try {
+        const res = await fetch('/api/comparativos/' + id, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) {
+          showToast('Comparativo excluído!', 'success')
+          await loadComparativos()
+        } else {
+          showToast('Erro ao excluir', 'error')
+        }
+      } catch(e) {
+        showToast('Erro ao excluir comparativo', 'error')
+      }
+    }
+
     // ======= INIT =======
     async function init() {
       const res = await fetch('/api/categories')
@@ -2889,12 +3752,18 @@ function adminPage(): string {
       const catSelect = document.getElementById('categoryId')
       const filterSelect = document.getElementById('filterCategory')
       const destaqueFilter = document.getElementById('destaqueCatFilter')
+      const cmpCatSelect = document.getElementById('cmpCategory')
       categories.forEach(cat => {
         catSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
         filterSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
         destaqueFilter.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
+        cmpCatSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
       })
       await loadProducts()
+      // Ativar modo manutenção ao abrir o painel
+      try {
+        await fetch('/api/admin/maintenance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ force: true }) })
+      } catch(e) { console.log('Manutenção não ativada:', e) }
     }
 
     init()
