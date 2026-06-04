@@ -382,6 +382,92 @@ app.delete('/api/comparativos/:id', async (c) => {
   } catch (e) { return c.json({ error: String(e) }, 500) }
 })
 
+// === API: COMPARE OS PREÇOS ===
+// Cada configuração de compare é armazenada como: pricecompare:{id} no ARTICLES_KV
+// Lista: pricecompare:list
+
+app.get('/api/pricecompare', async (c) => {
+  try {
+    const kv = c.env?.ARTICLES_KV
+    if (!kv) return c.json([])
+    const data = await kv.get('pricecompare:list')
+    return c.json(data ? JSON.parse(data) : [])
+  } catch { return c.json([]) }
+})
+
+app.get('/api/pricecompare/:id', async (c) => {
+  try {
+    const kv = c.env?.ARTICLES_KV
+    if (!kv) return c.json({ error: 'not found' }, 404)
+    const id = c.req.param('id')
+    const data = await kv.get(`pricecompare:${id}`)
+    if (!data) return c.json({ error: 'not found' }, 404)
+    return c.json(JSON.parse(data))
+  } catch { return c.json({ error: 'error' }, 500) }
+})
+
+app.post('/api/pricecompare', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  try {
+    const kv = c.env?.ARTICLES_KV
+    const body = await c.req.json()
+    const id = `pc_${Date.now()}_${Math.random().toString(36).slice(2,6)}`
+    const config = {
+      id,
+      productName: body.productName || '',
+      slug: body.slug || '',
+      active: body.active !== false,
+      showInArticle: body.showInArticle !== false,
+      stores: body.stores || [],
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString()
+    }
+    if (kv) {
+      await kv.put(`pricecompare:${id}`, JSON.stringify(config))
+      const listData = await kv.get('pricecompare:list')
+      const list = listData ? JSON.parse(listData) : []
+      list.unshift({ id, productName: config.productName, slug: config.slug, active: config.active, updatedAt: config.updatedAt })
+      await kv.put('pricecompare:list', JSON.stringify(list))
+    }
+    return c.json({ success: true, config }, 201)
+  } catch (e) { return c.json({ error: String(e) }, 500) }
+})
+
+app.put('/api/pricecompare/:id', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  try {
+    const kv = c.env?.ARTICLES_KV
+    const id = c.req.param('id')
+    const body = await c.req.json()
+    const config = { id, ...body, updatedAt: new Date().toISOString() }
+    if (kv) {
+      await kv.put(`pricecompare:${id}`, JSON.stringify(config))
+      const listData = await kv.get('pricecompare:list')
+      const list = listData ? JSON.parse(listData) : []
+      const idx = list.findIndex((x: any) => x.id === id)
+      const meta = { id, productName: config.productName, slug: config.slug, active: config.active, updatedAt: config.updatedAt }
+      if (idx >= 0) list[idx] = meta; else list.unshift(meta)
+      await kv.put('pricecompare:list', JSON.stringify(list))
+    }
+    return c.json({ success: true, config })
+  } catch (e) { return c.json({ error: String(e) }, 500) }
+})
+
+app.delete('/api/pricecompare/:id', async (c) => {
+  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  try {
+    const kv = c.env?.ARTICLES_KV
+    const id = c.req.param('id')
+    if (kv) {
+      await kv.delete(`pricecompare:${id}`)
+      const listData = await kv.get('pricecompare:list')
+      const list = listData ? JSON.parse(listData) : []
+      await kv.put('pricecompare:list', JSON.stringify(list.filter((x: any) => x.id !== id)))
+    }
+    return c.json({ success: true })
+  } catch (e) { return c.json({ error: String(e) }, 500) }
+})
+
 // === API: ARTIGOS DO BLOG ===
 
 // Listar artigos
@@ -1242,7 +1328,7 @@ function homePage(): string {
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
             <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
-            \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width=\'10\' height=\'10\' viewBox=\'0 0 24 24\' fill=\'white\'><path d=\'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z\'/></svg> Destaque</div>' : ''}
+            \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
             <div class="absolute bottom-3 left-3 right-3">
               <span class="inline-block text-white text-xs font-bold px-3 py-1 rounded-xl" style="background:\${catColor}cc">\${catName}</span>
             </div>
@@ -1965,7 +2051,7 @@ function categoryPage(categoryId: string): string {
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
             <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
-            \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width=\'10\' height=\'10\' viewBox=\'0 0 24 24\' fill=\'white\'><path d=\'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z\'/></svg> Destaque</div>' : ''}
+            \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
           </div>
           <!-- Conteúdo -->
           <div class="flex-1 flex flex-col">
@@ -2392,6 +2478,10 @@ function adminPage(): string {
       <button onclick="switchTab('comparativos')" id="tab-comparativos"
         class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-purple-600 -mb-px transition-all flex items-center gap-2">
         <i class="fas fa-balance-scale text-xs"></i> Comparativos
+      </button>
+      <button onclick="switchTab('precos')" id="tab-precos"
+        class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-green-600 -mb-px transition-all flex items-center gap-2">
+        <i class="fas fa-tags text-xs"></i> Compare Preços
       </button>
       <button onclick="switchTab('config')" id="tab-config"
         class="tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-600 -mb-px transition-all flex items-center gap-2">
@@ -2858,6 +2948,95 @@ function adminPage(): string {
     </div>
   </div>
 
+  <!-- TAB: COMPARE PREÇOS -->
+  <div id="section-precos" class="hidden max-w-7xl mx-auto px-4 py-8">
+    <div class="grid lg:grid-cols-5 gap-8">
+      <!-- FORMULÁRIO -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+          <h2 class="text-xl font-black text-gray-900 mb-1 flex items-center gap-2">
+            <i class="fas fa-tags text-green-600"></i> <span id="pcFormTitle">Nova Comparação</span>
+          </h2>
+          <p class="text-gray-400 text-sm mb-5">Configure a seção de comparação de preços para artigos</p>
+          <input type="hidden" id="pcEditId" value="">
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Nome do Produto <span class="text-red-500">*</span></label>
+            <input id="pcProductName" type="text" placeholder="Ex: Furadeira Bosch GSB 450" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100 transition-all">
+            <p class="text-xs text-gray-400 mt-1">Usado para gerar links automáticos nos marketplaces</p>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Slug do Artigo <span class="text-red-500">*</span></label>
+            <input id="pcSlug" type="text" placeholder="Ex: guia-eletronicos" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm outline-none focus:border-green-400 transition-all">
+            <p class="text-xs text-gray-400 mt-1">Identificador da URL do artigo onde aparecerá</p>
+          </div>
+
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700">Status</label>
+              <p class="text-xs text-gray-400">Exibir no artigo</p>
+            </div>
+            <div class="flex gap-3">
+              <select id="pcActive" class="px-3 py-2 rounded-xl border border-gray-200 text-sm outline-none focus:border-green-400 transition-all">
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Gerenciar lojas -->
+          <div class="border-t border-gray-100 pt-4 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-sm font-bold text-gray-700">Lojas / Marketplaces</p>
+              <button onclick="addPcStore()" class="bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5">
+                <i class="fas fa-plus"></i> Adicionar
+              </button>
+            </div>
+            <div id="pcStoresList" class="space-y-2 min-h-12 bg-gray-50 rounded-xl p-3 border border-dashed border-gray-200">
+              <p class="text-gray-400 text-xs text-center py-2">Clique em "Adicionar" para incluir marketplaces</p>
+            </div>
+          </div>
+
+          <!-- Geração automática de links -->
+          <div class="mb-5 bg-green-50 rounded-xl p-3 border border-green-100">
+            <p class="text-xs font-bold text-green-700 mb-2 flex items-center gap-1.5"><i class="fas fa-magic"></i> Links automáticos por marketplace</p>
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="addPcStorePreset('amazon')" class="bg-white border border-gray-200 hover:border-orange-300 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all text-gray-700 hover:text-orange-600">+ Amazon</button>
+              <button onclick="addPcStorePreset('mercadolivre')" class="bg-white border border-gray-200 hover:border-yellow-400 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all text-gray-700 hover:text-yellow-600">+ Mercado Livre</button>
+              <button onclick="addPcStorePreset('shopee')" class="bg-white border border-gray-200 hover:border-red-400 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all text-gray-700 hover:text-red-600">+ Shopee</button>
+              <button onclick="addPcStorePreset('magalu')" class="bg-white border border-gray-200 hover:border-blue-400 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all text-gray-700 hover:text-blue-600">+ Magalu</button>
+              <button onclick="addPcStorePreset('americanas')" class="bg-white border border-gray-200 hover:border-red-400 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-all text-gray-700 hover:text-red-700">+ Americanas</button>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button onclick="savePriceCompare()" id="btnSavePc" class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2">
+              <i class="fas fa-save"></i> Salvar
+            </button>
+            <button onclick="openNewPriceCompare()" class="px-4 bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-semibold py-3 rounded-xl transition-all">
+              <i class="fas fa-plus"></i> Novo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA -->
+      <div class="lg:col-span-3">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-black text-gray-900">Comparações Cadastradas</h2>
+          <span id="pcCount" class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">0 total</span>
+        </div>
+        <div id="pcList" class="space-y-4">
+          <div class="text-center py-16 text-gray-400">
+            <i class="fas fa-tags text-5xl mb-4 opacity-30"></i>
+            <p class="text-lg font-medium">Carregando...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TAB: CONFIG -->
   <div id="section-config" class="hidden max-w-7xl mx-auto px-4 py-8">
     <div class="max-w-2xl mx-auto">
@@ -2931,7 +3110,7 @@ function adminPage(): string {
 
     // ======= TABS =======
     function switchTab(tab) {
-      ['produtos','blog','destaques','comparativos','config'].forEach(t => {
+      ['produtos','blog','destaques','comparativos','precos','config'].forEach(t => {
         const el = document.getElementById('section-' + t)
         if (el) el.classList.toggle('hidden', tab !== t)
       })
@@ -2947,12 +3126,16 @@ function adminPage(): string {
       document.getElementById('tab-comparativos').className = tab === 'comparativos'
         ? 'tab-btn px-5 py-3 text-sm font-bold text-purple-600 border-b-2 border-purple-500 -mb-px transition-all flex items-center gap-2'
         : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-purple-600 -mb-px transition-all flex items-center gap-2'
+      document.getElementById('tab-precos').className = tab === 'precos'
+        ? 'tab-btn px-5 py-3 text-sm font-bold text-green-600 border-b-2 border-green-500 -mb-px transition-all flex items-center gap-2'
+        : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-green-600 -mb-px transition-all flex items-center gap-2'
       document.getElementById('tab-config').className = tab === 'config'
         ? 'tab-btn px-5 py-3 text-sm font-bold text-gray-700 border-b-2 border-gray-500 -mb-px transition-all flex items-center gap-2'
         : 'tab-btn px-5 py-3 text-sm font-bold text-gray-400 border-b-2 border-transparent hover:text-gray-600 -mb-px transition-all flex items-center gap-2'
       if (tab === 'blog') loadArticles()
       if (tab === 'destaques') loadDestaques()
       if (tab === 'comparativos') loadComparativos()
+      if (tab === 'precos') loadPriceCompareAdmin()
       if (tab === 'config') loadConfig()
     }
 
@@ -3745,6 +3928,215 @@ function adminPage(): string {
       }
     }
 
+    // ======= COMPARE OS PREÇOS (Admin) =======
+    let pcStores = []
+
+    const PC_STORE_PRESETS = {
+      amazon:       { storeType: 'amazon',       name: 'Amazon',        buttonText: 'Ver na Amazon',         shipping: 'Frete Prime disponível' },
+      mercadolivre: { storeType: 'mercadolivre', name: 'Mercado Livre', buttonText: 'Ver no Mercado Livre',  shipping: 'Frete Grátis disponível' },
+      shopee:       { storeType: 'shopee',       name: 'Shopee',        buttonText: 'Ver na Shopee',         shipping: 'Frete grátis em alguns itens' },
+      magalu:       { storeType: 'magalu',       name: 'Magazine Luiza',buttonText: 'Ver na Magalu',         shipping: 'Entrega rápida disponível' },
+      americanas:   { storeType: 'americanas',   name: 'Americanas',    buttonText: 'Ver nas Americanas',    shipping: 'Frete especial disponível' }
+    }
+
+    async function loadPriceCompareAdmin() {
+      const list = document.getElementById('pcList')
+      const countEl = document.getElementById('pcCount')
+      list.innerHTML = '<div class="text-center py-8 text-gray-400"><span class="spinner"></span><p class="mt-3 text-sm">Carregando...</p></div>'
+      try {
+        const res = await fetch('/api/pricecompare')
+        const data = await res.json()
+        countEl.textContent = (data.length || 0) + ' total'
+        if (!data.length) {
+          list.innerHTML = '<div class="text-center py-16 text-gray-400"><i class="fas fa-tags text-5xl mb-4 opacity-30"></i><p class="text-lg font-medium">Nenhuma comparação cadastrada ainda</p><p class="text-sm mt-1">Use o formulário ao lado para criar a primeira</p></div>'
+          return
+        }
+        list.innerHTML = data.map(pc => \`
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 card-admin">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded-full \${pc.active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}">\${pc.active !== false ? 'Ativo' : 'Inativo'}</span>
+                  <span class="text-xs text-gray-400 font-mono">/artigo/\${pc.slug}</span>
+                </div>
+                <h3 class="font-black text-gray-900 text-base leading-tight truncate">\${pc.productName}</h3>
+                <p class="text-xs text-gray-400 mt-1">Atualizado: \${pc.updatedAt ? new Date(pc.updatedAt).toLocaleDateString('pt-BR') : '—'}</p>
+              </div>
+              <div class="flex flex-col gap-2 flex-shrink-0">
+                <button onclick="editPriceCompare('\${pc.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+                <button onclick="deletePriceCompare('\${pc.id}','\${pc.productName.replace(/'/g,'')}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                  <i class="fas fa-trash"></i> Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        \`).join('')
+      } catch(e) {
+        list.innerHTML = '<div class="text-center py-8 text-red-400"><i class="fas fa-times-circle text-3xl mb-3"></i><p>Erro ao carregar</p></div>'
+      }
+    }
+
+    function openNewPriceCompare() {
+      document.getElementById('pcEditId').value = ''
+      document.getElementById('pcFormTitle').textContent = 'Nova Comparação'
+      document.getElementById('pcProductName').value = ''
+      document.getElementById('pcSlug').value = ''
+      document.getElementById('pcActive').value = 'true'
+      pcStores = []
+      renderPcStores()
+    }
+
+    async function editPriceCompare(id) {
+      try {
+        const res = await fetch('/api/pricecompare/' + id)
+        const pc = await res.json()
+        document.getElementById('pcEditId').value = pc.id
+        document.getElementById('pcFormTitle').textContent = 'Editar Comparação'
+        document.getElementById('pcProductName').value = pc.productName || ''
+        document.getElementById('pcSlug').value = pc.slug || ''
+        document.getElementById('pcActive').value = (pc.active !== false) ? 'true' : 'false'
+        pcStores = pc.stores || []
+        renderPcStores()
+        switchTab('precos')
+        showToast('Comparação carregada para edição', 'info')
+      } catch(e) { showToast('Erro ao carregar', 'error') }
+    }
+
+    function addPcStorePreset(type) {
+      const preset = PC_STORE_PRESETS[type]
+      if (!preset) return
+      pcStores.push({ ...preset, price: '', customUrl: '', logoUrl: '', badge: '', active: true, isBest: false, order: pcStores.length })
+      renderPcStores()
+      showToast(preset.name + ' adicionado!', 'success')
+    }
+
+    function addPcStore() {
+      pcStores.push({ storeType: 'custom', name: 'Nova Loja', buttonText: 'Ver oferta', shipping: '', price: '', customUrl: '', logoUrl: '', badge: '', active: true, isBest: false, order: pcStores.length })
+      renderPcStores()
+    }
+
+    function removePcStore(idx) {
+      pcStores.splice(idx, 1)
+      renderPcStores()
+    }
+
+    function updatePcStore(idx, field, value) {
+      if (pcStores[idx]) pcStores[idx][field] = (field === 'isBest' || field === 'active') ? (value === 'true' || value === true) : value
+    }
+
+    function movePcStore(idx, dir) {
+      const n = idx + dir
+      if (n < 0 || n >= pcStores.length) return
+      const tmp = pcStores[idx]; pcStores[idx] = pcStores[n]; pcStores[n] = tmp
+      renderPcStores()
+    }
+
+    function renderPcStores() {
+      const container = document.getElementById('pcStoresList')
+      if (!pcStores.length) {
+        container.innerHTML = '<p class="text-gray-400 text-xs text-center py-2">Use os botões acima para adicionar marketplaces</p>'
+        return
+      }
+      container.innerHTML = pcStores.map((s, i) => \`
+        <div class="bg-white border border-gray-200 rounded-xl p-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5">
+              <button onclick="movePcStore(\${i},-1)" class="w-6 h-5 bg-gray-100 hover:bg-gray-200 rounded text-gray-500 text-xs" \${i===0?'disabled':''}>▲</button>
+              <button onclick="movePcStore(\${i},1)" class="w-6 h-5 bg-gray-100 hover:bg-gray-200 rounded text-gray-500 text-xs" \${i===pcStores.length-1?'disabled':''}>▼</button>
+              <span class="text-xs font-bold text-gray-700">\${s.name}</span>
+            </div>
+            <button onclick="removePcStore(\${i})" class="text-red-400 hover:text-red-600 text-xs"><i class="fas fa-times-circle text-base"></i></button>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <div>
+              <label class="text-xs text-gray-400">Nome da Loja</label>
+              <input value="\${s.name}" onchange="updatePcStore(\${i},'name',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Preço</label>
+              <input value="\${s.price||''}" placeholder="R$ 299,90" onchange="updatePcStore(\${i},'price',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Frete</label>
+              <input value="\${s.shipping||''}" placeholder="Frete Grátis" onchange="updatePcStore(\${i},'shipping',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Texto do Botão</label>
+              <input value="\${s.buttonText||'Ver oferta'}" onchange="updatePcStore(\${i},'buttonText',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+            </div>
+            <div class="col-span-2">
+              <label class="text-xs text-gray-400">Link Afiliado / Customizado (opcional)</label>
+              <input value="\${s.customUrl||''}" placeholder="https://..." onchange="updatePcStore(\${i},'customUrl',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+            </div>
+            <div class="col-span-2">
+              <label class="text-xs text-gray-400">URL do Logo (opcional)</label>
+              <input value="\${s.logoUrl||''}" placeholder="https://..." onchange="updatePcStore(\${i},'logoUrl',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400">Etiqueta / Badge</label>
+              <input value="\${s.badge||''}" placeholder="Mais barato!" onchange="updatePcStore(\${i},'badge',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs text-gray-400">Melhor Oferta?</label>
+              <select onchange="updatePcStore(\${i},'isBest',this.value)" class="w-full text-xs px-2 py-1 border border-gray-200 rounded-lg outline-none focus:border-green-400">
+                <option value="false" \${!s.isBest?'selected':''}>Não</option>
+                <option value="true" \${s.isBest?'selected':''}>Sim ⭐</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      \`).join('')
+    }
+
+    async function savePriceCompare() {
+      const productName = document.getElementById('pcProductName').value.trim()
+      const slug = document.getElementById('pcSlug').value.trim()
+      if (!productName) { showToast('Informe o nome do produto', 'info'); return }
+      if (!slug) { showToast('Informe o slug do artigo', 'info'); return }
+      if (!pcStores.length) { showToast('Adicione pelo menos uma loja', 'info'); return }
+
+      const btn = document.getElementById('btnSavePc')
+      btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span>'
+      btn.disabled = true
+
+      const editId = document.getElementById('pcEditId').value
+      const payload = {
+        productName,
+        slug,
+        active: document.getElementById('pcActive').value === 'true',
+        showInArticle: true,
+        stores: pcStores
+      }
+
+      try {
+        const url = editId ? '/api/pricecompare/' + editId : '/api/pricecompare'
+        const method = editId ? 'PUT' : 'POST'
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        const data = await res.json()
+        if (data.success) {
+          showToast(editId ? 'Comparação atualizada!' : 'Comparação criada!', 'success')
+          openNewPriceCompare()
+          await loadPriceCompareAdmin()
+        } else {
+          showToast(data.error || 'Erro ao salvar', 'error')
+        }
+      } catch(e) { showToast('Erro ao salvar', 'error') }
+      btn.innerHTML = '<i class="fas fa-save"></i> Salvar'
+      btn.disabled = false
+    }
+
+    async function deletePriceCompare(id, name) {
+      if (!confirm('Excluir a comparação "' + name + '"?')) return
+      try {
+        const res = await fetch('/api/pricecompare/' + id, { method: 'DELETE' })
+        const data = await res.json()
+        if (data.success) { showToast('Comparação excluída!', 'success'); await loadPriceCompareAdmin() }
+        else showToast('Erro ao excluir', 'error')
+      } catch(e) { showToast('Erro ao excluir', 'error') }
+    }
+
     // ======= INIT =======
     async function init() {
       const res = await fetch('/api/categories')
@@ -3973,6 +4365,9 @@ function articlePage(article: any): string {
       ${content}
     </article>
 
+    <!-- COMPARE OS PREÇOS -->
+    <div id="priceCompareSection" class="hidden mt-10"></div>
+
     <!-- CTA de categoria -->
     <div class="mt-12 rounded-3xl overflow-hidden shadow-2xl" style="background:linear-gradient(135deg,#1e1b4b 0%,#3730a3 50%,#1e3a5f 100%);">
       <div class="p-8 text-center">
@@ -4067,6 +4462,121 @@ function articlePage(article: any): string {
       const pct = Math.min(100, total > 0 ? (scrolled / total) * 100 : 0)
       bar.style.width = pct + '%'
     }, { passive: true })
+
+    // ===== COMPARE OS PREÇOS =====
+    const ARTICLE_SLUG = '${article.slug || ''}'
+
+    // Logos SVG dos marketplaces (inline para não depender de CDN)
+    const STORE_LOGOS = {
+      amazon: '<svg viewBox="0 0 100 30" width="80" height="24" xmlns="http://www.w3.org/2000/svg"><text x="0" y="22" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="#FF9900" letter-spacing="-0.5">amazon</text><path d="M5 26 Q30 32 55 26 Q45 28 55 26" stroke="#FF9900" stroke-width="2" fill="none" stroke-linecap="round"/><text x="57" y="26" font-family="Arial,sans-serif" font-size="14" fill="#FF9900">.com.br</text></svg>',
+      mercadolivre: '<svg viewBox="0 0 120 28" width="100" height="24" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="12" fill="#FFE600"/><path d="M8 14 L14 8 L20 14 L14 20 Z" fill="#009EE3"/><text x="30" y="19" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#333">Mercado Livre</text></svg>',
+      shopee: '<svg viewBox="0 0 80 28" width="65" height="24" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="2" width="76" height="24" rx="4" fill="#EE4D2D"/><text x="8" y="19" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="white">Shopee</text></svg>',
+      magalu: '<svg viewBox="0 0 90 28" width="75" height="24" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="2" width="86" height="24" rx="4" fill="#0086FF"/><text x="8" y="19" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="white">Magalu</text></svg>',
+      americanas: '<svg viewBox="0 0 120 28" width="100" height="24" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="2" width="116" height="24" rx="4" fill="#D32F2F"/><text x="8" y="19" font-family="Arial,sans-serif" font-size="12" font-weight="bold" fill="white">Americanas</text></svg>',
+      custom: '<svg viewBox="0 0 80 28" width="65" height="24" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="2" width="76" height="24" rx="4" fill="#6366f1"/><text x="8" y="19" font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="white">Loja</text></svg>'
+    }
+
+    function generateStoreUrl(storeName, productName) {
+      const q = encodeURIComponent(productName)
+      const qDash = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+      const storeMap = {
+        amazon: 'https://www.amazon.com.br/s?k=' + q,
+        mercadolivre: 'https://lista.mercadolivre.com.br/' + qDash,
+        shopee: 'https://shopee.com.br/search?keyword=' + encodeURIComponent(productName),
+        magalu: 'https://www.magazineluiza.com.br/busca/' + qDash + '/',
+        americanas: 'https://www.americanas.com.br/busca/' + q
+      }
+      return storeMap[storeName.toLowerCase()] || null
+    }
+
+    function renderPriceCompare(config) {
+      if (!config || !config.active || !config.stores || config.stores.length === 0) return
+
+      const section = document.getElementById('priceCompareSection')
+      if (!section) return
+      section.classList.remove('hidden')
+
+      const bestStore = config.stores.find(s => s.isBest && s.active !== false)
+      const activeStores = config.stores.filter(s => s.active !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
+      const now = new Date()
+      const updateText = config.updatedAt ? new Date(config.updatedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : now.toLocaleDateString('pt-BR')
+
+      section.innerHTML = \`
+        <div style="background:white;border-radius:20px;border:1px solid #e5e7eb;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);" itemscope itemtype="https://schema.org/ItemList">
+          <!-- Header -->
+          <div style="background:linear-gradient(135deg,#1e1b4b,#3730a3);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="background:rgba(255,255,255,0.15);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              </div>
+              <div>
+                <p style="color:rgba(199,210,254,0.7);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 2px;">Compare os Preços</p>
+                <h3 style="color:white;font-size:16px;font-weight:900;margin:0;line-height:1.2;" itemprop="name">\${config.productName}</h3>
+              </div>
+            </div>
+            \${bestStore ? \`<div style="background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);color:#fcd34d;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;white-space:nowrap;display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="#fcd34d"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Melhor oferta: \${bestStore.name}</div>\` : ''}
+          </div>
+
+          <!-- Store Cards -->
+          <div style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+            \${activeStores.map((store, idx) => {
+              const logoKey = (store.storeType || 'custom').toLowerCase()
+              const logoSvg = STORE_LOGOS[logoKey] || STORE_LOGOS.custom
+              const url = store.customUrl || (store.productName ? generateStoreUrl(store.storeType || '', store.productName) : null) || generateStoreUrl(store.storeType || '', config.productName)
+              const isBest = store.isBest
+              const hasPrice = store.price && store.price.trim()
+
+              return \`
+                <div style="border:\${isBest ? '2px solid #6366f1' : '1px solid #f3f4f6'};border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;background:\${isBest ? 'linear-gradient(135deg,#fafafa,#f5f3ff)' : '#fafafa'};position:relative;transition:all 0.2s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(99,102,241,0.12)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'" itemscope itemtype="https://schema.org/ListItem">
+                  \${isBest ? '<div style="position:absolute;top:-11px;left:16px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;"><svg width=\\"9\\" height=\\"9\\" viewBox=\\"0 0 24 24\\" fill=\\"white\\"><path d=\\"M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z\\"/></svg>Melhor Oferta</div>' : ''}
+                  <!-- Logo -->
+                  <div style="flex-shrink:0;width:90px;display:flex;align-items:center;justify-content:flex-start;">
+                    \${store.logoUrl ? \`<img src="\${store.logoUrl}" alt="\${store.name}" style="max-width:80px;max-height:28px;object-fit:contain;">\` : (logoSvg)}
+                  </div>
+                  <!-- Info -->
+                  <div style="flex:1;min-width:0;">
+                    <p style="font-size:14px;font-weight:800;color:#1f2937;margin:0 0 2px;" itemprop="name">\${store.name}</p>
+                    \${store.shipping ? \`<p style="font-size:12px;color:\${store.shipping.toLowerCase().includes('grátis') ? '#059669' : '#6b7280'};margin:0;font-weight:600;">\${store.shipping}</p>\` : ''}
+                    \${store.badge ? \`<span style="display:inline-block;margin-top:4px;background:#fef3c7;color:#92400e;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">\${store.badge}</span>\` : ''}
+                  </div>
+                  <!-- Price + Button -->
+                  <div style="flex-shrink:0;text-align:right;">
+                    \${hasPrice ? \`<p style="font-size:20px;font-weight:900;color:\${isBest ? '#6366f1' : '#059669'};margin:0 0 6px;line-height:1;" itemprop="price">\${store.price}</p>\` : '<p style="font-size:13px;color:#9ca3af;margin:0 0 6px;">Ver preço</p>'}
+                    \${url ? \`<a href="\${url}" target="_blank" rel="noopener noreferrer sponsored" style="display:inline-flex;align-items:center;gap:5px;background:\${isBest ? 'linear-gradient(135deg,#6366f1,#4f46e5)' : '#374151'};color:white;font-size:12px;font-weight:800;padding:8px 16px;border-radius:10px;text-decoration:none;transition:all 0.2s;white-space:nowrap;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">\${store.buttonText || 'Ver oferta'}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>\` : ''}
+                  </div>
+                </div>
+              \`
+            }).join('')}
+          </div>
+
+          <!-- Footer -->
+          <div style="background:#f9fafb;border-top:1px solid #f3f4f6;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+            <p style="font-size:11px;color:#9ca3af;margin:0;display:flex;align-items:center;gap:5px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Última atualização: \${updateText}
+            </p>
+            <p style="font-size:10px;color:#d1d5db;margin:0;">Links de afiliados · Sem custo adicional para você</p>
+          </div>
+        </div>
+      \`
+    }
+
+    async function loadPriceCompare() {
+      if (!ARTICLE_SLUG) return
+      try {
+        const res = await fetch('/api/pricecompare')
+        const list = await res.json()
+        const match = list.find(pc => pc.slug === ARTICLE_SLUG && pc.active !== false)
+        if (!match) return
+        const detailRes = await fetch('/api/pricecompare/' + match.id)
+        const config = await detailRes.json()
+        if (config && config.showInArticle !== false) {
+          renderPriceCompare(config)
+        }
+      } catch(e) { console.log('Compare preços não carregado', e) }
+    }
+
+    loadPriceCompare()
   </script>
 
 </body>
