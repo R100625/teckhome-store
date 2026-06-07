@@ -1097,7 +1097,7 @@ function homePage(): string {
           </div>
           <div class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">Etapa 01</div>
           <h3 class="text-base font-black text-gray-900 mb-2">Pesquisa de Mercado</h3>
-          <p class="text-gray-600 text-sm leading-relaxed">Analisamos centenas de opções disponíveis no mercado brasileiro, considerando preço, disponibilidade e reputação da marca antes de selecionar produtos para análise.</p>
+          <p class="text-gray-600 text-sm leading-relaxed">Mapeamos centenas de produtos disponíveis no mercado brasileiro antes de iniciar qualquer análise. Avaliamos preço, disponibilidade, histórico da marca e posicionamento na categoria. Só avançamos com produtos que demonstram potencial real de entrega de valor ao consumidor — descartando opções sem relevância ou histórico confiável.</p>
         </article>
 
         <!-- Passo 2 -->
@@ -1107,7 +1107,7 @@ function homePage(): string {
           </div>
           <div class="text-xs font-black text-blue-400 uppercase tracking-widest mb-1">Etapa 02</div>
           <h3 class="text-base font-black text-gray-900 mb-2">Avaliações dos Consumidores</h3>
-          <p class="text-gray-600 text-sm leading-relaxed">Reunimos e analisamos avaliações reais de compradores verificados nas principais plataformas — Amazon, Mercado Livre e Shopee — para capturar a experiência real de uso.</p>
+          <p class="text-gray-600 text-sm leading-relaxed">Coletamos e interpretamos avaliações de compradores verificados nos principais marketplaces do Brasil. Filtramos opiniões com base em critérios como detalhamento, consistência e utilidade real. Isso nos permite identificar padrões de satisfação e reclamações recorrentes que não aparecem nas especificações técnicas oficiais.</p>
         </article>
 
         <!-- Passo 3 -->
@@ -1117,7 +1117,7 @@ function homePage(): string {
           </div>
           <div class="text-xs font-black text-purple-400 uppercase tracking-widest mb-1">Etapa 03</div>
           <h3 class="text-base font-black text-gray-900 mb-2">Comparação de Recursos</h3>
-          <p class="text-gray-600 text-sm leading-relaxed">Comparamos especificações técnicas, diferenciais e limitações de cada produto em relação às alternativas disponíveis na mesma faixa de preço.</p>
+          <p class="text-gray-600 text-sm leading-relaxed">Colocamos o produto lado a lado com suas principais alternativas na mesma faixa de preço. Avaliamos especificações técnicas, funcionalidades exclusivas, limitações conhecidas e o que cada opção entrega na prática. O objetivo é garantir que a recomendação faça sentido não apenas de forma isolada, mas dentro do contexto do mercado atual.</p>
         </article>
 
         <!-- Passo 4 -->
@@ -1127,7 +1127,7 @@ function homePage(): string {
           </div>
           <div class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-1">Etapa 04</div>
           <h3 class="text-base font-black text-gray-900 mb-2">Análise de Custo-Benefício</h3>
-          <p class="text-gray-600 text-sm leading-relaxed">Avaliamos o valor real entregue pelo produto em relação ao seu preço, considerando durabilidade, garantia e custo total de propriedade ao longo do tempo.</p>
+          <p class="text-gray-600 text-sm leading-relaxed">Ir além do preço de etiqueta é essencial. Analisamos o que o consumidor realmente leva para casa pelo valor investido — incluindo durabilidade esperada, condições de garantia, custo de manutenção e longevidade do produto. Um item mais barato que dura menos pode custar mais caro a longo prazo, e esse raciocínio guia nossas avaliações.</p>
         </article>
 
         <!-- Passo 5 -->
@@ -1137,7 +1137,7 @@ function homePage(): string {
           </div>
           <div class="text-xs font-black text-amber-400 uppercase tracking-widest mb-1">Etapa 05</div>
           <h3 class="text-base font-black text-gray-900 mb-2">Critérios de Qualidade</h3>
-          <p class="text-gray-600 text-sm leading-relaxed">Cada produto é avaliado por critérios objetivos: qualidade de construção, facilidade de uso, desempenho prático, durabilidade e qualidade do suporte ao cliente.</p>
+          <p class="text-gray-600 text-sm leading-relaxed">Aplicamos um conjunto fixo de critérios objetivos em todas as análises: qualidade de construção e acabamento, facilidade de uso no dia a dia, desempenho prático em condições reais, durabilidade comprovada por relatos de usuários e qualidade do suporte ao cliente. Esse padrão garante que as avaliações sejam comparáveis entre si e reprodutíveis ao longo do tempo.</p>
         </article>
 
         <!-- Passo 6 -->
@@ -1147,7 +1147,7 @@ function homePage(): string {
           </div>
           <div class="text-xs font-black text-sky-400 uppercase tracking-widest mb-1">Etapa 06</div>
           <h3 class="text-base font-black text-gray-900 mb-2">Recomendação Final</h3>
-          <p class="text-gray-600 text-sm leading-relaxed">Somente produtos que superam nossas métricas editoriais recebem recomendação. Nossa nota final reflete uma avaliação equilibrada e transparente de todos os critérios.</p>
+          <p class="text-gray-600 text-sm leading-relaxed">Apenas produtos que atendem ao conjunto completo de critérios editoriais recebem nossa recomendação. A nota final é calculada de forma ponderada, refletindo desempenho técnico, percepção dos usuários, custo-benefício e qualidade geral. Produtos que não atingem o nível mínimo são descartados — independentemente de qualquer vínculo comercial.</p>
         </article>
 
       </div>
@@ -1282,7 +1282,7 @@ function homePage(): string {
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Equipe Editorial
         </span>
-        <h2 id="equipe-title" class="section-title">Quem faz o TeckHome?</h2>
+        <h2 id="equipe-title" class="section-title">Equipe TeckHome</h2>
         <p class="text-gray-500 mt-3 max-w-xl mx-auto text-sm">Uma equipe dedicada a pesquisa, análise e curadoria de produtos para facilitar sua decisão de compra.</p>
         <div class="section-divider mx-auto"></div>
       </div>
@@ -1403,47 +1403,6 @@ function homePage(): string {
         </div>
       </div>
 
-    </div>
-  </section>
-
-  <!-- ===== NEWSLETTER ===== -->
-  <section id="newsletter" class="py-16 px-4" style="background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);" aria-labelledby="newsletter-title">
-    <div class="max-w-2xl mx-auto text-center">
-      <div class="w-14 h-14 mx-auto mb-5 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #6366f1, #4f46e5); box-shadow: 0 8px 24px rgba(99,102,241,0.35);">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      </div>
-      <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">Newsletter Gratuita</span>
-      <h2 id="newsletter-title" class="text-2xl md:text-3xl font-black text-gray-900 mb-3">Receba análises e ofertas em primeira mão</h2>
-      <p class="text-gray-500 text-sm leading-relaxed mb-8 max-w-md mx-auto">Cadastre-se e receba reviews exclusivos, comparativos e as melhores ofertas da semana diretamente no seu e-mail.</p>
-
-      <form id="newsletterForm" class="bg-white rounded-2xl shadow-lg border border-indigo-100 p-6 text-left" onsubmit="handleNewsletter(event)">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label for="nl-name" class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Nome</label>
-            <input id="nl-name" type="text" placeholder="Seu nome" required
-              class="newsletter-input w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 bg-gray-50 transition-all focus:bg-white focus:border-indigo-400">
-          </div>
-          <div>
-            <label for="nl-email" class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">E-mail</label>
-            <input id="nl-email" type="email" placeholder="seu@email.com" required
-              class="newsletter-input w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 bg-gray-50 transition-all focus:bg-white focus:border-indigo-400">
-          </div>
-        </div>
-        <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-indigo-200 text-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          Quero receber novidades
-        </button>
-        <p class="text-center text-xs text-gray-400 mt-3">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Sem spam. Cancele a qualquer momento. Seus dados são protegidos.
-        </p>
-      </form>
-
-      <div id="newsletterSuccess" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center mt-4">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" class="mx-auto mb-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <p class="font-black text-emerald-800 text-base mb-1">Cadastro realizado!</p>
-        <p class="text-emerald-700 text-sm">Obrigado por se inscrever. Em breve você receberá nossas análises.</p>
-      </div>
     </div>
   </section>
 
@@ -1571,7 +1530,7 @@ function homePage(): string {
             <li><a href="#por-que-confiar" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-xs text-indigo-400"></i> Por que Confiar</a></li>
             <li><a href="#equipe-teckhome" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-users text-xs text-indigo-400"></i> Equipe TeckHome</a></li>
             <li><a href="#faq" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-question-circle text-xs text-indigo-400"></i> FAQ</a></li>
-            <li><a href="#newsletter" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-envelope text-xs text-indigo-400"></i> Newsletter</a></li>
+            <li><a href="/admin" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-lock text-xs text-indigo-400"></i> Painel Admin</a></li>
 
           </ul>
         </div>
