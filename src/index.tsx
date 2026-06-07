@@ -712,7 +712,7 @@ function homePage(): string {
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="TeckHome Store — Reviews e Comparativos">
   <meta name="twitter:description" content="Descubra os melhores produtos antes de comprar. Reviews imparciais da Equipe TeckHome.">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"TeckHome Store","url":"https://teckhomestore.com","description":"Portal de reviews, comparativos e recomendações de produtos de tecnologia e utilidades para o lar","potentialAction":{"@type":"SearchAction","target":"https://teckhomestore.com/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://teckhomestore.com/#website","name":"TeckHome Store","url":"https://teckhomestore.com","description":"Portal brasileiro de reviews honestos, comparativos e recomendações de produtos de tecnologia, eletrodomésticos e utilidades para o lar","inLanguage":"pt-BR","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://teckhomestore.com/?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@type":"Organization","@id":"https://teckhomestore.com/#organization","name":"TeckHome Store","url":"https://teckhomestore.com","logo":{"@type":"ImageObject","url":"https://teckhomestore.com/static/logo.png","width":512,"height":512},"description":"Portal de reviews, comparativos e recomendações de produtos para o lar e tecnologia","contactPoint":{"@type":"ContactPoint","contactType":"customer service","email":"contato@teckhomestore.com","availableLanguage":"Portuguese"}},{"@type":"WebPage","@id":"https://teckhomestore.com/#webpage","url":"https://teckhomestore.com","name":"TeckHome Store — Reviews, Comparativos e Melhores Produtos para sua Casa","isPartOf":{"@id":"https://teckhomestore.com/#website"},"about":{"@id":"https://teckhomestore.com/#organization"},"description":"Reviews honestos, comparativos imparciais e recomendações dos melhores produtos de tecnologia, eletrodomésticos e utilidades para sua casa."}]}</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -812,6 +812,31 @@ function homePage(): string {
     i.fas.text-indigo-400 { color:#818cf8 !important; }
     i.fas.text-white { color:#ffffff !important; }
     i.fas.text-xs { font-size:0.75rem !important; }
+
+    /* ===== MOBILE IMPROVEMENTS ===== */
+    @media (max-width: 640px) {
+      .hero-title { font-size: clamp(2.2rem, 10vw, 3.5rem); }
+      .section-title { font-size: clamp(1.4rem, 6vw, 2rem); }
+      .hero-btn-primary, .hero-btn-secondary { width: 100%; justify-content: center; font-size: 0.9rem; padding: 13px 20px; }
+      .stat-counter { padding: 10px 8px; }
+    }
+    /* ===== FAQ ACCORDION ===== */
+    .faq-item { border-bottom: 1px solid #e5e7eb; }
+    .faq-question { cursor: pointer; user-select: none; }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.25s ease; }
+    .faq-answer.open { max-height: 400px; }
+    .faq-icon { transition: transform 0.3s ease; }
+    .faq-icon.open { transform: rotate(45deg); }
+    /* ===== RATING BARS ===== */
+    .rating-bar-fill { transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+    /* ===== NEWSLETTER ===== */
+    .newsletter-input:focus { box-shadow: 0 0 0 3px rgba(99,102,241,0.25); outline: none; }
+    /* ===== METHODOLOGY STEPS ===== */
+    .method-step { counter-increment: steps; }
+    .method-step::before { content: counter(steps); }
+    /* ===== BENEFIT CARD ===== */
+    .benefit-card { transition: all 0.3s cubic-bezier(.4,0,.2,1); }
+    .benefit-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(99,102,241,0.14); }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -835,9 +860,7 @@ function homePage(): string {
           <a href="#destaques" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Destaques</a>
           <a href="#categorias" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Categorias</a>
           <a href="#blog" class="nav-link text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors">Blog</a>
-          <a href="/admin" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm">
-            <i class="fas fa-lock text-xs"></i> Admin
-          </a>
+          <!-- Admin: acesso discreto apenas via /admin -->
         </div>
         <button id="mobileMenuBtn" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
@@ -851,9 +874,7 @@ function homePage(): string {
         <a href="#categorias" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Categorias</a>
         <a href="#destaques" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Destaques</a>
         <a href="#blog" class="text-sm font-semibold text-gray-700 py-2.5 px-3 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors">Blog</a>
-        <a href="/admin" class="flex items-center gap-2 text-sm font-semibold text-indigo-600 py-2.5 px-3 rounded-xl hover:bg-indigo-50 transition-colors border border-indigo-200 mt-1">
-          <i class="fas fa-lock text-xs"></i> Painel Admin
-        </a>
+        <!-- Painel Admin: acessível via /admin (não exibido no menu público) -->
       </div>
     </div>
   </nav>
@@ -1054,75 +1075,259 @@ function homePage(): string {
     </div>
   </section>
 
-  <!-- EQUIPE TECKHOME -->
-  <section id="equipe-teckhome" class="py-20 px-4" style="background: linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0f9ff 100%);">
-    <div class="max-w-4xl mx-auto">
 
-      <!-- Header editorial -->
-      <div class="text-center mb-12">
-        <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">Editorial</span>
-        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">Sobre a Equipe TeckHome</h2>
-        <div class="w-16 h-1 bg-indigo-600 rounded-full mx-auto"></div>
+  <!-- ===== COMO ANALISAMOS OS PRODUTOS ===== -->
+  <section id="metodologia" class="py-20 px-4 bg-white" aria-labelledby="metodologia-title">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="section-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Metodologia Editorial
+        </span>
+        <h2 id="metodologia-title" class="section-title">Como Analisamos os Produtos</h2>
+        <p class="text-gray-500 mt-3 max-w-xl mx-auto text-sm leading-relaxed">Nossa equipe segue um processo rigoroso de pesquisa e análise para garantir recomendações honestas e imparciais.</p>
+        <div class="section-divider mx-auto"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Passo 1 -->
+        <article class="benefit-card bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 rounded-2xl p-6">
+          <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <div class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-1">Etapa 01</div>
+          <h3 class="text-base font-black text-gray-900 mb-2">Pesquisa de Mercado</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">Analisamos centenas de opções disponíveis no mercado brasileiro, considerando preço, disponibilidade e reputação da marca antes de selecionar produtos para análise.</p>
+        </article>
+
+        <!-- Passo 2 -->
+        <article class="benefit-card bg-gradient-to-br from-blue-50 to-white border border-blue-100 rounded-2xl p-6">
+          <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <div class="text-xs font-black text-blue-400 uppercase tracking-widest mb-1">Etapa 02</div>
+          <h3 class="text-base font-black text-gray-900 mb-2">Avaliações dos Consumidores</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">Reunimos e analisamos avaliações reais de compradores verificados nas principais plataformas — Amazon, Mercado Livre e Shopee — para capturar a experiência real de uso.</p>
+        </article>
+
+        <!-- Passo 3 -->
+        <article class="benefit-card bg-gradient-to-br from-purple-50 to-white border border-purple-100 rounded-2xl p-6">
+          <div class="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <div class="text-xs font-black text-purple-400 uppercase tracking-widest mb-1">Etapa 03</div>
+          <h3 class="text-base font-black text-gray-900 mb-2">Comparação de Recursos</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">Comparamos especificações técnicas, diferenciais e limitações de cada produto em relação às alternativas disponíveis na mesma faixa de preço.</p>
+        </article>
+
+        <!-- Passo 4 -->
+        <article class="benefit-card bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-6">
+          <div class="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="text-xs font-black text-emerald-400 uppercase tracking-widest mb-1">Etapa 04</div>
+          <h3 class="text-base font-black text-gray-900 mb-2">Análise de Custo-Benefício</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">Avaliamos o valor real entregue pelo produto em relação ao seu preço, considerando durabilidade, garantia e custo total de propriedade ao longo do tempo.</p>
+        </article>
+
+        <!-- Passo 5 -->
+        <article class="benefit-card bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-2xl p-6">
+          <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div class="text-xs font-black text-amber-400 uppercase tracking-widest mb-1">Etapa 05</div>
+          <h3 class="text-base font-black text-gray-900 mb-2">Critérios de Qualidade</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">Cada produto é avaliado por critérios objetivos: qualidade de construção, facilidade de uso, desempenho prático, durabilidade e qualidade do suporte ao cliente.</p>
+        </article>
+
+        <!-- Passo 6 -->
+        <article class="benefit-card bg-gradient-to-br from-sky-50 to-white border border-sky-100 rounded-2xl p-6">
+          <div class="w-12 h-12 bg-sky-600 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="text-xs font-black text-sky-400 uppercase tracking-widest mb-1">Etapa 06</div>
+          <h3 class="text-base font-black text-gray-900 mb-2">Recomendação Final</h3>
+          <p class="text-gray-600 text-sm leading-relaxed">Somente produtos que superam nossas métricas editoriais recebem recomendação. Nossa nota final reflete uma avaliação equilibrada e transparente de todos os critérios.</p>
+        </article>
+
       </div>
 
-      <!-- Card principal da equipe -->
-      <div class="bg-white rounded-3xl shadow-xl border border-indigo-50 overflow-hidden" style="box-shadow: 0 20px 60px rgba(99,102,241,0.12);">
+      <!-- Nota sobre imparcialidade -->
+      <div class="mt-10 bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        </div>
+        <div>
+          <p class="font-bold text-indigo-900 text-sm">Compromisso com a Imparcialidade</p>
+          <p class="text-indigo-700 text-xs mt-1 leading-relaxed">Este site pode conter links de afiliados. Isso não influencia nossas análises nem nossas recomendações. Nossa prioridade é sempre o benefício do consumidor, não a comissão recebida. Saiba mais em nossa <a href="/politica-de-privacidade" class="underline font-semibold">Política de Privacidade</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <!-- Top accent bar -->
+  <!-- ===== SISTEMA DE NOTAS (REUTILIZÁVEL) ===== -->
+  <!-- Componente oculto — renderizado via JS quando necessário -->
+  <template id="tpl-rating-system">
+    <div class="th-rating-system bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+      <div class="flex items-center gap-2 mb-5">
+        <div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <h4 class="font-black text-gray-900 text-sm">Nota TeckHome</h4>
+      </div>
+      <div class="space-y-3 th-criteria"></div>
+      <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Nota Final</span>
+        <div class="flex items-center gap-2">
+          <div class="th-stars flex gap-0.5"></div>
+          <span class="th-final-score text-2xl font-black text-indigo-600"></span>
+          <span class="text-xs text-gray-400">/10</span>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ===== POR QUE CONFIAR NO TECKHOME ===== -->
+  <section id="por-que-confiar" class="py-20 px-4" style="background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);" aria-labelledby="confiar-title">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Confiança &amp; Transparência
+        </span>
+        <h2 id="confiar-title" class="text-3xl md:text-4xl font-black text-white mb-3">Por que confiar no TeckHome?</h2>
+        <p class="text-white/60 max-w-xl mx-auto text-sm leading-relaxed">Somos um portal independente focado exclusivamente no benefício do consumidor.</p>
+        <div class="w-12 h-1 bg-indigo-400 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <!-- Grid de diferenciais -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
+        <div class="benefit-card bg-white/8 border border-white/12 rounded-2xl p-6 text-center backdrop-blur-sm" style="background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.13);">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background:rgba(99,102,241,0.25);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="1.8" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <h3 class="font-black text-white text-sm mb-2">Reviews Detalhados</h3>
+          <p class="text-white/55 text-xs leading-relaxed">Cada análise passa por um processo editorial rigoroso antes de ser publicada.</p>
+        </div>
+        <div class="benefit-card bg-white/8 border border-white/12 rounded-2xl p-6 text-center backdrop-blur-sm" style="background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.13);">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background:rgba(16,185,129,0.2);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="1.8" stroke-linecap="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          </div>
+          <h3 class="font-black text-white text-sm mb-2">Comparações Imparciais</h3>
+          <p class="text-white/55 text-xs leading-relaxed">Comparamos produtos sem favorecimento de marcas ou lojas parceiras.</p>
+        </div>
+        <div class="benefit-card bg-white/8 border border-white/12 rounded-2xl p-6 text-center backdrop-blur-sm" style="background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.13);">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background:rgba(245,158,11,0.2);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3 class="font-black text-white text-sm mb-2">Atualizações Frequentes</h3>
+          <p class="text-white/55 text-xs leading-relaxed">Nosso conteúdo é revisado periodicamente para refletir as condições atuais do mercado.</p>
+        </div>
+        <div class="benefit-card bg-white/8 border border-white/12 rounded-2xl p-6 text-center backdrop-blur-sm" style="background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.13);">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background:rgba(139,92,246,0.2);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h3 class="font-black text-white text-sm mb-2">Foco no Consumidor</h3>
+          <p class="text-white/55 text-xs leading-relaxed">Toda recomendação é pensada para quem vai comprar, não para quem vende.</p>
+        </div>
+      </div>
+
+      <!-- Missão e valores -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="md:col-span-2 bg-white/8 border border-white/12 rounded-2xl p-8" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);">
+          <span class="text-xs font-black text-indigo-400 uppercase tracking-widest">Nossa Missão</span>
+          <h3 class="text-xl font-black text-white mt-2 mb-3">Ajudar consumidores a comprar melhor</h3>
+          <p class="text-white/65 text-sm leading-relaxed mb-4">O TeckHome Store nasceu da necessidade de ter um portal genuinamente focado no consumidor brasileiro — sem jargões técnicos desnecessários, sem exageros de marketing e sem conflito de interesses. Queremos ser o recurso que você consulta antes de qualquer compra importante.</p>
+          <p class="text-white/65 text-sm leading-relaxed">Acreditamos que informação de qualidade é um direito do consumidor. Por isso, investimos tempo em pesquisa, curadoria e análise para que você possa decidir com confiança.</p>
+        </div>
+        <div class="flex flex-col gap-4">
+          <div class="bg-white/8 border border-white/12 rounded-2xl p-5 flex items-center gap-4" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);">
+            <div class="w-10 h-10 rounded-xl bg-indigo-500/30 flex items-center justify-center flex-shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="text-white font-black text-sm">Transparência Total</div>
+              <div class="text-white/50 text-xs mt-0.5">Divulgamos quando usamos links de afiliados</div>
+            </div>
+          </div>
+          <div class="bg-white/8 border border-white/12 rounded-2xl p-5 flex items-center gap-4" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/30 flex items-center justify-center flex-shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div>
+              <div class="text-white font-black text-sm">Recomendações Éticas</div>
+              <div class="text-white/50 text-xs mt-0.5">Só recomendamos o que realmente vale</div>
+            </div>
+          </div>
+          <div class="bg-white/8 border border-white/12 rounded-2xl p-5 flex items-center gap-4" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1);">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/30 flex items-center justify-center flex-shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div>
+              <div class="text-white font-black text-sm">Qualidade Editorial</div>
+              <div class="text-white/50 text-xs mt-0.5">Padrão profissional em todo o conteúdo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EQUIPE TECKHOME (MELHORADA) ===== -->
+  <section id="equipe-teckhome" class="py-20 px-4" style="background: linear-gradient(135deg, #f8faff 0%, #eef2ff 50%, #f0f9ff 100%);" aria-labelledby="equipe-title">
+    <div class="max-w-5xl mx-auto">
+
+      <div class="text-center mb-14">
+        <span class="section-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Equipe Editorial
+        </span>
+        <h2 id="equipe-title" class="section-title">Quem faz o TeckHome?</h2>
+        <p class="text-gray-500 mt-3 max-w-xl mx-auto text-sm">Uma equipe dedicada a pesquisa, análise e curadoria de produtos para facilitar sua decisão de compra.</p>
+        <div class="section-divider mx-auto"></div>
+      </div>
+
+      <!-- Card equipe principal -->
+      <div class="bg-white rounded-3xl shadow-xl border border-indigo-50 overflow-hidden mb-8" style="box-shadow: 0 20px 60px rgba(99,102,241,0.10);">
         <div class="h-1.5 w-full" style="background: linear-gradient(90deg, #6366f1, #818cf8, #38bdf8, #6366f1); background-size: 200% 100%; animation: gradientMove 4s linear infinite;"></div>
-
         <div class="p-8 md:p-10">
           <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
-
-            <!-- Avatar / Logo identidade -->
             <div class="flex-shrink-0">
               <div class="relative">
                 <div class="w-28 h-28 rounded-2xl flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #1e3a5f 100%);">
                   <div class="text-center">
                     <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    <div class="text-white text-xs font-bold tracking-wide">TECH</div>
+                    <div class="text-white text-xs font-bold tracking-wide mt-1">TECH</div>
                   </div>
                 </div>
-                <!-- Badge verificado -->
                 <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center shadow-md border-2 border-white">
                   <i class="fas fa-check text-white text-xs"></i>
                 </div>
               </div>
             </div>
-
-            <!-- Conteúdo editorial -->
             <div class="flex-1 text-center md:text-left">
-              <div class="flex flex-col md:flex-row items-center md:items-start gap-3 mb-4">
-                <div>
-                  <h3 class="text-2xl font-black text-gray-900">Equipe TeckHome</h3>
-                  <div class="flex items-center justify-center md:justify-start gap-2 mt-1">
-                    <span class="inline-flex items-center gap-1 text-xs text-indigo-600 font-semibold bg-indigo-50 px-3 py-1 rounded-full">
-                      <i class="fas fa-shield-alt text-xs"></i> Portal Verificado
-                    </span>
-                    <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full">
-                      <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="animation: pulse 2s infinite;"></span> Ativo
-                    </span>
-                  </div>
-                </div>
+              <h3 class="text-2xl font-black text-gray-900 mb-1">Equipe TeckHome</h3>
+              <div class="flex items-center justify-center md:justify-start gap-2 mb-4">
+                <span class="inline-flex items-center gap-1 text-xs text-indigo-600 font-semibold bg-indigo-50 px-3 py-1 rounded-full"><i class="fas fa-shield-alt text-xs"></i> Portal Verificado</span>
+                <span class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold bg-emerald-50 px-3 py-1 rounded-full"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="animation: pulse 2s infinite;"></span> Ativo 2026</span>
               </div>
-
-              <p class="text-gray-600 text-base leading-relaxed mb-6">
-                A Equipe TeckHome reúne conteúdos, análises e recomendações de produtos voltados para tecnologia, casa e utilidades do dia a dia. Nosso objetivo é ajudar consumidores a fazer escolhas mais inteligentes através de reviews organizados, comparativos e conteúdos informativos.
-              </p>
-
-              <!-- Stats da equipe -->
-              <div class="grid grid-cols-3 gap-4">
-                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                  <div class="text-xl font-black text-indigo-600">7</div>
+              <p class="text-gray-600 text-sm leading-relaxed mb-6">A Equipe TeckHome é formada por pesquisadores e entusiastas de tecnologia focados em ajudar consumidores brasileiros a fazer escolhas mais inteligentes. Nosso processo editorial combina pesquisa de mercado, análise de dados e curadoria especializada para entregar conteúdo de alta qualidade.</p>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="text-center p-3 bg-indigo-50 rounded-2xl border border-indigo-100">
+                  <div class="text-xl font-black text-indigo-600">7+</div>
                   <div class="text-xs text-gray-500 font-medium mt-0.5">Categorias</div>
                 </div>
-                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                  <div class="text-xl font-black text-indigo-600">100%</div>
+                <div class="text-center p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  <div class="text-xl font-black text-emerald-600">100%</div>
                   <div class="text-xs text-gray-500 font-medium mt-0.5">Imparcial</div>
                 </div>
-                <div class="text-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
-                  <div class="flex justify-center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-                  <div class="text-xs text-gray-500 font-medium mt-0.5">Mercado BR</div>
+                <div class="text-center p-3 bg-blue-50 rounded-2xl border border-blue-100">
+                  <div class="text-xl font-black text-blue-600">BR</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Mercado Local</div>
+                </div>
+                <div class="text-center p-3 bg-amber-50 rounded-2xl border border-amber-100">
+                  <div class="text-xl font-black text-amber-600">2026</div>
+                  <div class="text-xs text-gray-500 font-medium mt-0.5">Atualizado</div>
                 </div>
               </div>
             </div>
@@ -1130,7 +1335,7 @@ function homePage(): string {
 
           <!-- Pilares editoriais -->
           <div class="mt-10 pt-8 border-t border-gray-100">
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Nossos Pilares</p>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">Nossos Pilares Editoriais</p>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="flex items-start gap-3 p-4 bg-indigo-50 rounded-2xl border border-indigo-100 hover:border-indigo-300 transition-all">
                 <div class="w-9 h-9 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -1164,6 +1369,165 @@ function homePage(): string {
         </div>
       </div>
 
+      <!-- Como escolhemos os melhores -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+          <h3 class="font-black text-gray-900 text-base mb-3 flex items-center gap-2">
+            <span class="w-7 h-7 bg-indigo-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </span>
+            Como escolhemos os melhores
+          </h3>
+          <ul class="space-y-2.5 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Análise de avaliações reais de compradores verificados</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Comparação de especificações técnicas e desempenho</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Verificação de reputação da marca e suporte ao cliente</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Avaliação do custo-benefício real para o consumidor</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Revisão periódica para manter a atualidade das informações</li>
+          </ul>
+        </div>
+        <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-6 text-white shadow-lg">
+          <h3 class="font-black text-white text-base mb-3 flex items-center gap-2">
+            <span class="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </span>
+            Compromisso TeckHome
+          </h3>
+          <ul class="space-y-2.5 text-sm text-white/85">
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Transparência total sobre parcerias e afiliados</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Nunca recomendamos produto que não acreditamos</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Análise imparcial independente de comissão</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Conteúdo atualizado regularmente com dados reais</li>
+            <li class="flex items-start gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a5b4fc" stroke-width="2.5" stroke-linecap="round" class="flex-shrink-0 mt-0.5"><path d="M20 6L9 17l-5-5"/></svg>Foco exclusivo no benefício do consumidor brasileiro</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== NEWSLETTER ===== -->
+  <section id="newsletter" class="py-16 px-4" style="background: linear-gradient(135deg, #eef2ff 0%, #f0fdf4 100%);" aria-labelledby="newsletter-title">
+    <div class="max-w-2xl mx-auto text-center">
+      <div class="w-14 h-14 mx-auto mb-5 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #6366f1, #4f46e5); box-shadow: 0 8px 24px rgba(99,102,241,0.35);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <span class="inline-block bg-indigo-100 text-indigo-700 text-xs font-black uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">Newsletter Gratuita</span>
+      <h2 id="newsletter-title" class="text-2xl md:text-3xl font-black text-gray-900 mb-3">Receba análises e ofertas em primeira mão</h2>
+      <p class="text-gray-500 text-sm leading-relaxed mb-8 max-w-md mx-auto">Cadastre-se e receba reviews exclusivos, comparativos e as melhores ofertas da semana diretamente no seu e-mail.</p>
+
+      <form id="newsletterForm" class="bg-white rounded-2xl shadow-lg border border-indigo-100 p-6 text-left" onsubmit="handleNewsletter(event)">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="nl-name" class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Nome</label>
+            <input id="nl-name" type="text" placeholder="Seu nome" required
+              class="newsletter-input w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 bg-gray-50 transition-all focus:bg-white focus:border-indigo-400">
+          </div>
+          <div>
+            <label for="nl-email" class="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">E-mail</label>
+            <input id="nl-email" type="email" placeholder="seu@email.com" required
+              class="newsletter-input w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 bg-gray-50 transition-all focus:bg-white focus:border-indigo-400">
+          </div>
+        </div>
+        <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-black py-3.5 px-6 rounded-xl transition-all shadow-md hover:shadow-indigo-200 text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Quero receber novidades
+        </button>
+        <p class="text-center text-xs text-gray-400 mt-3">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Sem spam. Cancele a qualquer momento. Seus dados são protegidos.
+        </p>
+      </form>
+
+      <div id="newsletterSuccess" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-6 text-center mt-4">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" class="mx-auto mb-3"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <p class="font-black text-emerald-800 text-base mb-1">Cadastro realizado!</p>
+        <p class="text-emerald-700 text-sm">Obrigado por se inscrever. Em breve você receberá nossas análises.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq" class="bg-white py-20 px-4" aria-labelledby="faq-title">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-12">
+        <span class="section-label">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+          Perguntas Frequentes
+        </span>
+        <h2 id="faq-title" class="section-title">Dúvidas sobre o TeckHome</h2>
+        <p class="text-gray-500 mt-3 max-w-md mx-auto text-sm">Tudo o que você precisa saber sobre como funcionamos.</p>
+        <div class="section-divider mx-auto"></div>
+      </div>
+
+      <div class="space-y-3" itemscope itemtype="https://schema.org/FAQPage">
+
+        <!-- FAQ 1 -->
+        <div class="faq-item border border-gray-100 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+          <button class="faq-question w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)" aria-expanded="false">
+            <span class="font-bold text-gray-800 text-sm pr-4" itemprop="name">Como os produtos são analisados no TeckHome?</span>
+            <svg class="faq-icon flex-shrink-0 w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-answer px-5" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <div itemprop="text" class="pb-5 text-gray-600 text-sm leading-relaxed">
+              Nossa equipe segue um processo editorial estruturado em 6 etapas: pesquisa de mercado, coleta de avaliações reais de compradores, comparação de especificações técnicas, análise de custo-benefício, verificação de qualidade e emissão de uma recomendação final. Apenas produtos que superam nossos critérios editoriais são publicados.
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="faq-item border border-gray-100 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+          <button class="faq-question w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)" aria-expanded="false">
+            <span class="font-bold text-gray-800 text-sm pr-4" itemprop="name">O que são links de afiliados e como eles funcionam?</span>
+            <svg class="faq-icon flex-shrink-0 w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-answer px-5" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <div itemprop="text" class="pb-5 text-gray-600 text-sm leading-relaxed">
+              Links de afiliados são links rastreados que nos permitem receber uma pequena comissão quando você realiza uma compra através deles. Essa comissão é paga pela loja (Amazon, Mercado Livre, etc.) e <strong>não gera nenhum custo adicional para você</strong>. O preço é exatamente o mesmo que você pagaria acessando diretamente. Essa receita nos ajuda a manter o portal e produzir conteúdo gratuito de qualidade.
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="faq-item border border-gray-100 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+          <button class="faq-question w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)" aria-expanded="false">
+            <span class="font-bold text-gray-800 text-sm pr-4" itemprop="name">Os preços e a disponibilidade dos produtos são atualizados?</span>
+            <svg class="faq-icon flex-shrink-0 w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-answer px-5" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <div itemprop="text" class="pb-5 text-gray-600 text-sm leading-relaxed">
+              Revisamos nosso conteúdo periodicamente para manter as informações atuais. No entanto, preços e disponibilidade podem variar a qualquer momento conforme promoções, estoque e políticas das lojas. Sempre recomendamos verificar o preço final diretamente na loja antes de finalizar sua compra.
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="faq-item border border-gray-100 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+          <button class="faq-question w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)" aria-expanded="false">
+            <span class="font-bold text-gray-800 text-sm pr-4" itemprop="name">As recomendações são influenciadas por marcas ou lojas?</span>
+            <svg class="faq-icon flex-shrink-0 w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-answer px-5" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <div itemprop="text" class="pb-5 text-gray-600 text-sm leading-relaxed">
+              Não. Nossas recomendações são 100% editorialmente independentes. Embora possamos receber comissões de afiliados, nosso processo de análise e seleção de produtos não é influenciado por acordos comerciais com marcas ou lojas. Recomendamos produtos com base exclusivamente nos méritos que apresentam para o consumidor.
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="faq-item border border-gray-100 rounded-2xl overflow-hidden" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+          <button class="faq-question w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors" onclick="toggleFaq(this)" aria-expanded="false">
+            <span class="font-bold text-gray-800 text-sm pr-4" itemprop="name">Posso sugerir um produto para análise?</span>
+            <svg class="faq-icon flex-shrink-0 w-5 h-5 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-answer px-5" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+            <div itemprop="text" class="pb-5 text-gray-600 text-sm leading-relaxed">
+              Sim! Adoramos receber sugestões da nossa comunidade. Entre em contato pelo e-mail <a href="mailto:contato@teckhomestore.com" class="text-indigo-600 font-semibold hover:underline">contato@teckhomestore.com</a> com o nome do produto e o link de onde ele está disponível. Nossa equipe irá avaliar e, se atender aos critérios editoriais, incluiremos em nossa fila de análises.
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -1203,7 +1567,11 @@ function homePage(): string {
             <li><a href="/" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-home text-xs text-indigo-400"></i> Início</a></li>
             <li><a href="#destaques" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-star text-xs text-indigo-400"></i> Destaques</a></li>
             <li><a href="#categorias" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-th-large text-xs text-indigo-400"></i> Categorias</a></li>
+            <li><a href="#metodologia" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-search text-xs text-indigo-400"></i> Como Analisamos</a></li>
+            <li><a href="#por-que-confiar" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-xs text-indigo-400"></i> Por que Confiar</a></li>
             <li><a href="#equipe-teckhome" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-users text-xs text-indigo-400"></i> Equipe TeckHome</a></li>
+            <li><a href="#faq" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-question-circle text-xs text-indigo-400"></i> FAQ</a></li>
+            <li><a href="#newsletter" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-envelope text-xs text-indigo-400"></i> Newsletter</a></li>
 
           </ul>
         </div>
@@ -1230,7 +1598,7 @@ function homePage(): string {
             <li><a href="/politica-de-privacidade" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-shield-alt text-xs text-indigo-400"></i> Política de Privacidade</a></li>
             <li><a href="/politica-de-cookies" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-cookie-bite text-xs text-indigo-400"></i> Política de Cookies</a></li>
             <li><a href="/sobre" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-info-circle text-xs text-indigo-400"></i> Sobre Nós</a></li>
-            <li><a href="/admin" class="hover:text-white transition-colors flex items-center gap-2"><i class="fas fa-lock text-xs text-indigo-400"></i> Painel Admin</a></li>
+            <!-- Painel Admin: acesso via URL direta /admin -->
           </ul>
           <div class="mt-6 pt-5 border-t border-gray-700">
             <h4 class="text-white font-bold text-sm uppercase tracking-widest mb-3">Contato</h4>
@@ -1264,6 +1632,64 @@ function homePage(): string {
     document.getElementById('mobileMenuBtn').addEventListener('click', () => {
       document.getElementById('mobileMenu').classList.toggle('hidden')
     })
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const answer = btn.nextElementSibling
+      const icon = btn.querySelector('.faq-icon')
+      const isOpen = answer.classList.contains('open')
+      // Close all
+      document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'))
+      document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('open'))
+      document.querySelectorAll('.faq-question').forEach(b => b.setAttribute('aria-expanded','false'))
+      // Toggle current
+      if (!isOpen) {
+        answer.classList.add('open')
+        icon.classList.add('open')
+        btn.setAttribute('aria-expanded','true')
+      }
+    }
+
+    // Newsletter
+    function handleNewsletter(e) {
+      e.preventDefault()
+      const name = document.getElementById('nl-name').value.trim()
+      const email = document.getElementById('nl-email').value.trim()
+      if (!name || !email) return
+      document.getElementById('newsletterForm').classList.add('hidden')
+      document.getElementById('newsletterSuccess').classList.remove('hidden')
+      // Future integration: POST to /api/newsletter
+      console.log('Newsletter signup:', name, email)
+    }
+
+    // Rating system helper (reusable for article pages)
+    function renderRatingSystem(container, ratings) {
+      // ratings: [{label, score, max}] where score 0-max (default max=10)
+      if (!container || !ratings || !ratings.length) return
+      const colors = ['indigo','blue','purple','emerald','amber']
+      let html = '<div class="th-rating-system bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">'
+      html += '<div class="flex items-center gap-2 mb-5"><div class="w-8 h-8 bg-indigo-600 rounded-xl flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><h4 class="font-black text-gray-900 text-sm">Nota TeckHome</h4></div>'
+      html += '<div class="space-y-3">'
+      let total = 0
+      ratings.forEach((r, i) => {
+        const max = r.max || 10
+        const pct = Math.round((r.score / max) * 100)
+        const color = colors[i % colors.length]
+        total += r.score
+        html += \`<div><div class="flex justify-between items-center mb-1"><span class="text-xs font-semibold text-gray-700">\${r.label}</span><span class="text-xs font-black text-\${color}-600">\${r.score}/\${max}</span></div><div class="w-full bg-gray-100 rounded-full h-2"><div class="rating-bar-fill bg-\${color}-500 h-2 rounded-full" style="width:\${pct}%"></div></div></div>\`
+      })
+      const avg = (total / ratings.length).toFixed(1)
+      const stars = Math.round(avg / 2)
+      html += '</div>'
+      html += '<div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">'
+      html += '<span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Nota Final</span>'
+      html += '<div class="flex items-center gap-2">'
+      html += Array.from({length:5},(_,i)=>\`<svg width="14" height="14" viewBox="0 0 24 24" fill="\${i<stars?'#f59e0b':'#d1d5db'}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>\`).join('')
+      html += \`<span class="text-2xl font-black text-indigo-600">\${avg}</span><span class="text-xs text-gray-400">/10</span>\`
+      html += '</div></div></div>'
+      container.innerHTML = html
+    }
+    window.renderRatingSystem = renderRatingSystem
 
     // Gera análise persuasiva automática baseada no produto
     function generateAnalysis(product, category) {
@@ -1431,7 +1857,7 @@ function homePage(): string {
           <!-- Imagem -->
           <div class="relative overflow-hidden">
             <div class="h-52 overflow-hidden bg-gray-50">
-              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
+              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" loading="lazy" decoding="async" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
             </div>
             \${featuredBadge}
             <div class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style="background:\${catColor};">
