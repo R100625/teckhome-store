@@ -2216,59 +2216,43 @@ function homePage(): string {
     }
 
     function gerarAnaliseIA(cmp) {
-      // Gera texto analítico automático baseado nos dados dos produtos
-      const prods = (cmp.products || []).slice(0, 4)
+      var prods = (cmp.products || []).slice(0, 4)
       if (prods.length < 2) return ''
-      const bestProd = prods.find(p => p.badge === 'best') || prods[0]
-      const cbProd = prods.find(p => p.badge === 'costbenefit')
-      const cat = cmp.category || 'categoria'
-      const titulo = cmp.title || 'estes produtos'
-
-      // Análise de preços
-      const prodsComPreco = prods.filter(p => p.price)
-      let analisePreco = ''
+      var bestProd = prods.find(function(p) { return p.badge === 'best' }) || prods[0]
+      var cbProd = prods.find(function(p) { return p.badge === 'costbenefit' })
+      var analisePreco = ''
+      var prodsComPreco = prods.filter(function(p) { return p.price })
       if (prodsComPreco.length >= 2) {
-        const precos = prodsComPreco.map(p => {
-          const n = parseFloat((p.price || '').replace(/[^0-9,]/g,'').replace(',','.'))
+        var precos = prodsComPreco.map(function(p) {
+          var n = parseFloat((p.price || '').replace(/[^0-9,]/g,'').replace(',','.'))
           return { name: p.name, val: n, price: p.price }
-        }).filter(x => !isNaN(x.val)).sort((a,b) => a.val - b.val)
+        }).filter(function(x) { return !isNaN(x.val) }).sort(function(a,b) { return a.val - b.val })
         if (precos.length >= 2) {
-          const mais_barato = precos[0]
-          const mais_caro = precos[precos.length-1]
-          const diff = mais_caro.val - mais_barato.val
-          const pct = ((diff / mais_caro.val) * 100).toFixed(0)
-          analisePreco = \`A diferença de preço entre o <strong>\${mais_barato.name}</strong> (\\${mais_barato.price}) e o <strong>\${mais_caro.name}</strong> (\\${mais_caro.price}) é de aproximadamente <strong>\${pct}%</strong>. \`
+          var barato = precos[0]
+          var caro = precos[precos.length-1]
+          var pct = (((caro.val - barato.val) / caro.val) * 100).toFixed(0)
+          analisePreco = 'A diferença de preço entre o <strong>' + barato.name + '</strong> (' + barato.price + ') e o <strong>' + caro.name + '</strong> (' + caro.price + ') é de aproximadamente <strong>' + pct + '%</strong>. '
         }
       }
-
-      // Análise de ratings
-      const prodsComRating = prods.filter(p => parseFloat(p.rating) > 0)
-      let analiseRating = ''
+      var analiseRating = ''
+      var prodsComRating = prods.filter(function(p) { return parseFloat(p.rating) > 0 })
       if (prodsComRating.length >= 2) {
-        const melhorRating = [...prodsComRating].sort((a,b) => parseFloat(b.rating)-parseFloat(a.rating))[0]
-        analiseRating = \`Em termos de avaliação dos usuários, o <strong>\${melhorRating.name}</strong> se destaca com <strong>\\${parseFloat(melhorRating.rating).toFixed(1)} estrelas</strong>. \`
+        var melhorR = prodsComRating.slice().sort(function(a,b) { return parseFloat(b.rating)-parseFloat(a.rating) })[0]
+        analiseRating = 'Em termos de avaliação dos usuários, o <strong>' + melhorR.name + '</strong> se destaca com <strong>' + parseFloat(melhorR.rating).toFixed(1) + ' estrelas</strong>. '
       }
-
-      // Análise de prós e contras
-      const totalPros = prods.reduce((s,p) => s + (p.pros||[]).length, 0)
-      const totalCons = prods.reduce((s,p) => s + (p.cons||[]).length, 0)
-      let analisePorsCons = ''
-      if (totalPros > 0 || totalCons > 0) {
-        const melhorCusto = cbProd || bestProd
-        const diferencial = (melhorCusto.pros || []).slice(0,2).join(' e ')
-        if (diferencial) analisePorsCons = \`O <strong>\${melhorCusto.name}</strong> se sobressai principalmente por \${diferencial.toLowerCase()}. \`
+      var analisePros = ''
+      var custoProd = cbProd || bestProd
+      if (custoProd && (custoProd.pros || []).length > 0) {
+        var dif = (custoProd.pros || []).slice(0,2).join(' e ')
+        if (dif) analisePros = 'O <strong>' + custoProd.name + '</strong> se sobressai principalmente por ' + dif.toLowerCase() + '. '
       }
-
-      // Recomendação final
-      let recomendacao = ''
+      var recomendacao = ''
       if (bestProd && cbProd && bestProd.name !== cbProd.name) {
-        recomendacao = \`<strong>🏆 Melhor desempenho:</strong> <span style="color:#7c3aed">\${bestProd.name}</span> — ideal para quem busca o melhor resultado sem compromisso. <strong>💚 Melhor custo-benefício:</strong> <span style="color:#059669">\${cbProd.name}</span> — excelente opção para quem quer ótima qualidade gastando menos.\`
+        recomendacao = '<strong>🏆 Melhor desempenho:</strong> <span style="color:#7c3aed">' + bestProd.name + '</span> — ideal para quem busca o melhor resultado sem compromisso. <strong>💚 Melhor custo-benefício:</strong> <span style="color:#059669">' + cbProd.name + '</span> — excelente opção para quem quer ótima qualidade gastando menos.'
       } else if (bestProd) {
-        recomendacao = \`Para a maioria dos compradores, o <strong>\${bestProd.name}</strong> oferece a melhor relação entre qualidade e investimento nesta categoria.\`
+        recomendacao = 'Para a maioria dos compradores, o <strong>' + bestProd.name + '</strong> oferece a melhor relação entre qualidade e investimento nesta categoria.'
       }
-
-      if (!analisePreco && !analiseRating && !analisePorsCons && !recomendacao) return ''
-
+      if (!analisePreco && !analiseRating && !analisePros && !recomendacao) return ''
       return \`
         <div style="background:linear-gradient(135deg,#faf5ff,#f3f0ff);border-radius:16px;padding:20px 24px;border:1px solid #e9d5ff;margin-top:20px;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
@@ -2277,8 +2261,8 @@ function homePage(): string {
             </div>
             <span style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.8px;">🤖 Análise TeckHome IA</span>
           </div>
-          <p style="font-size:13px;color:#374151;line-height:1.75;margin:0 0 10px;">\${analisePreco}\${analiseRating}\${analisePorsCons}</p>
-          \${recomendacao ? \`<div style="font-size:13px;color:#374151;line-height:1.7;padding-top:10px;border-top:1px solid #ddd6fe;">\${recomendacao}</div>\` : ''}
+          <p style="font-size:13px;color:#374151;line-height:1.75;margin:0 0 \${recomendacao ? '10px' : '0'};">\${analisePreco}\${analiseRating}\${analisePros}</p>
+          \${recomendacao ? '<div style="font-size:13px;color:#374151;line-height:1.7;padding-top:10px;border-top:1px solid #ddd6fe;">' + recomendacao + '</div>' : ''}
         </div>
       \`
     }
