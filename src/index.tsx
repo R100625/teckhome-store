@@ -590,7 +590,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-refrigeracao',
       title: 'Ar-condicionado em 2026: split, portátil ou janela? O guia definitivo para escolher sem erro',
       category: 'Refrigeração', categoryIcon: '❄️', categoryId: 'refrigeracao',
-      image: 'https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=1200&q=80',
+      image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80',
       readTime: '8 min',
       keywords: 'ar condicionado split vs portátil, melhor ar condicionado 2026, BTU ideal',
       excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz.',
@@ -2076,7 +2076,7 @@ function homePage(): string {
         excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz. Neste guia, calculamos o BTU ideal para cada ambiente e comparamos split, portátil e janela com dados reais de consumo.',
         category: 'Refrigeração',
         categoryIcon: '❄️',
-        image: 'https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=600&q=80',
+        image: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=80',
         readTime: '8 min',
         keywords: 'ar condicionado split vs portátil, melhor ar condicionado 2026, BTU ideal, ar condicionado econômico'
       },
@@ -4858,13 +4858,22 @@ function articlePage(article: any): string {
   <nav class="navbar-article sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="/" class="flex items-center gap-2.5 group">
-          <img src="/static/logo.png" alt="TeckHome Store" class="w-9 h-9 rounded-xl object-cover shadow-md group-hover:shadow-indigo-200 transition-shadow">
-          <div>
-            <span class="text-lg font-black text-gray-900 tracking-tight">Teck<span class="text-indigo-600">Home</span> Store</span>
-            <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
-          </div>
-        </a>
+        <div class="flex items-center gap-3">
+          <!-- Botão Voltar visível -->
+          <a href="/" title="Voltar à página inicial"
+            class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow-md shrink-0"
+            style="text-decoration:none;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            <span class="hidden sm:inline">Voltar</span>
+          </a>
+          <a href="/" class="flex items-center gap-2.5 group" style="text-decoration:none;">
+            <img src="/static/logo.png" alt="TeckHome Store" class="w-9 h-9 rounded-xl object-cover shadow-md group-hover:shadow-indigo-200 transition-shadow">
+            <div class="hidden md:block">
+              <span class="text-lg font-black text-gray-900 tracking-tight">Teck<span class="text-indigo-600">Home</span> Store</span>
+              <span class="text-xs text-gray-400 block leading-none -mt-0.5">Descubra antes de comprar</span>
+            </div>
+          </a>
+        </div>
         <div class="flex items-center gap-4">
           <a href="/#blog" class="text-sm font-semibold text-gray-600 hover:text-indigo-600 transition-colors flex items-center gap-1.5">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -4977,7 +4986,7 @@ function articlePage(article: any): string {
           <div class="p-4"><span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">Eletrodomésticos</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Air fryer ou forno elétrico? A verdade</p></div>
         </a>
         <a href="/artigo/guia-refrigeracao" class="related-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 group" style="text-decoration:none;">
-          <div class="h-28 overflow-hidden"><img src="https://images.unsplash.com/photo-1631545806609-88e3f14ff966?w=400&q=70" alt="Refrigeração" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>
+          <div class="h-28 overflow-hidden"><img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&q=70" alt="Refrigeração" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"></div>
           <div class="p-4"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Refrigeração</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Ar-condicionado 2026: guia definitivo</p></div>
         </a>
       </div>
