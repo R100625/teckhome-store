@@ -668,6 +668,7 @@ function maintenancePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store — Em Manutenção</title>
@@ -726,6 +727,7 @@ function homePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store — Reviews, Comparativos e Melhores Produtos para sua Casa</title>
@@ -1060,7 +1062,7 @@ function homePage(): string {
           Comparativo de Produtos
         </span>
         <h2 class="section-title">Qual Produto Escolher?</h2>
-        <p class="text-gray-500 mt-3 max-w-xl mx-auto text-sm leading-relaxed">Nossa IA analisa pontos fortes, fracos e custo-benefício de produtos similares para você decidir com confiança</p>
+        <p class="text-gray-500 mt-3 max-w-xl mx-auto text-sm leading-relaxed">Nossa equipe analisa pontos fortes, fracos e custo-benefício de produtos similares para você decidir com confiança</p>
         <div class="section-divider mx-auto" style="background:linear-gradient(90deg,#7c3aed,#6366f1);"></div>
       </div>
       <!-- Container de cards comparativos (carregado via JS) -->
@@ -1790,7 +1792,7 @@ function homePage(): string {
 
           <!-- Imagem lado esquerdo -->
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
-            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
             \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
             <div class="absolute bottom-3 left-3 right-3">
@@ -1895,7 +1897,7 @@ function homePage(): string {
           <!-- Imagem -->
           <div class="relative overflow-hidden">
             <div class="h-52 overflow-hidden bg-gray-50">
-              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" loading="lazy" decoding="async" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
+              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" loading="lazy" decoding="async" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
             </div>
             \${featuredBadge}
             <div class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style="background:\${catColor};">
@@ -2177,7 +2179,7 @@ function homePage(): string {
               alt="\${art.title}"
               class="w-full h-full object-cover"
               loading="lazy"
-              onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'"
+              referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80'"
               itemprop="image">
             <!-- Gradient overlay -->
             <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(0,0,0,0.45) 0%,transparent 55%);"></div>
@@ -2279,7 +2281,7 @@ function homePage(): string {
             <div style="width:28px;height:28px;background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 7v4m0 4h.01"/></svg>
             </div>
-            <span style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.8px;">🤖 Análise TeckHome IA</span>
+            <span style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.8px;">⭐ Análise da Equipe TeckHome</span>
           </div>
           <p style="font-size:13px;color:#374151;line-height:1.75;margin:0 0 \${recomendacao ? '10px' : '0'};">\${analisePreco}\${analiseRating}\${analisePros}</p>
           \${recomendacao ? '<div style="font-size:13px;color:#374151;line-height:1.7;padding-top:10px;border-top:1px solid #ddd6fe;">' + recomendacao + '</div>' : ''}
@@ -2334,7 +2336,7 @@ function homePage(): string {
                   <!-- Imagem e nome -->
                   <div style="text-align:center;margin-bottom:14px;\${p.badge?'padding-top:8px':''}">
                     \${p.image
-                      ? \`<img src="\${p.image}" alt="\${p.name||'Produto'}" style="width:80px;height:80px;object-fit:cover;border-radius:14px;border:2px solid \${borderColor(p)};margin:0 auto 10px;display:block;box-shadow:0 4px 12px rgba(0,0,0,0.08);" loading="lazy" onerror="this.style.display='none'">\`
+                      ? \`<img src="\${p.image}" alt="\${p.name||'Produto'}" style="width:80px;height:80px;object-fit:cover;border-radius:14px;border:2px solid \${borderColor(p)};margin:0 auto 10px;display:block;box-shadow:0 4px 12px rgba(0,0,0,0.08);" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">\`
                       : \`<div style="width:80px;height:80px;background:linear-gradient(135deg,#f3f0ff,#ede9fe);border-radius:14px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid #e9d5ff;">📦</div>\`}
                     <p style="font-size:13px;font-weight:800;color:#1f2937;margin:0 0 6px;line-height:1.3;">\${p.name || 'Produto'}</p>
                     <div style="display:flex;justify-content:center;gap:1px;margin-bottom:5px;">\${starsHtml(p.rating)}</div>
@@ -2373,7 +2375,7 @@ function homePage(): string {
               \`).join('')}
             </div>
 
-            <!-- Análise IA gerada automaticamente -->
+            <!-- Análise da Equipe TeckHome -->
             \${analiseIA}
 
             <!-- Conclusão editorial (se preenchida no admin) -->
@@ -2430,7 +2432,7 @@ function homePage(): string {
           return '<a href="/categoria/' + (p.categoryId || '') + '" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col card-hover group cursor-pointer" style="text-decoration:none;" onclick="event.preventDefault();openProductFromRecent(\'' + p.id + '\')">'
             + '<div class="relative">'
             + '<div class="h-44 overflow-hidden bg-gray-50">'
-            + '<img src="' + imgSrc + '" alt="' + p.title.replace(/"/g,'') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src=\'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.title) + '&background=6366f1&color=fff&size=400\'">'
+            + '<img src="' + imgSrc + '" alt="' + p.title.replace(/"/g,'') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" referrerpolicy="no-referrer" onerror="this.src=\'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.title) + '&background=6366f1&color=fff&size=400\'">'
             + '</div>'
             + badgeHtml
             + '</div>'
@@ -2484,6 +2486,7 @@ function categoryPage(categoryId: string): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store - Categoria</title>
@@ -2792,7 +2795,7 @@ function categoryPage(categoryId: string): string {
         <div class="flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
           <!-- Imagem -->
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
-            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
             \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
           </div>
@@ -2870,7 +2873,7 @@ function categoryPage(categoryId: string): string {
         <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col cursor-pointer" data-id="\${product.id}" onclick="openProductModalCp('\${product.id}')">
           <div class="relative">
             <div class="h-52 overflow-hidden bg-gray-50">
-              <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'">
+              <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'">
             </div>
             \${featuredBadge}
             <!-- Overlay lupa -->
@@ -2925,7 +2928,7 @@ function categoryPage(categoryId: string): string {
             <img src="\${imgSrc}" alt="\${product.title}" 
                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                  style="filter:brightness(0.72);"
-                 onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=800'">
+                 referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=800'">
             <!-- Gradient overlay -->
             <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.50) 50%, rgba(0,0,0,0.15) 100%);"></div>
             <!-- Conteúdo sobre a imagem -->
@@ -3043,19 +3046,20 @@ function categoryPage(categoryId: string): string {
       if (category) {
         document.title = \`TeckHome Store - \${category.name}\`
         document.getElementById('categoryHeader').innerHTML = \`
-          <div class="max-w-7xl mx-auto">
-            <nav class="text-sm text-gray-400 mb-3 flex items-center gap-2">
+          <div class="max-w-7xl mx-auto text-center">
+            <nav class="text-sm text-gray-400 mb-4 flex items-center justify-center gap-2">
               <a href="/" class="hover:text-indigo-600 transition-colors">Início</a>
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
               <span class="text-gray-600 font-medium">\${category.name}</span>
             </nav>
-            <div class="flex items-center gap-4">
-              <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, \${category.color}18, \${category.color}35); border: 2px solid \${category.color}40;">
+            <div class="flex flex-col items-center gap-4">
+              <div class="w-16 h-16 rounded-2xl flex items-center justify-center shadow-md" style="background: linear-gradient(135deg, \${category.color}18, \${category.color}35); border: 2px solid \${category.color}40;">
                 \${getCatSvgCp(category.id, category.color)}
               </div>
               <div>
-                <h1 class="text-3xl font-black text-gray-900">\${category.name}</h1>
-                <p class="text-gray-500">\${category.description}</p>
+                <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-1">\${category.name}</h1>
+                <p class="text-gray-500 max-w-lg mx-auto">\${category.description}</p>
+                <div class="w-12 h-1 rounded-full mx-auto mt-3" style="background:\${category.color};"></div>
               </div>
             </div>
           </div>
@@ -3230,6 +3234,7 @@ function adminPage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store - Admin</title>
@@ -4137,7 +4142,7 @@ function adminPage(): string {
         const imgSrc = p.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80\`
         return \`
           <div class="card-admin bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4" data-id="\${p.id}">
-            <img src="\${imgSrc}" alt="\${p.title}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
+            <img src="\${imgSrc}" alt="\${p.title}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background: \${cat.color}">\${cat.icon} \${cat.name}</span>
@@ -4412,7 +4417,7 @@ function adminPage(): string {
           return \`
             <div class="bg-white rounded-2xl border-2 border-yellow-200 shadow-sm p-4 flex items-center gap-4 card-admin">
               <div class="relative flex-shrink-0">
-                <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=f59e0b&color=fff&size=80'">
+                <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=f59e0b&color=fff&size=80'">
                 <span class="absolute -top-1.5 -right-1.5 text-base">⭐</span>
               </div>
               <div class="flex-1 min-w-0">
@@ -4443,7 +4448,7 @@ function adminPage(): string {
           const isFeatured = p.featured
           return \`
             <div class="bg-white rounded-2xl border \${isFeatured ? 'border-yellow-300 bg-yellow-50' : 'border-gray-100'} shadow-sm p-4 flex items-center gap-4 card-admin">
-              <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
+              <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100 flex-shrink-0" referrerpolicy="no-referrer" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1 flex-wrap">
                   <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background:\${cat.color}">\${cat.icon} \${cat.name}</span>
@@ -5127,6 +5132,7 @@ function articlePage(article: any): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>${title} — TeckHome Store</title>
@@ -5221,7 +5227,7 @@ function articlePage(article: any): string {
 
   <!-- HERO DO ARTIGO -->
   <div class="hero-article">
-    <img src="${image}" alt="${title}" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80'">
+    <img src="${image}" alt="${title}" referrerpolicy="no-referrer" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80'">
     <div class="hero-article-overlay"></div>
     <div class="absolute bottom-0 left-0 right-0 p-6 md:p-12">
       <div class="max-w-4xl mx-auto">
@@ -5502,6 +5508,7 @@ function loginPage(erro?: string): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Acesso Restrito — TeckHome Store</title>
@@ -5664,6 +5671,7 @@ function termosPage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Termos de Uso — TeckHome Store</title>
@@ -5753,6 +5761,7 @@ function privacidadePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Política de Privacidade — TeckHome Store</title>
@@ -5859,6 +5868,7 @@ function cookiesPage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Política de Cookies — TeckHome Store</title>
@@ -5965,6 +5975,7 @@ function sobrePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Sobre Nós — TeckHome Store</title>
