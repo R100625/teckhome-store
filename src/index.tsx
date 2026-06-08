@@ -610,7 +610,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-eletronicos',
       title: 'Como escolher o melhor smartphone em 2026: tudo que você precisa saber antes de comprar',
       category: 'Eletrônicos', categoryIcon: '📱', categoryId: 'eletronicos',
-      image: 'https://picsum.photos/seed/smartphone2026/1200/630',
+      image: 'https://sspark.genspark.ai/cfimages?u1=4SEfU2sjsdxH2fKTjctldf%2FCq2j031YWor%2FkcYTeYAT4PVAK4ZfqZOmqfniCBubYlVLhZi6hfzq6EEHAIknKa2uZmSTfHj0XuH2biw%3D%3D&u2=146x3%2BZm8%2B0UH1Wa&width=1200',
       readTime: '6 min',
       keywords: 'melhor smartphone 2026, como escolher celular, review celular custo-benefício',
       excerpt: 'Você está prestes a gastar centenas de reais em um celular — e pode cometer o mesmo erro que milhares de brasileiros cometem todo ano.',
@@ -620,7 +620,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-eletrodomesticos',
       title: 'Air fryer ou forno elétrico? A verdade que as marcas não te contam — e qual comprar em 2026',
       category: 'Eletrodomésticos', categoryIcon: '🏠', categoryId: 'eletrodomesticos',
-      image: 'https://picsum.photos/seed/airfryer2026/1200/630',
+      image: 'https://sspark.genspark.ai/cfimages?u1=9oGnD%2BkEZ1hQ8E6J2c63g1KKfuJS3O2P2vJyKuvI80Hi6suJiJBMFeWwyqzRjYQ%2FLSoopo%2Feiiq8yr4AyJPziTIp%2FEDxuglm7lrE8Q%3D%3D&u2=yOnadCJvi2x87scq&width=1200',
       readTime: '7 min',
       keywords: 'air fryer vs forno elétrico, melhor air fryer 2026, qual comprar',
       excerpt: 'A air fryer se tornou febre no Brasil — mas será que ela é realmente superior ao forno elétrico, ou é apenas marketing bem feito?',
@@ -630,7 +630,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-refrigeracao',
       title: 'Ar-condicionado em 2026: split, portátil ou janela? O guia definitivo para escolher sem erro',
       category: 'Refrigeração', categoryIcon: '❄️', categoryId: 'refrigeracao',
-      image: 'https://picsum.photos/seed/arcondicionado2026/1200/630',
+      image: 'https://sspark.genspark.ai/cfimages?u1=NSxWYylJqxI%2F10q34wDcaDMXKLC7k9%2BkTIMMS9Et96ESoFGldgD9zRqLJKrkGNBVzEL15gCVNEfrqEhjZXlahWXPGTYlG%2FBxzftf56JR&u2=pYiupZOhAAsyHb2J&width=1200',
       readTime: '8 min',
       keywords: 'ar condicionado split vs portátil, melhor ar condicionado 2026, BTU ideal',
       excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz.',
@@ -640,7 +640,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-ferramentas',
       title: 'As 7 ferramentas elétricas que todo proprietário de imóvel precisa ter em casa',
       category: 'Ferramentas', categoryIcon: '🔧', categoryId: 'ferramentas',
-      image: 'https://picsum.photos/seed/ferramentas2026/1200/630',
+      image: 'https://sspark.genspark.ai/cfimages?u1=bc6xD4kC0ObnVtzq%2FtckFqFhmD7hko1WZ2UCAQCYJD%2Ffw2yLUa0%2BnQnsbklKbNZaJQPgaHO0EyZgSSNlmvXUp8w6mE1ftVcsecRmaemAZaog2ZLSaxBzoErOeb0runD57A%3D%3D&u2=rCOQbJfTHjhZa34K&width=1200',
       readTime: '6 min',
       keywords: 'ferramentas elétricas essenciais, melhor parafusadeira 2026, kit ferramentas casa',
       excerpt: 'Se você é proprietário de imóvel ou simplesmente gosta de resolver problemas em casa sem depender de terceiros, existem 7 ferramentas elétricas que vão transformar sua vida.',
@@ -650,7 +650,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-cama-mesa',
       title: 'Cama e Mesa em 2026: como montar um quarto confortável e elegante sem gastar uma fortuna',
       category: 'Cama e Mesa', categoryIcon: '🛏️', categoryId: 'cama-mesa',
-      image: 'https://picsum.photos/seed/camemesa2026/1200/630',
+      image: 'https://sspark.genspark.ai/cfimages?u1=AsTbGRlo3KMahKeXLCazrz9sssY9uM5gGo23PSAn95pgMXuu5b1D77ssIMMzA0cNXzZo78IlJwZT%2FdnbcTI4ZiE4W8XrQ4Ze1ey%2B5MK734APHOT1uDFFjKwq8D7aMOc6xo7ql5HM%3D&u2=mexamyxxKkv8ULD9&width=1200',
       readTime: '8 min',
       keywords: 'jogo de cama qualidade, travesseiro ideal, colchão custo-benefício, roupa de cama 2026',
       excerpt: 'A qualidade do seu sono depende diretamente da qualidade da sua cama — e não é necessário gastar uma fortuna para dormir muito bem. Descubra os critérios que realmente fazem diferença.',
@@ -660,7 +660,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-jardim',
       title: 'Jardim em casa: como começar do zero e criar um espaço verde bonito mesmo sem experiência',
       category: 'Jardim', categoryIcon: '🌿', categoryId: 'jardim',
-      image: 'https://picsum.photos/seed/jardim2026/1200/630',
+      image: 'https://sspark.genspark.ai/cfimages?u1=pGDdlxyzYWLC5fDZm8SNZwSGwNqPhoTyW0xJB%2FEpa7lFcTSagIw%2FFp2LeV0MePqLoPjsctvsqDc8mnAngVZSjPGqS8K6fVMlbHoITrhLGeNI05hw3PzNP823WtEpWzQ3t5dSkUgWhJbrpCyvYL36NcsjoRM%2FFGuUBS9tliJZZ6Is0OugIH0TWYu%2Bg5xHA2SY%2Fai6OeYu%2Bk9IJBs2KTk4bt2v%2FXKrnZ5zDg%3D%3D&u2=boqmZwFZj%2F%2FBNcMe&width=1200',
       readTime: '9 min',
       keywords: 'jardim em casa para iniciantes, como cuidar de plantas, horta em apartamento 2026, ferramentas para jardim',
       excerpt: 'Criar um jardim bonito e saudável não exige conhecimento avançado em botânica — exige apenas as ferramentas certas, as plantas certas para o seu espaço e alguns hábitos simples.',
@@ -670,7 +670,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-ventilacao',
       title: 'Ventilador ou ar-condicionado? O guia completo sobre ventilação doméstica em 2026',
       category: 'Ventilação', categoryIcon: '💨', categoryId: 'ventilacao',
-      image: 'https://picsum.photos/seed/ventilacao2026/1200/630',
+      image: 'https://sspark.genspark.ai/cfimages?u1=j4f%2F8VQClA3q0oHT861xZtAvCbCvX%2Fn8R11e4u9rwv6Dio4kt1ROuxOURxdtMrCOa2tPFUk8Cf8LB8m2iOWTbtgMr2ixHBZikBrJM3gTYdfE2QN4N0NgWHUv38qYkRnb3IozN31vyul1OfBRLLIsBhDS9IFnhps%3D&u2=roKI4BGgZTHpaZUN&width=1200',
       readTime: '7 min',
       keywords: 'ventilador de teto custo-benefício, ventilador vs ar condicionado, climatizador evaporativo 2026, melhor ventilador',
       excerpt: 'Em um Brasil onde o calor bate 35°C em grande parte do país por meses seguidos, escolher o sistema de ventilação correto pode significar economia de até R$ 150 por mês na conta de luz.',
@@ -2130,7 +2130,7 @@ function homePage(): string {
         excerpt: 'Você está prestes a gastar centenas de reais em um celular — e pode cometer o mesmo erro que milhares de brasileiros cometem todo ano: comprar pelo nome da marca, e não pelo que o produto realmente entrega. Neste guia, revelamos os 5 critérios que profissionais de tecnologia usam para avaliar smartphones, e que vão mudar completamente a forma como você escolhe o próximo aparelho.',
         category: 'Eletrônicos',
         categoryIcon: '📱',
-        image: 'https://picsum.photos/seed/smartphone2026/600/400',
+        image: 'https://sspark.genspark.ai/cfimages?u1=4SEfU2sjsdxH2fKTjctldf%2FCq2j031YWor%2FkcYTeYAT4PVAK4ZfqZOmqfniCBubYlVLhZi6hfzq6EEHAIknKa2uZmSTfHj0XuH2biw%3D%3D&u2=146x3%2BZm8%2B0UH1Wa&width=600',
         readTime: '6 min',
         keywords: 'melhor smartphone 2026, como escolher celular, review celular custo-benefício, smartphone barato bom'
       },
@@ -2142,7 +2142,7 @@ function homePage(): string {
         excerpt: 'A air fryer se tornou febre no Brasil — mas será que ela é realmente superior ao forno elétrico, ou é apenas marketing bem feito? Nossa equipe testou os dois aparelhos e a resposta vai surpreender você. Descubra qual realmente vale a pena para a sua cozinha antes de gastar seu dinheiro.',
         category: 'Eletrodomésticos',
         categoryIcon: '🏠',
-        image: 'https://picsum.photos/seed/airfryer2026/600/400',
+        image: 'https://sspark.genspark.ai/cfimages?u1=9oGnD%2BkEZ1hQ8E6J2c63g1KKfuJS3O2P2vJyKuvI80Hi6suJiJBMFeWwyqzRjYQ%2FLSoopo%2Feiiq8yr4AyJPziTIp%2FEDxuglm7lrE8Q%3D%3D&u2=yOnadCJvi2x87scq&width=600',
         readTime: '7 min',
         keywords: 'air fryer vs forno elétrico, melhor air fryer 2026, qual comprar, air fryer consume energia'
       },
@@ -2154,7 +2154,7 @@ function homePage(): string {
         excerpt: 'Comprar o ar-condicionado errado pode te custar mais de R$ 500 extras por ano só na conta de luz. Neste guia, calculamos o BTU ideal para cada ambiente e comparamos split, portátil e janela com dados reais de consumo.',
         category: 'Refrigeração',
         categoryIcon: '❄️',
-        image: 'https://picsum.photos/seed/arcondicionado2026/600/400',
+        image: 'https://sspark.genspark.ai/cfimages?u1=NSxWYylJqxI%2F10q34wDcaDMXKLC7k9%2BkTIMMS9Et96ESoFGldgD9zRqLJKrkGNBVzEL15gCVNEfrqEhjZXlahWXPGTYlG%2FBxzftf56JR&u2=pYiupZOhAAsyHb2J&width=600',
         readTime: '8 min',
         keywords: 'ar condicionado split vs portátil, melhor ar condicionado 2026, BTU ideal, ar condicionado econômico'
       },
@@ -2166,7 +2166,7 @@ function homePage(): string {
         excerpt: 'Com um kit de ferramentas básico que custa entre R$ 400 e R$ 800, você recupera o investimento em 3-4 chamados de técnico evitados. Veja quais são as 7 ferramentas essenciais que nossa equipe selecionou com análise real de custo-benefício, durabilidade e marcas confiáveis disponíveis no Brasil.',
         category: 'Ferramentas',
         categoryIcon: '🔧',
-        image: 'https://picsum.photos/seed/ferramentas2026/600/400',
+        image: 'https://sspark.genspark.ai/cfimages?u1=bc6xD4kC0ObnVtzq%2FtckFqFhmD7hko1WZ2UCAQCYJD%2Ffw2yLUa0%2BnQnsbklKbNZaJQPgaHO0EyZgSSNlmvXUp8w6mE1ftVcsecRmaemAZaog2ZLSaxBzoErOeb0runD57A%3D%3D&u2=rCOQbJfTHjhZa34K&width=600',
         readTime: '6 min',
         keywords: 'ferramentas elétricas essenciais, melhor parafusadeira 2026, kit ferramentas casa, ferramentas custo-benefício'
       },
@@ -2178,7 +2178,7 @@ function homePage(): string {
         excerpt: 'A qualidade do seu sono depende diretamente da qualidade da sua cama — e não é necessário gastar uma fortuna para dormir muito melhor. Descubra os critérios que realmente fazem diferença na escolha de colchão, travesseiro e roupa de cama.',
         category: 'Cama e Mesa',
         categoryIcon: '🛏️',
-        image: 'https://picsum.photos/seed/camemesa2026/600/400',
+        image: 'https://sspark.genspark.ai/cfimages?u1=AsTbGRlo3KMahKeXLCazrz9sssY9uM5gGo23PSAn95pgMXuu5b1D77ssIMMzA0cNXzZo78IlJwZT%2FdnbcTI4ZiE4W8XrQ4Ze1ey%2B5MK734APHOT1uDFFjKwq8D7aMOc6xo7ql5HM%3D&u2=mexamyxxKkv8ULD9&width=600',
         readTime: '8 min',
         keywords: 'jogo de cama qualidade, travesseiro ideal, colchão custo-benefício, roupa de cama 2026, melhor colchão casal'
       },
@@ -2190,7 +2190,7 @@ function homePage(): string {
         excerpt: 'Criar um jardim bonito e saudável não exige conhecimento avançado em botânica — exige as plantas certas para o seu espaço, as ferramentas adequadas e alguns hábitos simples. Este guia completo é para quem quer começar hoje.',
         category: 'Jardim',
         categoryIcon: '🌿',
-        image: 'https://picsum.photos/seed/jardim2026/600/400',
+        image: 'https://sspark.genspark.ai/cfimages?u1=pGDdlxyzYWLC5fDZm8SNZwSGwNqPhoTyW0xJB%2FEpa7lFcTSagIw%2FFp2LeV0MePqLoPjsctvsqDc8mnAngVZSjPGqS8K6fVMlbHoITrhLGeNI05hw3PzNP823WtEpWzQ3t5dSkUgWhJbrpCyvYL36NcsjoRM%2FFGuUBS9tliJZZ6Is0OugIH0TWYu%2Bg5xHA2SY%2Fai6OeYu%2Bk9IJBs2KTk4bt2v%2FXKrnZ5zDg%3D%3D&u2=boqmZwFZj%2F%2FBNcMe&width=600',
         readTime: '9 min',
         keywords: 'jardim em casa iniciantes, como cuidar de plantas, horta em apartamento 2026, ferramentas para jardim'
       },
@@ -2202,7 +2202,7 @@ function homePage(): string {
         excerpt: 'Em um Brasil onde o calor bate 35°C por meses seguidos, escolher o sistema de ventilação correto pode significar economia de até R$ 150 por mês na conta de luz. Entenda as diferenças entre ventilador de teto, climatizador e ar-condicionado.',
         category: 'Ventilação',
         categoryIcon: '💨',
-        image: 'https://picsum.photos/seed/ventilacao2026/600/400',
+        image: 'https://sspark.genspark.ai/cfimages?u1=j4f%2F8VQClA3q0oHT861xZtAvCbCvX%2Fn8R11e4u9rwv6Dio4kt1ROuxOURxdtMrCOa2tPFUk8Cf8LB8m2iOWTbtgMr2ixHBZikBrJM3gTYdfE2QN4N0NgWHUv38qYkRnb3IozN31vyul1OfBRLLIsBhDS9IFnhps%3D&u2=roKI4BGgZTHpaZUN&width=600',
         readTime: '7 min',
         keywords: 'ventilador de teto custo-benefício, ventilador vs ar condicionado, climatizador evaporativo 2026'
       }
@@ -2239,7 +2239,7 @@ function homePage(): string {
         const artUrl = art.url || (art.slug ? \`/artigo/\${art.slug}\` : '#blog')
         const isFirst = i === 0
         const bgGrad = blogGradients[i % blogGradients.length]
-        const imgSrc = art.image || \`https://picsum.photos/seed/article\${i}/600/400\`
+        const imgSrc = art.image || \`https://sspark.genspark.ai/cfimages?u1=9G120AEXK4R0PUalolrkt8Bcq2YGaoX%2BdHSEwwe%2BO8Lk6wM4nlRPRq48zdYXs012IjOBgrKwcxuA4GOr%2FYm25c9n919R9PJoAEzNC7cr1o0%2FYwmp1xIDz5ay8lianV%2FJYuvcjxeNgLE3aL%2B2m20gWaNjs0UXALj3Ng%3D%3D&u2=k6KRcG%2FOs6Z5mFcz\`
         return \`
         <a href="\${artUrl}" class="blog-card bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col cursor-pointer" style="text-decoration:none; box-shadow:0 2px 16px rgba(99,102,241,0.07);" itemscope itemtype="https://schema.org/Article">
           <div class="blog-card-img relative" style="height:\${isFirst ? '220px' : '200px'}; background:\${bgGrad};">
@@ -3162,9 +3162,9 @@ function categoryPage(categoryId: string): string {
 
     async function loadCategoryBlog() {
       const staticArt = [
-        { slug: 'guia-eletronicos', url: '/artigo/guia-eletronicos', title: 'Como escolher o melhor smartphone em 2026', excerpt: 'Os critérios que profissionais usam para avaliar smartphones e mudar a forma como você escolhe.', category: 'Eletrônicos', image: 'https://picsum.photos/seed/smartphone2026/600/400', readTime: '6 min' },
-        { slug: 'guia-eletrodomesticos', url: '/artigo/guia-eletrodomesticos', title: 'Air fryer ou forno elétrico? A verdade que as marcas não te contam', excerpt: 'Nossa equipe testou os dois aparelhos. Descubra qual realmente vale a pena para sua cozinha.', category: 'Eletrodomésticos', image: 'https://picsum.photos/seed/airfryer2026/600/400', readTime: '7 min' },
-        { slug: 'guia-refrigeracao', url: '/artigo/guia-refrigeracao', title: 'Ar-condicionado 2026: split, portátil ou janela?', excerpt: 'Guia definitivo com dados reais de consumo e cálculo do BTU ideal para cada ambiente.', category: 'Refrigeração', image: 'https://picsum.photos/seed/arcondicionado2026/600/400', readTime: '8 min' }
+        { slug: 'guia-eletronicos', url: '/artigo/guia-eletronicos', title: 'Como escolher o melhor smartphone em 2026', excerpt: 'Os critérios que profissionais usam para avaliar smartphones e mudar a forma como você escolhe.', category: 'Eletrônicos', image: 'https://sspark.genspark.ai/cfimages?u1=4SEfU2sjsdxH2fKTjctldf%2FCq2j031YWor%2FkcYTeYAT4PVAK4ZfqZOmqfniCBubYlVLhZi6hfzq6EEHAIknKa2uZmSTfHj0XuH2biw%3D%3D&u2=146x3%2BZm8%2B0UH1Wa&width=600', readTime: '6 min' },
+        { slug: 'guia-eletrodomesticos', url: '/artigo/guia-eletrodomesticos', title: 'Air fryer ou forno elétrico? A verdade que as marcas não te contam', excerpt: 'Nossa equipe testou os dois aparelhos. Descubra qual realmente vale a pena para sua cozinha.', category: 'Eletrodomésticos', image: 'https://sspark.genspark.ai/cfimages?u1=9oGnD%2BkEZ1hQ8E6J2c63g1KKfuJS3O2P2vJyKuvI80Hi6suJiJBMFeWwyqzRjYQ%2FLSoopo%2Feiiq8yr4AyJPziTIp%2FEDxuglm7lrE8Q%3D%3D&u2=yOnadCJvi2x87scq&width=600', readTime: '7 min' },
+        { slug: 'guia-refrigeracao', url: '/artigo/guia-refrigeracao', title: 'Ar-condicionado 2026: split, portátil ou janela?', excerpt: 'Guia definitivo com dados reais de consumo e cálculo do BTU ideal para cada ambiente.', category: 'Refrigeração', image: 'https://sspark.genspark.ai/cfimages?u1=NSxWYylJqxI%2F10q34wDcaDMXKLC7k9%2BkTIMMS9Et96ESoFGldgD9zRqLJKrkGNBVzEL15gCVNEfrqEhjZXlahWXPGTYlG%2FBxzftf56JR&u2=pYiupZOhAAsyHb2J&width=600', readTime: '8 min' }
       ]
       let adminArt = []
       try { const r = await fetch('/api/articles'); if (r.ok) adminArt = await r.json() } catch(e) {}
@@ -3175,7 +3175,7 @@ function categoryPage(categoryId: string): string {
       if (!grid) return
       const grads = ['linear-gradient(135deg,#4f46e5,#7c3aed)','linear-gradient(135deg,#0891b2,#0e7490)','linear-gradient(135deg,#059669,#047857)']
       grid.innerHTML = articles.map((art, i) => {
-        const imgSrc = art.image || ('https://picsum.photos/seed/cat' + i + '/600/400')
+        const imgSrc = art.image || 'https://sspark.genspark.ai/cfimages?u1=9G120AEXK4R0PUalolrkt8Bcq2YGaoX%2BdHSEwwe%2BO8Lk6wM4nlRPRq48zdYXs012IjOBgrKwcxuA4GOr%2FYm25c9n919R9PJoAEzNC7cr1o0%2FYwmp1xIDz5ay8lianV%2FJYuvcjxeNgLE3aL%2B2m20gWaNjs0UXALj3Ng%3D%3D&u2=k6KRcG%2FOs6Z5mFcz'
         return '<a href="' + (art.url || '/artigo/' + art.slug) + '" style="text-decoration:none;display:flex;flex-direction:column;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #f3f4f6;box-shadow:0 2px 16px rgba(99,102,241,0.07);">'
           + '<div style="height:180px;background:' + grads[i % grads.length] + ';position:relative;overflow:hidden;">'
           + '<img src="' + imgSrc + '" alt="' + art.title.replace(/"/g,'') + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.style.display='none';">'
@@ -5231,7 +5231,7 @@ function articlePage(article: any): string {
   const title = article.title || 'Artigo TeckHome'
   const excerpt = article.excerpt || ''
   const content = article.content || `<p>${excerpt}</p>`
-  const image = article.image || 'https://picsum.photos/seed/teckhome-article/1200/630'
+  const image = article.image || 'https://sspark.genspark.ai/cfimages?u1=9G120AEXK4R0PUalolrkt8Bcq2YGaoX%2BdHSEwwe%2BO8Lk6wM4nlRPRq48zdYXs012IjOBgrKwcxuA4GOr%2FYm25c9n919R9PJoAEzNC7cr1o0%2FYwmp1xIDz5ay8lianV%2FJYuvcjxeNgLE3aL%2B2m20gWaNjs0UXALj3Ng%3D%3D&u2=k6KRcG%2FOs6Z5mFcz'
   const category = article.category || 'Geral'
   const categoryIcon = article.categoryIcon || '📝'
   const readTime = article.readTime || '5 min'
@@ -5427,15 +5427,15 @@ function articlePage(article: any): string {
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <a href="/artigo/guia-eletronicos" class="related-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 group" style="text-decoration:none;">
-          <div class="h-28 overflow-hidden" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);"><img src="https://picsum.photos/seed/smartphone2026/400/200" alt="Eletrônicos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null;this.style.display='none';"></div>
+          <div class="h-28 overflow-hidden" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);"><img src="https://sspark.genspark.ai/cfimages?u1=4SEfU2sjsdxH2fKTjctldf%2FCq2j031YWor%2FkcYTeYAT4PVAK4ZfqZOmqfniCBubYlVLhZi6hfzq6EEHAIknKa2uZmSTfHj0XuH2biw%3D%3D&u2=146x3%2BZm8%2B0UH1Wa&width=400" alt="Eletrônicos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null;this.style.display='none';"></div>
           <div class="p-4"><span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">Eletrônicos</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Como escolher o melhor smartphone em 2026</p></div>
         </a>
         <a href="/artigo/guia-eletrodomesticos" class="related-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 group" style="text-decoration:none;">
-          <div class="h-28 overflow-hidden" style="background:linear-gradient(135deg,#d97706,#b45309);"><img src="https://picsum.photos/seed/airfryer2026/400/200" alt="Eletrodomésticos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null;this.style.display='none';"></div>
+          <div class="h-28 overflow-hidden" style="background:linear-gradient(135deg,#d97706,#b45309);"><img src="https://sspark.genspark.ai/cfimages?u1=9oGnD%2BkEZ1hQ8E6J2c63g1KKfuJS3O2P2vJyKuvI80Hi6suJiJBMFeWwyqzRjYQ%2FLSoopo%2Feiiq8yr4AyJPziTIp%2FEDxuglm7lrE8Q%3D%3D&u2=yOnadCJvi2x87scq&width=400" alt="Eletrodomésticos" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null;this.style.display='none';"></div>
           <div class="p-4"><span class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">Eletrodomésticos</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Air fryer ou forno elétrico? A verdade</p></div>
         </a>
         <a href="/artigo/guia-refrigeracao" class="related-card bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 group" style="text-decoration:none;">
-          <div class="h-28 overflow-hidden" style="background:linear-gradient(135deg,#0891b2,#0e7490);"><img src="https://picsum.photos/seed/arcondicionado2026/400/200" alt="Refrigeração" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null;this.style.display='none';"></div>
+          <div class="h-28 overflow-hidden" style="background:linear-gradient(135deg,#0891b2,#0e7490);"><img src="https://sspark.genspark.ai/cfimages?u1=NSxWYylJqxI%2F10q34wDcaDMXKLC7k9%2BkTIMMS9Et96ESoFGldgD9zRqLJKrkGNBVzEL15gCVNEfrqEhjZXlahWXPGTYlG%2FBxzftf56JR&u2=pYiupZOhAAsyHb2J&width=400" alt="Refrigeração" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null;this.style.display='none';"></div>
           <div class="p-4"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Refrigeração</span><p class="text-sm font-bold text-gray-800 mt-2 leading-snug group-hover:text-indigo-600 transition-colors">Ar-condicionado 2026: guia definitivo</p></div>
         </a>
       </div>
