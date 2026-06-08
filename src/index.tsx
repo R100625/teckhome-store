@@ -668,7 +668,6 @@ function maintenancePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store — Em Manutenção</title>
@@ -727,7 +726,6 @@ function homePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store — Reviews, Comparativos e Melhores Produtos para sua Casa</title>
@@ -2486,7 +2484,6 @@ function categoryPage(categoryId: string): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store - Categoria</title>
@@ -3234,7 +3231,6 @@ function adminPage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>TeckHome Store - Admin</title>
@@ -5132,7 +5128,6 @@ function articlePage(article: any): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>${title} — TeckHome Store</title>
@@ -5508,7 +5503,6 @@ function loginPage(erro?: string): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Acesso Restrito — TeckHome Store</title>
@@ -5671,7 +5665,6 @@ function termosPage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Termos de Uso — TeckHome Store</title>
@@ -5761,7 +5754,6 @@ function privacidadePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Política de Privacidade — TeckHome Store</title>
@@ -5868,7 +5860,6 @@ function cookiesPage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Política de Cookies — TeckHome Store</title>
@@ -5975,7 +5966,6 @@ function sobrePage(): string {
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="/static/logo.png">
   <title>Sobre Nós — TeckHome Store</title>
