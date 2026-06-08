@@ -1025,20 +1025,21 @@ function homePage(): string {
   <!-- DESTAQUES -->
   <section id="destaques" class="bg-white py-20 px-4">
     <div class="max-w-7xl mx-auto">
-      <div class="flex items-end justify-between mb-12">
-        <div>
-          <span class="section-label"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Em Destaque</span>
-          <h2 class="section-title" id="featuredSectionTitle">Produtos Recomendados</h2>
-          <p class="text-gray-500 mt-2 text-sm">Os mais bem avaliados pela nossa equipe editorial</p>
-          <div class="section-divider"></div>
-        </div>
-
+      <!-- Cabeçalho centralizado -->
+      <div class="text-center mb-12">
+        <span class="section-label mx-auto" style="display:inline-flex;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Em Destaque
+        </span>
+        <h2 class="section-title" id="featuredSectionTitle">Produtos Recomendados</h2>
+        <p class="text-gray-500 mt-2 text-sm max-w-lg mx-auto">Os mais bem avaliados pela nossa equipe editorial — escolhidos a dedo para você</p>
+        <div class="section-divider mx-auto"></div>
       </div>
-      <div id="featuredGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <div class="shimmer h-80"></div>
-        <div class="shimmer h-80"></div>
-        <div class="shimmer h-80"></div>
-        <div class="shimmer h-80"></div>
+      <div id="featuredGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+        <div class="shimmer h-80 w-full"></div>
+        <div class="shimmer h-80 w-full"></div>
+        <div class="shimmer h-80 w-full"></div>
+        <div class="shimmer h-80 w-full"></div>
       </div>
       <div id="noFeatured" class="hidden text-center py-20">
         <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -1050,28 +1051,26 @@ function homePage(): string {
   </section>
 
   <!-- COMPARATIVOS HOME -->
-  <section id="comparativos-home" class="bg-white py-16 px-4 border-t border-gray-100">
+  <section id="comparativos-home" class="py-20 px-4" style="background:linear-gradient(135deg,#faf5ff 0%,#f3f0ff 50%,#faf5ff 100%);border-top:1px solid #e9d5ff;border-bottom:1px solid #e9d5ff;">
     <div class="max-w-7xl mx-auto">
-      <!-- Header da seção -->
-      <div class="flex items-end justify-between mb-10">
-        <div>
-          <span class="section-label" style="color:#7c3aed;background:linear-gradient(135deg,#f3f0ff,#ede9fe);border-color:#c4b5fd;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 15H6M15 18l3-3-3-3M9 18l-3-3 3-3"/></svg>
-            Comparativos
-          </span>
-          <h2 class="section-title" style="color:#1f2937;">Produtos Similares: Qual Escolher?</h2>
-          <p class="text-gray-500 mt-2 text-sm">Análises lado a lado para você decidir com confiança</p>
-          <div class="section-divider" style="background:linear-gradient(90deg,#7c3aed,#6366f1);"></div>
-        </div>
+      <!-- Header centralizado -->
+      <div class="text-center mb-14">
+        <span class="section-label mx-auto" style="display:inline-flex;color:#7c3aed;background:linear-gradient(135deg,#f3f0ff,#ede9fe);border-color:#c4b5fd;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15H6M15 18l3-3-3-3M9 18l-3-3 3-3"/></svg>
+          Comparativo de Produtos
+        </span>
+        <h2 class="section-title">Qual Produto Escolher?</h2>
+        <p class="text-gray-500 mt-3 max-w-xl mx-auto text-sm leading-relaxed">Nossa IA analisa pontos fortes, fracos e custo-benefício de produtos similares para você decidir com confiança</p>
+        <div class="section-divider mx-auto" style="background:linear-gradient(90deg,#7c3aed,#6366f1);"></div>
       </div>
       <!-- Container de cards comparativos (carregado via JS) -->
-      <div id="homeComparativosGrid" class="space-y-8">
+      <div id="homeComparativosGrid" class="space-y-10">
         <!-- shimmer placeholder -->
-        <div class="shimmer rounded-2xl h-64"></div>
-        <div class="shimmer rounded-2xl h-64"></div>
+        <div class="shimmer rounded-3xl h-72 w-full"></div>
+        <div class="shimmer rounded-3xl h-72 w-full"></div>
       </div>
-      <div id="homeComparativosEmpty" class="hidden text-center py-16 text-gray-400">
-        <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+      <div id="homeComparativosEmpty" class="hidden text-center py-16">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8"><path d="M18 15H6M15 18l3-3-3-3M9 18l-3-3 3-3"/></svg>
         </div>
         <p class="text-gray-500 font-medium">Nenhum comparativo disponível no momento</p>
@@ -2216,51 +2215,171 @@ function homePage(): string {
       }
     }
 
+    function gerarAnaliseIA(cmp) {
+      // Gera texto analítico automático baseado nos dados dos produtos
+      const prods = (cmp.products || []).slice(0, 4)
+      if (prods.length < 2) return ''
+      const bestProd = prods.find(p => p.badge === 'best') || prods[0]
+      const cbProd = prods.find(p => p.badge === 'costbenefit')
+      const cat = cmp.category || 'categoria'
+      const titulo = cmp.title || 'estes produtos'
+
+      // Análise de preços
+      const prodsComPreco = prods.filter(p => p.price)
+      let analisePreco = ''
+      if (prodsComPreco.length >= 2) {
+        const precos = prodsComPreco.map(p => {
+          const n = parseFloat((p.price || '').replace(/[^0-9,]/g,'').replace(',','.'))
+          return { name: p.name, val: n, price: p.price }
+        }).filter(x => !isNaN(x.val)).sort((a,b) => a.val - b.val)
+        if (precos.length >= 2) {
+          const mais_barato = precos[0]
+          const mais_caro = precos[precos.length-1]
+          const diff = mais_caro.val - mais_barato.val
+          const pct = ((diff / mais_caro.val) * 100).toFixed(0)
+          analisePreco = \`A diferença de preço entre o <strong>\${mais_barato.name}</strong> (\\${mais_barato.price}) e o <strong>\${mais_caro.name}</strong> (\\${mais_caro.price}) é de aproximadamente <strong>\${pct}%</strong>. \`
+        }
+      }
+
+      // Análise de ratings
+      const prodsComRating = prods.filter(p => parseFloat(p.rating) > 0)
+      let analiseRating = ''
+      if (prodsComRating.length >= 2) {
+        const melhorRating = [...prodsComRating].sort((a,b) => parseFloat(b.rating)-parseFloat(a.rating))[0]
+        analiseRating = \`Em termos de avaliação dos usuários, o <strong>\${melhorRating.name}</strong> se destaca com <strong>\\${parseFloat(melhorRating.rating).toFixed(1)} estrelas</strong>. \`
+      }
+
+      // Análise de prós e contras
+      const totalPros = prods.reduce((s,p) => s + (p.pros||[]).length, 0)
+      const totalCons = prods.reduce((s,p) => s + (p.cons||[]).length, 0)
+      let analisePorsCons = ''
+      if (totalPros > 0 || totalCons > 0) {
+        const melhorCusto = cbProd || bestProd
+        const diferencial = (melhorCusto.pros || []).slice(0,2).join(' e ')
+        if (diferencial) analisePorsCons = \`O <strong>\${melhorCusto.name}</strong> se sobressai principalmente por \${diferencial.toLowerCase()}. \`
+      }
+
+      // Recomendação final
+      let recomendacao = ''
+      if (bestProd && cbProd && bestProd.name !== cbProd.name) {
+        recomendacao = \`<strong>🏆 Melhor desempenho:</strong> <span style="color:#7c3aed">\${bestProd.name}</span> — ideal para quem busca o melhor resultado sem compromisso. <strong>💚 Melhor custo-benefício:</strong> <span style="color:#059669">\${cbProd.name}</span> — excelente opção para quem quer ótima qualidade gastando menos.\`
+      } else if (bestProd) {
+        recomendacao = \`Para a maioria dos compradores, o <strong>\${bestProd.name}</strong> oferece a melhor relação entre qualidade e investimento nesta categoria.\`
+      }
+
+      if (!analisePreco && !analiseRating && !analisePorsCons && !recomendacao) return ''
+
+      return \`
+        <div style="background:linear-gradient(135deg,#faf5ff,#f3f0ff);border-radius:16px;padding:20px 24px;border:1px solid #e9d5ff;margin-top:20px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#7c3aed,#6366f1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 7v4m0 4h.01"/></svg>
+            </div>
+            <span style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:0.8px;">🤖 Análise TeckHome IA</span>
+          </div>
+          <p style="font-size:13px;color:#374151;line-height:1.75;margin:0 0 10px;">\${analisePreco}\${analiseRating}\${analisePorsCons}</p>
+          \${recomendacao ? \`<div style="font-size:13px;color:#374151;line-height:1.7;padding-top:10px;border-top:1px solid #ddd6fe;">\${recomendacao}</div>\` : ''}
+        </div>
+      \`
+    }
+
     function renderHomeComparativoCard(cmp) {
       const prods = (cmp.products || []).slice(0, 4)
       const starsHtml = (r) => {
         const v = parseFloat(r) || 0
         return Array.from({length:5}, (_,i) =>
-          \`<svg width="11" height="11" viewBox="0 0 24 24" fill="\${i<Math.floor(v)?'#f59e0b':i<v?'#fcd34d':'#e5e7eb'}"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>\`
+          \`<svg width="12" height="12" viewBox="0 0 24 24" fill="\${i<Math.floor(v)?'#f59e0b':i<v?'#fcd34d':'#e5e7eb'}"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>\`
         ).join('')
       }
       const badgeHtml = (p) => {
-        if (p.badge === 'best') return '<span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;white-space:nowrap;">🏆 MELHOR ESCOLHA</span>'
-        if (p.badge === 'costbenefit') return '<span style="background:linear-gradient(135deg,#059669,#10b981);color:white;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;white-space:nowrap;">💚 CUSTO-BENEFÍCIO</span>'
+        if (p.badge === 'best') return '<span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:white;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap;letter-spacing:0.3px;">🏆 MELHOR ESCOLHA</span>'
+        if (p.badge === 'costbenefit') return '<span style="background:linear-gradient(135deg,#059669,#10b981);color:white;font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap;letter-spacing:0.3px;">💚 CUSTO-BENEFÍCIO</span>'
         return ''
       }
+      const borderColor = (p) => p.badge === 'best' ? '#c4b5fd' : p.badge === 'costbenefit' ? '#6ee7b7' : '#e5e7eb'
+      const bgCard = (p) => p.badge === 'best' ? 'linear-gradient(135deg,#faf5ff,#ffffff)' : p.badge === 'costbenefit' ? 'linear-gradient(135deg,#f0fdf4,#ffffff)' : 'white'
+      const analiseIA = gerarAnaliseIA(cmp)
+
       return \`
-        <div style="background:white;border-radius:20px;border:1px solid #e5e7eb;padding:28px;box-shadow:0 4px 20px rgba(124,58,237,0.07);position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#7c3aed,#6366f1,#818cf8);"></div>
-          <!-- Cabeçalho -->
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="background:linear-gradient(135deg,#f3f0ff,#ede9fe);color:#7c3aed;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;border:1px solid #c4b5fd;">⚖️ Comparativo</span>
-                \${cmp.category ? \`<span style="background:#f1f5f9;color:#64748b;font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;">\${cmp.category}</span>\` : ''}
-              </div>
-              <h3 style="font-size:18px;font-weight:900;color:#111827;margin:0;line-height:1.3;">\${cmp.title}</h3>
-              \${cmp.summary ? \`<p style="font-size:13px;color:#6b7280;margin:8px 0 0;line-height:1.6;max-width:600px;">\${cmp.summary}</p>\` : ''}
-            </div>
-          </div>
-          <!-- Cards dos produtos -->
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;">
-            \${prods.map(p => \`
-              <div style="border:1px solid \${p.badge==='best'?'#c4b5fd':'#e5e7eb'};border-radius:14px;padding:16px;position:relative;background:\${p.badge==='best'?'linear-gradient(135deg,#faf5ff,white)':p.badge==='costbenefit'?'linear-gradient(135deg,#f0fdf4,white)':'white'};transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
-                \${p.badge ? \`<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;">\${badgeHtml(p)}</div>\` : ''}
-                <div style="text-align:center;margin-bottom:12px;\${p.badge?'padding-top:6px':''}">
-                  \${p.image ? \`<img src="\${p.image}" alt="\${p.name||'Produto'}" style="width:72px;height:72px;object-fit:cover;border-radius:12px;border:1px solid #f3f4f6;margin:0 auto 10px;display:block;" loading="lazy">\` : \`<div style="width:72px;height:72px;background:#f3f0ff;border-radius:12px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;">📦</div>\`}
-                  <p style="font-size:12px;font-weight:800;color:#1f2937;margin:0 0 6px;line-height:1.3;">\${p.name || 'Produto'}</p>
-                  <div style="display:flex;justify-content:center;gap:1px;margin-bottom:4px;">\${starsHtml(p.rating)}</div>
-                  \${p.price ? \`<p style="font-size:15px;font-weight:900;color:#059669;margin:4px 0;">\${p.price}</p>\` : ''}
+        <div style="background:white;border-radius:24px;border:1px solid #e5e7eb;box-shadow:0 8px 40px rgba(124,58,237,0.1);position:relative;overflow:hidden;">
+          <!-- Barra superior colorida -->
+          <div style="height:5px;background:linear-gradient(90deg,#7c3aed,#6366f1,#818cf8,#a78bfa);"></div>
+
+          <div style="padding:28px 28px 24px;">
+            <!-- Cabeçalho do comparativo -->
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+                  <span style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#f3f0ff,#ede9fe);color:#7c3aed;font-size:10px;font-weight:800;padding:4px 12px;border-radius:20px;border:1px solid #c4b5fd;text-transform:uppercase;letter-spacing:0.5px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15H6M15 18l3-3-3-3M9 18l-3-3 3-3"/></svg>
+                    Comparativo
+                  </span>
+                  \${cmp.category ? \`<span style="background:#f8fafc;color:#64748b;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid #e2e8f0;">\${cmp.category}</span>\` : ''}
+                  <span style="background:#f0fdf4;color:#059669;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid #bbf7d0;">\${prods.length} produtos</span>
                 </div>
-                \${(p.pros||[]).length ? \`<div style="margin-bottom:8px;">\${(p.pros||[]).slice(0,3).map(pro => \`<div style="font-size:11px;color:#059669;display:flex;align-items:flex-start;gap:4px;margin-bottom:3px;"><span>✓</span><span>\${pro}</span></div>\`).join('')}</div>\` : ''}
-                \${(p.cons||[]).length ? \`<div style="margin-bottom:10px;">\${(p.cons||[]).slice(0,2).map(con => \`<div style="font-size:11px;color:#ef4444;display:flex;align-items:flex-start;gap:4px;margin-bottom:3px;"><span>✗</span><span>\${con}</span></div>\`).join('')}</div>\` : ''}
-                \${p.affiliateUrl ? \`<a href="\${p.affiliateUrl}" target="_blank" rel="noopener sponsored" style="display:block;text-align:center;background:\${p.badge==='best'?'linear-gradient(135deg,#7c3aed,#6366f1)':'#6366f1'};color:white;font-size:12px;font-weight:700;padding:8px 12px;border-radius:10px;text-decoration:none;margin-top:auto;">Ver Preço</a>\` : ''}
+                <h3 style="font-size:20px;font-weight:900;color:#111827;margin:0 0 6px;line-height:1.3;">\${cmp.title}</h3>
+                \${cmp.summary ? \`<p style="font-size:13px;color:#6b7280;margin:0;line-height:1.65;max-width:680px;">\${cmp.summary}</p>\` : ''}
               </div>
-            \`).join('')}
+            </div>
+
+            <!-- Cards dos produtos lado a lado -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:16px;margin-bottom:4px;">
+              \${prods.map(p => \`
+                <div style="border:2px solid \${borderColor(p)};border-radius:18px;padding:20px 16px;position:relative;background:\${bgCard(p)};transition:transform 0.2s,box-shadow 0.2s;display:flex;flex-direction:column;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+                  \${p.badge ? \`<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap;z-index:2;">\${badgeHtml(p)}</div>\` : ''}
+                  <!-- Imagem e nome -->
+                  <div style="text-align:center;margin-bottom:14px;\${p.badge?'padding-top:8px':''}">
+                    \${p.image
+                      ? \`<img src="\${p.image}" alt="\${p.name||'Produto'}" style="width:80px;height:80px;object-fit:cover;border-radius:14px;border:2px solid \${borderColor(p)};margin:0 auto 10px;display:block;box-shadow:0 4px 12px rgba(0,0,0,0.08);" loading="lazy" onerror="this.style.display='none'">\`
+                      : \`<div style="width:80px;height:80px;background:linear-gradient(135deg,#f3f0ff,#ede9fe);border-radius:14px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid #e9d5ff;">📦</div>\`}
+                    <p style="font-size:13px;font-weight:800;color:#1f2937;margin:0 0 6px;line-height:1.3;">\${p.name || 'Produto'}</p>
+                    <div style="display:flex;justify-content:center;gap:1px;margin-bottom:5px;">\${starsHtml(p.rating)}</div>
+                    \${p.rating ? \`<span style="font-size:11px;color:#6b7280;">\${parseFloat(p.rating).toFixed(1)}/5.0</span>\` : ''}
+                    \${p.price ? \`<p style="font-size:17px;font-weight:900;color:#059669;margin:8px 0 0;">\${p.price}</p>\` : ''}
+                  </div>
+                  <!-- Prós -->
+                  \${(p.pros||[]).length ? \`
+                    <div style="margin-bottom:8px;">
+                      \${(p.pros||[]).slice(0,3).map(pro => \`
+                        <div style="font-size:11.5px;color:#065f46;display:flex;align-items:flex-start;gap:5px;margin-bottom:4px;background:#f0fdf4;padding:3px 7px;border-radius:6px;">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="3" style="flex-shrink:0;margin-top:1px;"><path d="M20 6L9 17l-5-5"/></svg>
+                          <span>\${pro}</span>
+                        </div>
+                      \`).join('')}
+                    </div>
+                  \` : ''}
+                  <!-- Contras -->
+                  \${(p.cons||[]).length ? \`
+                    <div style="margin-bottom:12px;">
+                      \${(p.cons||[]).slice(0,2).map(con => \`
+                        <div style="font-size:11.5px;color:#991b1b;display:flex;align-items:flex-start;gap:5px;margin-bottom:4px;background:#fff5f5;padding:3px 7px;border-radius:6px;">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" style="flex-shrink:0;margin-top:1px;"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                          <span>\${con}</span>
+                        </div>
+                      \`).join('')}
+                    </div>
+                  \` : ''}
+                  <!-- Botão -->
+                  <div style="margin-top:auto;">
+                    \${p.affiliateUrl
+                      ? \`<a href="\${p.affiliateUrl}" target="_blank" rel="noopener sponsored" style="display:block;text-align:center;background:\${p.badge==='best'?'linear-gradient(135deg,#7c3aed,#6366f1)':p.badge==='costbenefit'?'linear-gradient(135deg,#059669,#10b981)':'linear-gradient(135deg,#6366f1,#818cf8)'};color:white;font-size:12px;font-weight:700;padding:10px 14px;border-radius:12px;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">Ver Preço →</a>\`
+                      : \`<div style="text-align:center;font-size:11px;color:#9ca3af;padding:8px;">Busque nas lojas</div>\`}
+                  </div>
+                </div>
+              \`).join('')}
+            </div>
+
+            <!-- Análise IA gerada automaticamente -->
+            \${analiseIA}
+
+            <!-- Conclusão editorial (se preenchida no admin) -->
+            \${cmp.conclusion ? \`
+              <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border-radius:14px;padding:16px 20px;border-left:4px solid #f59e0b;margin-top:16px;">
+                <p style="font-size:11px;font-weight:800;color:#92400e;margin:0 0 5px;text-transform:uppercase;letter-spacing:0.5px;">📝 Conclusão Editorial</p>
+                <p style="font-size:13px;color:#374151;margin:0;line-height:1.75;">\${cmp.conclusion}</p>
+              </div>
+            \` : ''}
           </div>
-          \${cmp.conclusion ? \`<div style="background:linear-gradient(135deg,#f3f0ff,#ede9fe);border-radius:12px;padding:14px 18px;border-left:4px solid #7c3aed;"><p style="font-size:12px;font-weight:700;color:#7c3aed;margin:0 0 4px;">💡 Conclusão</p><p style="font-size:13px;color:#374151;margin:0;line-height:1.7;">\${cmp.conclusion}</p></div>\` : ''}
         </div>
       \`
     }
@@ -3728,31 +3847,48 @@ function adminPage(): string {
 
     // ======= PRODUTOS =======
     async function fetchMetadata() {
-      const url = document.getElementById('productUrl').value.trim()
+      const urlEl = document.getElementById('productUrl')
+      const url = urlEl ? urlEl.value.trim() : ''
       if (!url) return
+      // Validar URL básica antes de enviar
+      try { new URL(url) } catch(e) {
+        showToast('⚠️ Cole uma URL completa (ex: https://amazon.com.br/...)', 'error')
+        return
+      }
       const btn = document.getElementById('fetchBtn')
-      btn.innerHTML = '<span class="spinner"></span>'
-      btn.disabled = true
+      if (btn) { btn.innerHTML = '<span class="spinner"></span> Buscando...'; btn.disabled = true }
       try {
         const res = await fetch('/api/fetch-metadata', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
+        if (!res.ok) throw new Error('HTTP ' + res.status)
         const data = await res.json()
-        if (data.title) document.getElementById('productTitle').value = data.title
-        if (data.description) document.getElementById('productDesc').value = data.description
-        if (data.imageUrl) document.getElementById('productImage').value = data.imageUrl
-        if (data.store) document.getElementById('productStore').value = data.store
-        const preview = document.getElementById('urlPreview')
         if (data.title) {
-          preview.classList.remove('hidden')
-          document.getElementById('previewImg').src = data.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(data.title)}&background=6366f1&color=fff&size=100\`
-          document.getElementById('previewTitle').textContent = data.title
-          document.getElementById('previewStore').textContent = data.store || ''
-          showToast('Dados do produto carregados!', 'success')
+          const titleEl = document.getElementById('productTitle')
+          const descEl = document.getElementById('productDesc')
+          const imgEl = document.getElementById('productImage')
+          const storeEl = document.getElementById('productStore')
+          if (titleEl) titleEl.value = data.title
+          if (descEl && data.description) descEl.value = data.description
+          if (imgEl && data.imageUrl) imgEl.value = data.imageUrl
+          if (storeEl && data.store) storeEl.value = data.store
+          const preview = document.getElementById('urlPreview')
+          if (preview) {
+            preview.classList.remove('hidden')
+            const previewImg = document.getElementById('previewImg')
+            if (previewImg) previewImg.src = data.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(data.title)}&background=6366f1&color=fff&size=100\`
+            const previewTitleEl = document.getElementById('previewTitle')
+            if (previewTitleEl) previewTitleEl.textContent = data.title
+            const previewStoreEl = document.getElementById('previewStore')
+            if (previewStoreEl) previewStoreEl.textContent = data.store || ''
+          }
+          showToast('✅ Dados carregados! Revise e salve.', 'success')
         } else {
-          showToast('Preencha os campos manualmente.', 'info')
+          showToast('⚠️ Não foi possível extrair dados. Preencha manualmente.', 'info')
         }
-      } catch (e) { showToast('Erro ao buscar dados.', 'error') }
-      btn.innerHTML = '<i class="fas fa-magic"></i> Buscar'
-      btn.disabled = false
+      } catch (e) {
+        console.error('fetchMetadata error:', e)
+        showToast('⚠️ Erro ao buscar dados. Preencha manualmente.', 'error')
+      }
+      if (btn) { btn.innerHTML = '<i class="fas fa-magic"></i> Buscar'; btn.disabled = false }
     }
 
     async function addProduct() {
@@ -4202,9 +4338,11 @@ function adminPage(): string {
         const data = await res.json()
         countEl.textContent = (data.length || 0) + ' total'
         if (!data.length) {
+          window._allComparativos = []
           list.innerHTML = '<div class="text-center py-16 text-gray-400"><i class="fas fa-balance-scale text-5xl mb-4 opacity-30"></i><p class="text-lg font-medium">Nenhum comparativo cadastrado ainda</p><p class="text-sm mt-1">Use o formulário ao lado para criar o primeiro</p></div>'
           return
         }
+        window._allComparativos = data
         list.innerHTML = data.map(cmp => \`
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 card-admin">
             <div class="flex items-start justify-between gap-3">
@@ -4223,7 +4361,7 @@ function adminPage(): string {
                 <button onclick="editComparativo('\${cmp.id}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
                   <i class="fas fa-edit"></i> Editar
                 </button>
-                <button onclick="deleteComparativo('\${cmp.id}', '\${cmp.title.replace(/'/g,\\"\\\\\\\\'\\")}' )" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
+                <button onclick="deleteComparativo('\${cmp.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold px-3 py-2 rounded-xl transition-all flex items-center gap-1.5">
                   <i class="fas fa-trash"></i> Excluir
                 </button>
               </div>
@@ -4484,7 +4622,9 @@ function adminPage(): string {
       btn.disabled = false
     }
 
-    async function deleteComparativo(id, title) {
+    async function deleteComparativo(id) {
+      const _cmpItem = (window._allComparativos || []).find(c => c.id === id)
+      const title = _cmpItem ? _cmpItem.title : 'este comparativo'
       if (!confirm(\`Excluir o comparativo "\${title}"? Esta ação não pode ser desfeita.\`)) return
       try {
         const res = await fetch('/api/comparativos/' + id, { method: 'DELETE' })
@@ -4711,18 +4851,20 @@ function adminPage(): string {
 
     // ======= INIT =======
     async function init() {
-      const res = await fetch('/api/categories')
-      categories = await res.json()
-      const catSelect = document.getElementById('categoryId')
-      const filterSelect = document.getElementById('filterCategory')
-      const destaqueFilter = document.getElementById('destaqueCatFilter')
-      const cmpCatSelect = document.getElementById('cmpCategory')
-      categories.forEach(cat => {
-        catSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
-        filterSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
-        destaqueFilter.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
-        cmpCatSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
-      })
+      try {
+        const res = await fetch('/api/categories')
+        categories = await res.json()
+        const catSelect = document.getElementById('categoryId')
+        const filterSelect = document.getElementById('filterCategory')
+        const destaqueFilter = document.getElementById('destaqueCatFilter')
+        const cmpCatSelect = document.getElementById('cmpCategory')
+        categories.forEach(cat => {
+          if (catSelect) catSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
+          if (filterSelect) filterSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
+          if (destaqueFilter) destaqueFilter.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
+          if (cmpCatSelect) cmpCatSelect.innerHTML += \`<option value="\${cat.id}">\${cat.icon} \${cat.name}</option>\`
+        })
+      } catch(e) { console.error('Erro ao carregar categorias:', e) }
       await loadProducts()
       // Ativar modo manutenção ao abrir o painel
       try {
