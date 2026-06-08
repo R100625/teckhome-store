@@ -650,7 +650,7 @@ app.get('/artigo/:slug', async (c) => {
       slug: 'guia-cama-mesa',
       title: 'Cama e Mesa em 2026: como montar um quarto confortável e elegante sem gastar uma fortuna',
       category: 'Cama e Mesa', categoryIcon: '🛏️', categoryId: 'cama-mesa',
-      image: 'https://sspark.genspark.ai/cfimages?u1=AsTbGRlo3KMahKeXLCazrz9sssY9uM5gGo23PSAn95pgMXuu5b1D77ssIMMzA0cNXzZo78IlJwZT%2FdnbcTI4ZiE4W8XrQ4Ze1ey%2B5MK734APHOT1uDFFjKwq8D7aMOc6xo7ql5HM%3D&u2=mexamyxxKkv8ULD9&width=1200',
+      image: 'https://sspark.genspark.ai/cfimages?u1=9y5q8mLdZmpWkfs4quYJgDQVHwnm5Hl9p96x5AC5DZSP%2BN7UYoLHJL24OGxyUie3bBtTNHaagx%2BaQ4%2BIBlQ7KAxgNEnkjwFYAR%2FYaWogoYzNs%2BCjIfwBW43gsPGu96RDk1%2BIz7R6ZVJO1aeJpEuRF8hIzxFGAY149lonFk6pkVIYhqKgFJzl97IN4gGVMoSHMNIKmHLI6CIQKXHxeIP%2BZ%2BerbCO%2FqLu1D728s8dBtIauinD4EPbupMoe6APYHGTgn5UIbYmuuedNRq0tBA%2B1Ot9SPHNOoOd0eL8vqdxlYdp8AUvmiUA%3D&u2=0d%2FF7wvPAfdjEB4o&width=1200',
       readTime: '8 min',
       keywords: 'jogo de cama qualidade, travesseiro ideal, colchão custo-benefício, roupa de cama 2026',
       excerpt: 'A qualidade do seu sono depende diretamente da qualidade da sua cama — e não é necessário gastar uma fortuna para dormir muito bem. Descubra os critérios que realmente fazem diferença.',
@@ -2178,7 +2178,7 @@ function homePage(): string {
         excerpt: 'A qualidade do seu sono depende diretamente da qualidade da sua cama — e não é necessário gastar uma fortuna para dormir muito melhor. Descubra os critérios que realmente fazem diferença na escolha de colchão, travesseiro e roupa de cama.',
         category: 'Cama e Mesa',
         categoryIcon: '🛏️',
-        image: 'https://sspark.genspark.ai/cfimages?u1=AsTbGRlo3KMahKeXLCazrz9sssY9uM5gGo23PSAn95pgMXuu5b1D77ssIMMzA0cNXzZo78IlJwZT%2FdnbcTI4ZiE4W8XrQ4Ze1ey%2B5MK734APHOT1uDFFjKwq8D7aMOc6xo7ql5HM%3D&u2=mexamyxxKkv8ULD9&width=600',
+        image: 'https://sspark.genspark.ai/cfimages?u1=9y5q8mLdZmpWkfs4quYJgDQVHwnm5Hl9p96x5AC5DZSP%2BN7UYoLHJL24OGxyUie3bBtTNHaagx%2BaQ4%2BIBlQ7KAxgNEnkjwFYAR%2FYaWogoYzNs%2BCjIfwBW43gsPGu96RDk1%2BIz7R6ZVJO1aeJpEuRF8hIzxFGAY149lonFk6pkVIYhqKgFJzl97IN4gGVMoSHMNIKmHLI6CIQKXHxeIP%2BZ%2BerbCO%2FqLu1D728s8dBtIauinD4EPbupMoe6APYHGTgn5UIbYmuuedNRq0tBA%2B1Ot9SPHNOoOd0eL8vqdxlYdp8AUvmiUA%3D&u2=0d%2FF7wvPAfdjEB4o&width=600',
         readTime: '8 min',
         keywords: 'jogo de cama qualidade, travesseiro ideal, colchão custo-benefício, roupa de cama 2026, melhor colchão casal'
       },
