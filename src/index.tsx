@@ -1830,7 +1830,7 @@ function homePage(): string {
 
           <!-- Imagem lado esquerdo -->
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
-            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
             \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
             <div class="absolute bottom-3 left-3 right-3">
@@ -1934,10 +1934,11 @@ function homePage(): string {
     // Fallback SVG inline para quando imagem falha completamente
     function imgFallbackSvg(title) {
       const colors = ['#4f46e5','#0891b2','#059669','#d97706','#db2777','#7c3aed','#2563eb']
-      const color = colors[title.length % colors.length]
+      const color = colors[(title || '').length % colors.length]
       const letter = (title || 'P')[0].toUpperCase()
       return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='" + color + "'/%3E%3Ctext x='200' y='230' font-family='Arial,sans-serif' font-size='160' font-weight='bold' fill='white' text-anchor='middle'%3E" + letter + "%3C/text%3E%3C/svg%3E"
     }
+    window.imgFallbackSvg = imgFallbackSvg
 
     function createProductCard(product, category) {
       const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg">
@@ -1953,7 +1954,7 @@ function homePage(): string {
           <!-- Imagem -->
           <div class="relative overflow-hidden">
             <div class="h-52 overflow-hidden bg-gray-50">
-              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)" itemprop="image">
+              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)" itemprop="image">
             </div>
             \${featuredBadge}
             <div class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style="background:\${catColor};">
@@ -2486,7 +2487,7 @@ function homePage(): string {
 
         grid.innerHTML = recent.map(function(p) {
           var cat = catMap[p.categoryId] || {}
-          var imgSrc = p.imageUrl || (imgFallbackSvg(p.title))
+          var imgSrc = getProxiedImg(p.imageUrl) || imgFallbackSvg(p.title)
           var rating = p.rating ? parseFloat(p.rating) : 0
           var starsHtml = [1,2,3,4,5].map(function(i) {
             var fill = rating >= i ? '#f59e0b' : (rating >= i-0.5 ? '#fcd34d' : '#d1d5db')
@@ -2495,10 +2496,10 @@ function homePage(): string {
           var catName = cat.name || ''
           var catColor = cat.color || '#6366f1'
           var badgeHtml = p.featured ? '<div class="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-lg shadow flex items-center gap-1"><svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Destaque</div>' : '<div class="absolute top-2 right-2 bg-white/90 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-lg shadow">Novo</div>'
-          return '<a href="/categoria/' + (p.categoryId || '') + '" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col card-hover group cursor-pointer" style="text-decoration:none;" onclick="event.preventDefault();openProductFromRecent(\'' + p.id + '\')">'
+          return '<a href="/categoria/' + (p.categoryId || '') + '" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col card-hover group cursor-pointer" style="text-decoration:none;" data-pid="' + p.id + '" onclick="event.preventDefault();openProductFromRecent(this.dataset.pid)">'
             + '<div class="relative">'
             + '<div class="h-44 overflow-hidden bg-gray-50">'
-            + '<img src="' + imgSrc + '" alt="' + p.title.replace(/"/g,'') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">'
+            + '<img src="' + imgSrc + '" alt="' + p.title.replace(/"/g,'') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">'
             + '</div>'
             + badgeHtml
             + '</div>'
@@ -2855,6 +2856,7 @@ function categoryPage(categoryId: string): string {
       const letter = (title || 'P')[0].toUpperCase()
       return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='" + color + "'/%3E%3Ctext x='200' y='230' font-family='Arial,sans-serif' font-size='160' font-weight='bold' fill='white' text-anchor='middle'%3E" + letter + "%3C/text%3E%3C/svg%3E"
     }
+    window.imgFallbackSvg = window.imgFallbackSvg || imgFallbackSvg
 
     function getCostBenefitCp(product) {
       const score = 70 + ((product.title.length * 7 + (product.store || '').length * 3) % 28)
@@ -2875,7 +2877,7 @@ function categoryPage(categoryId: string): string {
         <div class="flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
           <!-- Imagem -->
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
-            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
             \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
           </div>
@@ -2953,7 +2955,7 @@ function categoryPage(categoryId: string): string {
         <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col cursor-pointer" data-id="\${product.id}" onclick="openProductModalCp('\${product.id}')">
           <div class="relative">
             <div class="h-52 overflow-hidden bg-gray-50">
-              <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
+              <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">
             </div>
             \${featuredBadge}
             <!-- Overlay lupa -->
@@ -3008,7 +3010,7 @@ function categoryPage(categoryId: string): string {
             <img src="\${imgSrc}" alt="\${product.title}" 
                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                  style="filter:brightness(0.72);"
-                 onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
+                 onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">
             <!-- Gradient overlay -->
             <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.50) 50%, rgba(0,0,0,0.15) 100%);"></div>
             <!-- Conteúdo sobre a imagem -->
@@ -4253,7 +4255,7 @@ function adminPage(): string {
         const imgSrc = p.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80\`
         return \`
           <div class="card-admin bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4" data-id="\${p.id}">
-            <img src="\${imgSrc}" alt="\${p.title}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">
+            <img src="\${imgSrc}" alt="\${p.title}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background: \${cat.color}">\${cat.icon} \${cat.name}</span>
@@ -4528,7 +4530,7 @@ function adminPage(): string {
           return \`
             <div class="bg-white rounded-2xl border-2 border-yellow-200 shadow-sm p-4 flex items-center gap-4 card-admin">
               <div class="relative flex-shrink-0">
-                <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">
+                <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">
                 <span class="absolute -top-1.5 -right-1.5 text-base">⭐</span>
               </div>
               <div class="flex-1 min-w-0">
@@ -4559,7 +4561,7 @@ function adminPage(): string {
           const isFeatured = p.featured
           return \`
             <div class="bg-white rounded-2xl border \${isFeatured ? 'border-yellow-300 bg-yellow-50' : 'border-gray-100'} shadow-sm p-4 flex items-center gap-4 card-admin">
-              <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">
+              <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.onerror=null;this.src=window.imgFallbackSvg(this.alt)">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1 flex-wrap">
                   <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background:\${cat.color}">\${cat.icon} \${cat.name}</span>
