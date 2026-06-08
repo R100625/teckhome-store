@@ -197,6 +197,46 @@ app.get('/favicon.ico', (c) => {
   return c.redirect('/static/logo.png', 301)
 })
 
+// === PROXY DE IMAGEM (evita bloqueio de hotlinking de Amazon, ML, etc.) ===
+app.get('/api/img', async (c) => {
+  const url = c.req.query('url')
+  if (!url) return c.json({ error: 'url param required' }, 400)
+  try {
+    const decoded = decodeURIComponent(url)
+    // Só aceita https para segurança
+    if (!decoded.startsWith('https://') && !decoded.startsWith('http://')) {
+      return c.json({ error: 'invalid url' }, 400)
+    }
+    const resp = await fetch(decoded, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, br',
+        // Sem Referer — é isso que desbloqueia as imagens de ML, Amazon, etc.
+      },
+      redirect: 'follow',
+      cf: { cacheTtl: 86400, cacheEverything: true } as any
+    })
+    if (!resp.ok) return c.json({ error: 'upstream error', status: resp.status }, 502)
+    const contentType = resp.headers.get('content-type') || 'image/jpeg'
+    // Só retorna se for imagem
+    if (!contentType.startsWith('image/') && !contentType.includes('octet-stream')) {
+      return c.json({ error: 'not an image' }, 400)
+    }
+    const body = await resp.arrayBuffer()
+    return new Response(body, {
+      status: 200,
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+        'Access-Control-Allow-Origin': '*',
+      }
+    })
+  } catch (e) {
+    return c.json({ error: 'proxy error' }, 502)
+  }
+})
+
 // === PÁGINA PRINCIPAL ===
 app.get('/', (c) => {
   return c.html(homePage())
@@ -1777,7 +1817,7 @@ function homePage(): string {
       const product = allProductsCache.find(p => p.id === productId)
       if (!product) return
       const category = window._categoriesCache ? window._categoriesCache.find(c => c.id === product.categoryId) : null
-      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600\`
+      const imgSrc = getProxiedImg(product.imageUrl) || imgFallbackSvg(product.title)
       const { pros, contras } = generateProsContras(product, category)
       const { score, stars } = getCostBenefit(product)
       const analysis = generateAnalysis(product, category)
@@ -1790,7 +1830,7 @@ function homePage(): string {
 
           <!-- Imagem lado esquerdo -->
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
-            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
             \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
             <div class="absolute bottom-3 left-3 right-3">
@@ -1881,11 +1921,29 @@ function homePage(): string {
 
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeProductModal() })
 
+    // Helper: proxy de imagem para desbloquear hotlinking de ML, Amazon, etc.
+    function getProxiedImg(url) {
+      if (!url) return ''
+      // Imagens externas passam pelo proxy do Worker
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return '/api/img?url=' + encodeURIComponent(url)
+      }
+      return url
+    }
+
+    // Fallback SVG inline para quando imagem falha completamente
+    function imgFallbackSvg(title) {
+      const colors = ['#4f46e5','#0891b2','#059669','#d97706','#db2777','#7c3aed','#2563eb']
+      const color = colors[title.length % colors.length]
+      const letter = (title || 'P')[0].toUpperCase()
+      return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='" + color + "'/%3E%3Ctext x='200' y='230' font-family='Arial,sans-serif' font-size='160' font-weight='bold' fill='white' text-anchor='middle'%3E" + letter + "%3C/text%3E%3C/svg%3E"
+    }
+
     function createProductCard(product, category) {
       const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-lg">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         Destaque</div>\` : ''
-      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400\`
+      const imgSrc = getProxiedImg(product.imageUrl) || imgFallbackSvg(product.title)
       const { score } = getCostBenefit(product)
       const catColor = category ? category.color : '#6366f1'
       const catSvgSmall = category ? getCatSvg(category.id, '#ffffff') : \`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>\`
@@ -1895,7 +1953,7 @@ function homePage(): string {
           <!-- Imagem -->
           <div class="relative overflow-hidden">
             <div class="h-52 overflow-hidden bg-gray-50">
-              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" loading="lazy" decoding="async" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'" itemprop="image">
+              <img src="\${imgSrc}" alt="\${product.title} — Review TeckHome Store" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)" itemprop="image">
             </div>
             \${featuredBadge}
             <div class="absolute top-3 right-3 w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style="background:\${catColor};">
@@ -2428,7 +2486,7 @@ function homePage(): string {
 
         grid.innerHTML = recent.map(function(p) {
           var cat = catMap[p.categoryId] || {}
-          var imgSrc = p.imageUrl || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(p.title) + '&background=6366f1&color=fff&size=400')
+          var imgSrc = p.imageUrl || (imgFallbackSvg(p.title))
           var rating = p.rating ? parseFloat(p.rating) : 0
           var starsHtml = [1,2,3,4,5].map(function(i) {
             var fill = rating >= i ? '#f59e0b' : (rating >= i-0.5 ? '#fcd34d' : '#d1d5db')
@@ -2440,7 +2498,7 @@ function homePage(): string {
           return '<a href="/categoria/' + (p.categoryId || '') + '" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col card-hover group cursor-pointer" style="text-decoration:none;" onclick="event.preventDefault();openProductFromRecent(\'' + p.id + '\')">'
             + '<div class="relative">'
             + '<div class="h-44 overflow-hidden bg-gray-50">'
-            + '<img src="' + imgSrc + '" alt="' + p.title.replace(/"/g,'') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src=\'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.title) + '&background=6366f1&color=fff&size=400\'">'
+            + '<img src="' + imgSrc + '" alt="' + p.title.replace(/"/g,'') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">'
             + '</div>'
             + badgeHtml
             + '</div>'
@@ -2783,6 +2841,21 @@ function categoryPage(categoryId: string): string {
       return { pros: prosList[idx], contras: contrasList[idx] }
     }
 
+    // Helper: proxy de imagem para desbloquear hotlinking de ML, Amazon, etc.
+    function getProxiedImg(url) {
+      if (!url) return ''
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        return '/api/img?url=' + encodeURIComponent(url)
+      }
+      return url
+    }
+    function imgFallbackSvg(title) {
+      const colors = ['#4f46e5','#0891b2','#059669','#d97706','#db2777','#7c3aed','#2563eb']
+      const color = colors[(title || '').length % colors.length]
+      const letter = (title || 'P')[0].toUpperCase()
+      return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='400' height='400' fill='" + color + "'/%3E%3Ctext x='200' y='230' font-family='Arial,sans-serif' font-size='160' font-weight='bold' fill='white' text-anchor='middle'%3E" + letter + "%3C/text%3E%3C/svg%3E"
+    }
+
     function getCostBenefitCp(product) {
       const score = 70 + ((product.title.length * 7 + (product.store || '').length * 3) % 28)
       const stars = Math.round(score / 20)
@@ -2792,7 +2865,7 @@ function categoryPage(categoryId: string): string {
     function openProductModalCp(productId) {
       const product = allProducts.find(p => p.id === productId)
       if (!product) return
-      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600\`
+      const imgSrc = getProxiedImg(product.imageUrl) || imgFallbackSvg(product.title)
       const { pros, contras } = generateProsContrasCp(product)
       const { score, stars } = getCostBenefitCp(product)
       const analysis = generateAnalysisCp(product)
@@ -2802,7 +2875,7 @@ function categoryPage(categoryId: string): string {
         <div class="flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
           <!-- Imagem -->
           <div class="md:w-2/5 flex-shrink-0 relative bg-gray-50">
-            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=600'">
+            <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-64 md:h-full object-cover" style="min-height:260px;max-height:420px;" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
             <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
             \${product.featured ? '<div class="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-xl shadow-lg flex items-center gap-1"><svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>' : ''}
           </div>
@@ -2874,13 +2947,13 @@ function categoryPage(categoryId: string): string {
     function createProductCard(product) {
       const featuredBadge = product.featured ? \`<div class="absolute top-3 left-3 featured-badge text-white text-xs font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow">
         <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Destaque</div>\` : ''
-      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400\`
+      const imgSrc = getProxiedImg(product.imageUrl) || imgFallbackSvg(product.title)
       const { score } = getCostBenefitCp(product)
       return \`
         <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col cursor-pointer" data-id="\${product.id}" onclick="openProductModalCp('\${product.id}')">
           <div class="relative">
             <div class="h-52 overflow-hidden bg-gray-50">
-              <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=400'">
+              <img src="\${imgSrc}" alt="\${product.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
             </div>
             \${featuredBadge}
             <!-- Overlay lupa -->
@@ -2917,7 +2990,7 @@ function categoryPage(categoryId: string): string {
     }
 
     function createFeaturedHeroCard(product) {
-      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=800\`
+      const imgSrc = getProxiedImg(product.imageUrl) || imgFallbackSvg(product.title)
       const { pros } = generateProsContrasCp(product)
       const { score } = getCostBenefitCp(product)
       const rating = product.rating ? parseFloat(product.rating) : 0
@@ -2935,7 +3008,7 @@ function categoryPage(categoryId: string): string {
             <img src="\${imgSrc}" alt="\${product.title}" 
                  class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                  style="filter:brightness(0.72);"
-                 onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=800'">
+                 onerror="this.onerror=null;this.src=imgFallbackSvg(product.title)">
             <!-- Gradient overlay -->
             <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.50) 50%, rgba(0,0,0,0.15) 100%);"></div>
             <!-- Conteúdo sobre a imagem -->
@@ -4180,7 +4253,7 @@ function adminPage(): string {
         const imgSrc = p.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80\`
         return \`
           <div class="card-admin bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center gap-4" data-id="\${p.id}">
-            <img src="\${imgSrc}" alt="\${p.title}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
+            <img src="\${imgSrc}" alt="\${p.title}" class="w-16 h-16 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 flex-wrap mb-1">
                 <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background: \${cat.color}">\${cat.icon} \${cat.name}</span>
@@ -4455,7 +4528,7 @@ function adminPage(): string {
           return \`
             <div class="bg-white rounded-2xl border-2 border-yellow-200 shadow-sm p-4 flex items-center gap-4 card-admin">
               <div class="relative flex-shrink-0">
-                <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=f59e0b&color=fff&size=80'">
+                <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">
                 <span class="absolute -top-1.5 -right-1.5 text-base">⭐</span>
               </div>
               <div class="flex-1 min-w-0">
@@ -4486,7 +4559,7 @@ function adminPage(): string {
           const isFeatured = p.featured
           return \`
             <div class="bg-white rounded-2xl border \${isFeatured ? 'border-yellow-300 bg-yellow-50' : 'border-gray-100'} shadow-sm p-4 flex items-center gap-4 card-admin">
-              <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(p.title)}&background=6366f1&color=fff&size=80'">
+              <img src="\${img}" alt="\${p.title}" class="w-14 h-14 rounded-xl object-cover bg-gray-100 flex-shrink-0" onerror="this.onerror=null;this.src=imgFallbackSvg(p.title)">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 mb-1 flex-wrap">
                   <span class="text-xs px-2 py-0.5 rounded-full font-medium text-white" style="background:\${cat.color}">\${cat.icon} \${cat.name}</span>
