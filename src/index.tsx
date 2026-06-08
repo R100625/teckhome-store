@@ -1099,6 +1099,26 @@ function homePage(): string {
         <div class="shimmer h-36"></div>
         <div class="shimmer h-36"></div>
       </div>
+
+      <!-- ADICIONADOS RECENTEMENTE -->
+      <div id="recentlyAddedSection" class="mt-16" style="display:none;">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <span class="section-label" style="display:inline-flex;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Novidades
+            </span>
+            <h3 class="text-xl font-black text-gray-800 mt-1">Adicionados Recentemente</h3>
+          </div>
+          <span class="text-xs text-gray-400 font-medium">Últimos produtos cadastrados</span>
+        </div>
+        <div id="recentlyAddedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div class="shimmer rounded-2xl h-64"></div>
+          <div class="shimmer rounded-2xl h-64"></div>
+          <div class="shimmer rounded-2xl h-64"></div>
+          <div class="shimmer rounded-2xl h-64"></div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -2368,10 +2388,75 @@ function homePage(): string {
       \`
     }
 
+    async function loadRecentlyAdded() {
+      try {
+        // Reutiliza allProductsCache se já carregado, senão busca
+        var products = allProductsCache && allProductsCache.length > 0
+          ? allProductsCache
+          : await fetch('/api/products').then(function(r){ return r.json() })
+
+        // Ordena por createdAt desc (mais recente primeiro) e pega 4
+        var sorted = products.slice().sort(function(a, b) {
+          var da = a.createdAt ? new Date(a.createdAt).getTime() : 0
+          var db = b.createdAt ? new Date(b.createdAt).getTime() : 0
+          return db - da
+        })
+        var recent = sorted.slice(0, 4)
+
+        if (recent.length === 0) return
+
+        var section = document.getElementById('recentlyAddedSection')
+        if (section) section.style.display = ''
+
+        var catMap = {}
+        if (window._categoriesCache) {
+          window._categoriesCache.forEach(function(c) { catMap[c.id] = c })
+        }
+
+        var grid = document.getElementById('recentlyAddedGrid')
+        if (!grid) return
+
+        grid.innerHTML = recent.map(function(p) {
+          var cat = catMap[p.categoryId] || {}
+          var imgSrc = p.imageUrl || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(p.title) + '&background=6366f1&color=fff&size=400')
+          var rating = p.rating ? parseFloat(p.rating) : 0
+          var starsHtml = [1,2,3,4,5].map(function(i) {
+            var fill = rating >= i ? '#f59e0b' : (rating >= i-0.5 ? '#fcd34d' : '#d1d5db')
+            return '<svg width="12" height="12" viewBox="0 0 24 24" fill="' + fill + '"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'
+          }).join('')
+          var catName = cat.name || ''
+          var catColor = cat.color || '#6366f1'
+          var badgeHtml = p.featured ? '<div class="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-2 py-0.5 rounded-lg shadow flex items-center gap-1"><svg width="8" height="8" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Destaque</div>' : '<div class="absolute top-2 right-2 bg-white/90 text-gray-500 text-xs font-semibold px-2 py-0.5 rounded-lg shadow">Novo</div>'
+          return '<a href="/categoria/' + (p.categoryId || '') + '" class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col card-hover group cursor-pointer" style="text-decoration:none;" onclick="event.preventDefault();openProductFromRecent(\'' + p.id + '\')">'
+            + '<div class="relative">'
+            + '<div class="h-44 overflow-hidden bg-gray-50">'
+            + '<img src="' + imgSrc + '" alt="' + p.title.replace(/"/g,'') + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src=\'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.title) + '&background=6366f1&color=fff&size=400\'">'
+            + '</div>'
+            + badgeHtml
+            + '</div>'
+            + '<div class="p-3 flex flex-col flex-1 gap-1">'
+            + (catName ? '<span class="text-xs font-bold uppercase tracking-wide" style="color:' + catColor + '">' + catName + '</span>' : '')
+            + '<h4 class="font-bold text-gray-800 text-sm leading-tight line-clamp-2">' + p.title + '</h4>'
+            + '<div class="flex items-center gap-1 mt-auto pt-1">' + starsHtml + (rating > 0 ? '<span class="text-xs text-gray-500 ml-1">' + rating.toFixed(1) + '</span>' : '') + '</div>'
+            + '</div>'
+            + '</a>'
+        }).join('')
+
+      } catch(e) { console.log('loadRecentlyAdded erro:', e) }
+    }
+
+    function openProductFromRecent(productId) {
+      // Busca na cache e abre o modal da home
+      if (!allProductsCache) return
+      var p = allProductsCache.find(function(x){ return x.id === productId })
+      if (p) openProductModal(p.id)
+    }
+
     async function init() {
       const categories = await loadCategories()
       window._categoriesCache = categories
       await loadFeatured(categories)
+      await loadRecentlyAdded()
       await loadHomeComparativos()
       await loadBlog()
     }
@@ -2821,6 +2906,77 @@ function categoryPage(categoryId: string): string {
       \`
     }
 
+    function createFeaturedHeroCard(product) {
+      const imgSrc = product.imageUrl || \`https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=800\`
+      const { pros } = generateProsContrasCp(product)
+      const { score } = getCostBenefitCp(product)
+      const rating = product.rating ? parseFloat(product.rating) : 0
+      const starsHtml = [1,2,3,4,5].map(i => {
+        const fill = rating >= i ? '#f59e0b' : (rating >= i-0.5 ? '#fcd34d' : '#d1d5db')
+        return \`<svg width="16" height="16" viewBox="0 0 24 24" fill="\${fill}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>\`
+      }).join('')
+
+      return \`
+        <div class="col-span-full mb-2" id="featuredHeroCard">
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group" 
+               style="min-height:320px; max-height:480px;"
+               onclick="openProductModalCp('\${product.id}')">
+            <!-- Imagem de fundo full -->
+            <img src="\${imgSrc}" alt="\${product.title}" 
+                 class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                 style="filter:brightness(0.72);"
+                 onerror="this.src='https://ui-avatars.com/api/?name=\${encodeURIComponent(product.title)}&background=6366f1&color=fff&size=800'">
+            <!-- Gradient overlay -->
+            <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.50) 50%, rgba(0,0,0,0.15) 100%);"></div>
+            <!-- Conteúdo sobre a imagem -->
+            <div class="relative z-10 flex flex-col justify-end h-full p-8 md:p-12" style="min-height:320px;">
+              <!-- Badge destaque -->
+              <div class="flex items-center gap-3 mb-4">
+                <span class="inline-flex items-center gap-1.5 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg uppercase tracking-widest">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  Produto Destaque
+                </span>
+                <span class="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full border border-white/30">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  Verificado TeckHome
+                </span>
+              </div>
+              <!-- Título -->
+              <h2 class="text-2xl md:text-4xl font-black text-white leading-tight mb-3 max-w-2xl drop-shadow-lg">\${product.title}</h2>
+              <!-- Avaliação + score -->
+              <div class="flex flex-wrap items-center gap-4 mb-5">
+                <div class="flex items-center gap-1">\${starsHtml}<span class="text-white/80 text-sm font-semibold ml-1">\${rating > 0 ? rating.toFixed(1) : ''}</span></div>
+                <div class="flex items-center gap-2 bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 border border-white/20">
+                  <span class="text-white text-xs font-bold">Custo-Benefício</span>
+                  <div class="w-20 bg-white/30 rounded-full h-1.5"><div class="bg-gradient-to-r from-yellow-400 to-green-400 h-1.5 rounded-full" style="width:\${score}%"></div></div>
+                  <span class="text-yellow-300 font-black text-sm">\${score}/100</span>
+                </div>
+                \${product.store ? \`<span class="text-white/70 text-sm font-medium">\${product.store}</span>\` : ''}
+              </div>
+              <!-- Pontos fortes e CTA -->
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <ul class="flex flex-wrap gap-2">
+                  \${pros.slice(0,3).map(pro => \`<li class="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-xl border border-white/20"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"><path d="M20 6L9 17l-5-5"/></svg>\${pro}</li>\`).join('')}
+                </ul>
+                <button onclick="event.stopPropagation();openProductModalCp('\${product.id}')"
+                  class="flex-shrink-0 flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-700 font-black text-sm px-6 py-3 rounded-2xl shadow-lg transition-all hover:shadow-xl">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  Ver Análise Completa
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Separador visual -->
+          <div class="flex items-center gap-3 mt-8 mb-2">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Todos os produtos</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+          </div>
+        </div>
+      \`
+    }
+
     function renderProducts() {
       let filtered = [...allProducts]
       
@@ -2843,10 +2999,22 @@ function categoryPage(categoryId: string): string {
         grid.innerHTML = ''
         emptyState.classList.remove('hidden')
         if (category) document.getElementById('emptyIcon').innerHTML = getCatSvgCp(category.id, category.color).replace('width="26" height="26"','width="70" height="70"')
-      } else {
-        emptyState.classList.add('hidden')
-        grid.innerHTML = filtered.map(createProductCard).join('')
+        return
       }
+
+      emptyState.classList.add('hidden')
+
+      // Separa destaque principal (apenas quando filtro=all ou featured e sem search)
+      const showHero = (currentFilter === 'all' || currentFilter === 'featured') && !currentSearch
+      const featuredProduct = showHero ? filtered.find(p => p.featured) : null
+      const restProducts = featuredProduct ? filtered.filter(p => p.id !== featuredProduct.id) : filtered
+
+      let html = ''
+      if (featuredProduct) {
+        html += createFeaturedHeroCard(featuredProduct)
+      }
+      html += restProducts.map(createProductCard).join('')
+      grid.innerHTML = html
     }
 
     function filterProducts(filter) {
@@ -3218,12 +3386,19 @@ function adminPage(): string {
                   class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all">
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Avaliação (0-5)</label>
-                <div class="flex items-center gap-2 mt-3">
-                  <input type="range" id="productRating" min="0" max="5" step="0.5" value="0" 
-                    class="flex-1 accent-indigo-600"
-                    oninput="document.getElementById('ratingValue').textContent = this.value + '★'">
-                  <span id="ratingValue" class="text-yellow-500 font-bold text-sm w-10 text-right">0★</span>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Avaliação (0–5)</label>
+                <div class="flex items-center gap-3 mt-1">
+                  <input type="number" id="productRating" min="0" max="5" step="0.1" value="0"
+                    class="w-24 px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-center outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all"
+                    oninput="updateRatingStars(this.value)">
+                  <div id="ratingStarsPreview" class="flex items-center gap-0.5">
+                    <svg class="star-icon" data-index="1" width="20" height="20" viewBox="0 0 24 24" fill="#d1d5db" onclick="setRatingFromStar(1)" style="cursor:pointer;transition:fill 0.15s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="star-icon" data-index="2" width="20" height="20" viewBox="0 0 24 24" fill="#d1d5db" onclick="setRatingFromStar(2)" style="cursor:pointer;transition:fill 0.15s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="star-icon" data-index="3" width="20" height="20" viewBox="0 0 24 24" fill="#d1d5db" onclick="setRatingFromStar(3)" style="cursor:pointer;transition:fill 0.15s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="star-icon" data-index="4" width="20" height="20" viewBox="0 0 24 24" fill="#d1d5db" onclick="setRatingFromStar(4)" style="cursor:pointer;transition:fill 0.15s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="star-icon" data-index="5" width="20" height="20" viewBox="0 0 24 24" fill="#d1d5db" onclick="setRatingFromStar(5)" style="cursor:pointer;transition:fill 0.15s"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  </div>
+                  <span id="ratingValue" class="text-xs text-gray-400 font-medium">0 / 5</span>
                 </div>
               </div>
             </div>
@@ -3829,6 +4004,36 @@ function adminPage(): string {
       setTimeout(() => toast.classList.remove('show'), 3500)
     }
 
+    // ======= RATING STARS =======
+    function updateRatingStars(val) {
+      var v = parseFloat(val) || 0
+      if (v < 0) v = 0
+      if (v > 5) v = 5
+      var stars = document.querySelectorAll('#ratingStarsPreview .star-icon')
+      stars.forEach(function(star, idx) {
+        var threshold = idx + 1
+        if (v >= threshold) {
+          star.setAttribute('fill', '#f59e0b')
+        } else if (v >= threshold - 0.5) {
+          star.setAttribute('fill', '#fcd34d')
+        } else {
+          star.setAttribute('fill', '#d1d5db')
+        }
+      })
+      var lbl = document.getElementById('ratingValue')
+      if (lbl) lbl.textContent = v.toFixed(1) + ' / 5'
+      var input = document.getElementById('productRating')
+      if (input && parseFloat(input.value) !== v) input.value = v
+    }
+
+    function setRatingFromStar(starNum) {
+      var input = document.getElementById('productRating')
+      if (input) {
+        input.value = starNum
+        updateRatingStars(starNum)
+      }
+    }
+
     // ======= PRODUTOS =======
     async function fetchMetadata() {
       const urlEl = document.getElementById('productUrl')
@@ -3911,7 +4116,7 @@ function adminPage(): string {
       ['productUrl','productTitle','productDesc','productImage','productStore'].forEach(id => document.getElementById(id).value = '')
       document.getElementById('categoryId').value = ''
       document.getElementById('productRating').value = 0
-      document.getElementById('ratingValue').textContent = '0★'
+      updateRatingStars(0)
       document.getElementById('productFeatured').checked = false
       document.getElementById('urlPreview').classList.add('hidden')
     }
