@@ -253,31 +253,54 @@ app.get('/categoria/:id', (c) => {
 })
 
 // === AUTH ADMIN ===
-const COOKIE_NAME = 'teckhome_auth'
-const MAINTENANCE_KEY = 'site:maintenance'
+const COOKIE_NAME        = 'teckhome_auth'
+const MAINTENANCE_KEY    = 'site:maintenance'
 const SESSION_KEY_PREFIX = 'session:'
-const RATE_KEY_PREFIX = 'login:attempts:'
-const MAX_ATTEMPTS = 10          // tentativas antes do bloqueio
-const BLOCK_SECONDS = 900        // 15 minutos de bloqueio
-const SESSION_TTL = 86400        // sessão válida por 24h
+const RATE_KEY_PREFIX    = 'login:attempts:'
+const LAST_LOGIN_KEY     = 'admin:last_login'
+
+const MAX_ATTEMPTS  = 5     // tentativas antes do bloqueio
+const BLOCK_SECONDS = 900   // bloqueio de 15 minutos
+const IDLE_TTL      = 1800  // logout por inatividade em 30 minutos
+const WARN_BEFORE   = 300   // aviso no painel 5 minutos antes de expirar
+
+// Estrutura armazenada no KV por token:
+// { lastActivity: <epoch_ms>, loginAt: <epoch_ms>, ip: string }
 
 // Retorna o IP do visitante (Cloudflare injeta CF-Connecting-IP)
 function getClientIP(c: any): string {
   return c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown'
 }
 
-// Verifica se o token de sessão no cookie existe e é válido no KV
+// Extrai o token do cookie
+function getSessionToken(c: any): string | null {
+  const cookieHeader = c.req.header('Cookie') || ''
+  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`))
+  if (!match || !match[1] || match[1].length < 32) return null
+  return match[1]
+}
+
+// Verifica se a sessão existe no KV e não expirou por inatividade
+// Se válida, renova o lastActivity automaticamente (sliding window)
 async function isAuthenticated(c: any): Promise<boolean> {
   try {
-    const cookieHeader = c.req.header('Cookie') || ''
-    const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`))
-    if (!match) return false
-    const token = match[1]
-    if (!token || token.length < 32) return false
+    const token = getSessionToken(c)
+    if (!token) return false
     const kv = c.env?.PRODUCTS_KV
     if (!kv) return false
-    const stored = await kv.get(`${SESSION_KEY_PREFIX}${token}`)
-    return stored === '1'
+    const raw = await kv.get(`${SESSION_KEY_PREFIX}${token}`)
+    if (!raw) return false
+    const sess = JSON.parse(raw) as { lastActivity: number; loginAt: number; ip: string }
+    const now = Date.now()
+    // Verifica janela de inatividade
+    if (now - sess.lastActivity > IDLE_TTL * 1000) {
+      await kv.delete(`${SESSION_KEY_PREFIX}${token}`)
+      return false
+    }
+    // Renova lastActivity (sliding window) — TTL absoluto igual ao IDLE_TTL
+    sess.lastActivity = now
+    await kv.put(`${SESSION_KEY_PREFIX}${token}`, JSON.stringify(sess), { expirationTtl: IDLE_TTL })
+    return true
   } catch {
     return false
   }
@@ -306,18 +329,24 @@ app.get('/admin', async (c) => {
 })
 
 app.post('/admin/login', async (c) => {
-  const kv = c.env?.PRODUCTS_KV
-  const ip = getClientIP(c)
+  const kv  = c.env?.PRODUCTS_KV
+  const ip  = getClientIP(c)
   const rateKey = `${RATE_KEY_PREFIX}${ip}`
 
-  // --- Verificação de rate limiting ---
+  // --- Verificação de rate limiting (máx. 5 tentativas / 15 min) ---
   try {
     if (kv) {
-      const attemptsRaw = await kv.get(rateKey)
-      const attempts = parseInt(attemptsRaw || '0', 10)
-      if (attempts >= MAX_ATTEMPTS) {
-        // Não revela detalhes — mensagem genérica
-        return c.html(loginPage('Acesso temporariamente bloqueado. Tente novamente mais tarde.'), 429)
+      const raw = await kv.get(rateKey)
+      if (raw) {
+        const { count, blockedUntil } = JSON.parse(raw) as { count: number; blockedUntil: number }
+        const now = Date.now()
+        if (blockedUntil && now < blockedUntil) {
+          const minLeft = Math.ceil((blockedUntil - now) / 60000)
+          return c.html(loginPage(`Acesso bloqueado. Tente novamente em ${minLeft} minuto${minLeft !== 1 ? 's' : ''}.`), 429)
+        }
+        if (count >= MAX_ATTEMPTS) {
+          return c.html(loginPage('Acesso temporariamente bloqueado. Tente novamente mais tarde.'), 429)
+        }
       }
     }
   } catch {}
@@ -336,11 +365,9 @@ app.post('/admin/login', async (c) => {
     password = (params.get('password') || '').trim()
   }
 
-  // --- Credenciais vêm exclusivamente das variáveis de ambiente ---
+  // --- Credenciais exclusivamente de variáveis de ambiente ---
   const expectedUser = c.env?.ADMIN_USERNAME || ''
   const expectedPass = c.env?.ADMIN_PASSWORD || ''
-
-  // Rejeita se as variáveis de ambiente não foram configuradas
   if (!expectedUser || !expectedPass) {
     return c.html(loginPage('Painel não configurado. Contate o administrador.'), 503)
   }
@@ -348,49 +375,99 @@ app.post('/admin/login', async (c) => {
   const valid = username === expectedUser && password === expectedPass
 
   if (valid) {
-    // Login OK — zera contador de tentativas
+    // Login OK — zera rate limit
     try { if (kv) await kv.delete(rateKey) } catch {}
 
-    // Gera token de sessão único e armazena no KV com TTL
+    const now          = Date.now()
     const sessionToken = crypto.randomUUID()
+    const sessData     = { lastActivity: now, loginAt: now, ip }
+
+    // Persiste sessão no KV com TTL = janela de inatividade
     try {
-      if (kv) await kv.put(`${SESSION_KEY_PREFIX}${sessionToken}`, '1', { expirationTtl: SESSION_TTL })
+      if (kv) {
+        await kv.put(`${SESSION_KEY_PREFIX}${sessionToken}`, JSON.stringify(sessData), { expirationTtl: IDLE_TTL })
+        // Registra data/hora do último login
+        await kv.put(LAST_LOGIN_KEY, new Date(now).toISOString())
+      }
     } catch {}
 
     const res = c.redirect('/admin')
-    res.headers.set('Set-Cookie', `${COOKIE_NAME}=${sessionToken}; Path=/; HttpOnly; Max-Age=${SESSION_TTL}; SameSite=Lax; Secure`)
+    res.headers.set('Set-Cookie', `${COOKIE_NAME}=${sessionToken}; Path=/; HttpOnly; Max-Age=${IDLE_TTL}; SameSite=Lax; Secure`)
     return res
   }
 
-  // Login falhou — incrementa contador de tentativas
+  // Login falhou — incrementa contador; bloqueia após MAX_ATTEMPTS
   try {
     if (kv) {
-      const attemptsRaw = await kv.get(rateKey)
-      const attempts = parseInt(attemptsRaw || '0', 10) + 1
-      await kv.put(rateKey, String(attempts), { expirationTtl: BLOCK_SECONDS })
+      const raw = await kv.get(rateKey)
+      let count = 1
+      if (raw) {
+        const prev = JSON.parse(raw) as { count: number; blockedUntil: number }
+        count = (prev.count || 0) + 1
+      }
+      const blockedUntil = count >= MAX_ATTEMPTS ? Date.now() + BLOCK_SECONDS * 1000 : 0
+      await kv.put(rateKey, JSON.stringify({ count, blockedUntil }), { expirationTtl: BLOCK_SECONDS })
+      if (blockedUntil) {
+        return c.html(loginPage(`Muitas tentativas incorretas. Acesso bloqueado por ${BLOCK_SECONDS / 60} minutos.`), 429)
+      }
+      const remaining = MAX_ATTEMPTS - count
+      return c.html(loginPage(`Usuário ou senha inválidos. ${remaining} tentativa${remaining !== 1 ? 's' : ''} restante${remaining !== 1 ? 's' : ''}.`), 401)
     }
   } catch {}
 
-  // Mensagem genérica — não revela qual campo está errado
   return c.html(loginPage('Usuário ou senha inválidos.'), 401)
 })
 
 app.get('/admin/logout', async (c) => {
-  // Invalida o token de sessão no KV
   try {
-    const kv = c.env?.PRODUCTS_KV
+    const kv    = c.env?.PRODUCTS_KV
+    const token = getSessionToken(c)
     if (kv) {
-      // Desativar manutenção
       await kv.put(MAINTENANCE_KEY, '0')
-      // Revogar sessão
-      const cookieHeader = c.req.header('Cookie') || ''
-      const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`))
-      if (match) await kv.delete(`${SESSION_KEY_PREFIX}${match[1]}`)
+      if (token) await kv.delete(`${SESSION_KEY_PREFIX}${token}`)
     }
   } catch {}
   const res = c.redirect('/')
   res.headers.set('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; SameSite=Strict`)
   return res
+})
+
+// === API: SESSÃO ===
+
+// Retorna info da sessão atual para o frontend gerir idle timer e exibir último login
+app.get('/api/admin/session', async (c) => {
+  if (!(await isAuthenticated(c))) return c.json({ authenticated: false }, 401)
+  try {
+    const kv    = c.env?.PRODUCTS_KV
+    const token = getSessionToken(c)
+    if (!kv || !token) return c.json({ authenticated: true })
+    const raw       = await kv.get(`${SESSION_KEY_PREFIX}${token}`)
+    const lastLogin = await kv.get(LAST_LOGIN_KEY)
+    if (!raw) return c.json({ authenticated: false }, 401)
+    const sess   = JSON.parse(raw) as { lastActivity: number; loginAt: number; ip: string }
+    const now    = Date.now()
+    const idleMs = now - sess.lastActivity
+    return c.json({
+      authenticated : true,
+      loginAt       : sess.loginAt,
+      lastActivity  : sess.lastActivity,
+      idleSeconds   : Math.floor(idleMs / 1000),
+      expiresIn     : Math.max(0, IDLE_TTL - Math.floor(idleMs / 1000)),
+      warnBefore    : WARN_BEFORE,
+      idleTtl       : IDLE_TTL,
+      lastLogin     : lastLogin || null,
+      ip            : sess.ip,
+    })
+  } catch {
+    return c.json({ authenticated: true })
+  }
+})
+
+// Heartbeat: renova lastActivity da sessão (chamado pelo frontend a cada 2 minutos enquanto a aba está ativa)
+app.post('/api/admin/heartbeat', async (c) => {
+  if (!(await isAuthenticated(c))) return c.json({ ok: false, reason: 'expired' }, 401)
+  // isAuthenticated() já renovou o lastActivity — apenas confirmar
+  return c.json({ ok: true, expiresIn: IDLE_TTL })
 })
 
 // === API: MANUTENÇÃO ===
@@ -4115,6 +4192,40 @@ function adminPage(): string {
         </div>
       </div>
 
+      <!-- Sessão Atual -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+        <h3 class="text-base font-black text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-shield-alt text-indigo-500"></i> Sessão Atual
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between py-2 border-b border-gray-50">
+            <span class="text-gray-500">Último login registrado</span>
+            <span class="font-semibold text-gray-700" id="siLastLogin">—</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-50">
+            <span class="text-gray-500">Login desta sessão</span>
+            <span class="font-semibold text-gray-700" id="siLoginAt">—</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-50">
+            <span class="text-gray-500">Expira por inatividade em</span>
+            <span class="font-semibold text-gray-700" id="siExpiresIn">—</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-50">
+            <span class="text-gray-500">IP de origem</span>
+            <span class="font-semibold text-gray-700" id="siIp">—</span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-gray-500">Proteção força bruta</span>
+            <span class="font-semibold text-gray-700">5 tentativas · bloqueio 15 min</span>
+          </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-gray-100">
+          <a href="/admin/logout" class="flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors">
+            <i class="fas fa-sign-out-alt"></i> Encerrar sessão agora
+          </a>
+        </div>
+      </div>
+
       <!-- Info do Sistema -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h3 class="text-base font-black text-gray-900 mb-4 flex items-center gap-2">
@@ -4135,13 +4246,8 @@ function adminPage(): string {
           </div>
           <div class="flex justify-between py-2">
             <span class="text-gray-500">Versão</span>
-            <span class="font-semibold text-gray-700">2.0.0</span>
+            <span class="font-semibold text-gray-700">2.1.0</span>
           </div>
-        </div>
-        <div class="mt-4 pt-4 border-t border-gray-100">
-          <a href="/admin/logout" class="flex items-center gap-2 text-sm font-bold text-red-500 hover:text-red-600 transition-colors">
-            <i class="fas fa-sign-out-alt"></i> Fazer Logout do Admin
-          </a>
         </div>
       </div>
     </div>
@@ -5255,7 +5361,156 @@ function adminPage(): string {
       } catch(e) { console.log('Manutenção não ativada:', e) }
     }
 
-    init()
+    // ======= GESTÃO DE SESSÃO / IDLE LOGOUT =======
+
+    // Formata data ISO em pt-BR legível
+    function fmtDate(iso) {
+      if (!iso) return '—'
+      try {
+        return new Date(iso).toLocaleString('pt-BR', {
+          day:'2-digit', month:'2-digit', year:'numeric',
+          hour:'2-digit', minute:'2-digit', second:'2-digit'
+        })
+      } catch { return iso }
+    }
+
+    // Formata segundos em mm:ss ou XXh YYm
+    function fmtSeconds(s) {
+      if (s <= 0) return '0s'
+      if (s < 3600) {
+        const m = Math.floor(s / 60), ss = s % 60
+        return m > 0 ? \`\${m}m \${ss}s\` : \`\${ss}s\`
+      }
+      const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60)
+      return \`\${h}h \${m}m\`
+    }
+
+    let _sessionData    = null
+    let _warnModalShown = false
+
+    // Atualiza campos da aba Config
+    function updateSessionUI(data) {
+      const el = id => document.getElementById(id)
+      if (!data) return
+      if (el('siLastLogin')) el('siLastLogin').textContent = fmtDate(data.lastLogin)
+      if (el('siLoginAt'))   el('siLoginAt').textContent   = data.loginAt ? fmtDate(new Date(data.loginAt).toISOString()) : '—'
+      if (el('siExpiresIn')) el('siExpiresIn').textContent = fmtSeconds(data.expiresIn)
+      if (el('siIp'))        el('siIp').textContent        = data.ip || '—'
+    }
+
+    // Injeta o modal de aviso (uma única vez no DOM)
+    function ensureIdleModal() {
+      if (document.getElementById('idleModal')) return
+      const div = document.createElement('div')
+      div.id = 'idleModal'
+      div.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;'
+      div.innerHTML = \`
+        <div style="background:#fff;border-radius:20px;padding:32px 28px;max-width:380px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,.25);text-align:center;">
+          <div style="width:56px;height:56px;background:#fef3c7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <h3 style="font-size:18px;font-weight:800;color:#111827;margin:0 0 8px;">Sessão prestes a expirar</h3>
+          <p style="font-size:14px;color:#6b7280;margin:0 0 6px;">Você será desconectado por inatividade em:</p>
+          <p id="idleCountdown" style="font-size:40px;font-weight:900;color:#4f46e5;margin:0 0 24px;letter-spacing:-1px;font-variant-numeric:tabular-nums;">5:00</p>
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <button onclick="keepSession()" style="background:#4f46e5;color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" style="vertical-align:middle;margin-right:6px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Continuar conectado
+            </button>
+            <button onclick="window.location.href='/admin/logout'" style="background:#f3f4f6;color:#374151;border:none;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;">
+              Sair agora
+            </button>
+          </div>
+        </div>\`
+      document.body.appendChild(div)
+    }
+
+    function showIdleModal(secsLeft) {
+      ensureIdleModal()
+      document.getElementById('idleModal').style.display = 'flex'
+      updateCountdown(secsLeft)
+    }
+
+    function hideIdleModal() {
+      const m = document.getElementById('idleModal')
+      if (m) m.style.display = 'none'
+      _warnModalShown = false
+    }
+
+    function updateCountdown(secs) {
+      const el = document.getElementById('idleCountdown')
+      if (!el) return
+      const s = Math.max(0, secs)
+      const m = Math.floor(s / 60), ss = s % 60
+      el.textContent = \`\${m}:\${String(ss).padStart(2,'0')}\`
+      el.style.color = s <= 60 ? '#dc2626' : s <= 120 ? '#d97706' : '#4f46e5'
+    }
+
+    async function keepSession() {
+      try {
+        const r = await fetch('/api/admin/heartbeat', { method: 'POST' })
+        if (!r.ok) { window.location.href = '/admin/logout'; return }
+      } catch { window.location.href = '/admin/logout'; return }
+      hideIdleModal()
+      if (_countdownInterval) { clearInterval(_countdownInterval); _countdownInterval = null }
+    }
+
+    let _countdownInterval = null
+    let _sessionPollInterval = null
+    let _heartbeatInterval   = null
+
+    async function sessionPoll() {
+      try {
+        const r = await fetch('/api/admin/session')
+        if (r.status === 401) { window.location.href = '/admin/logout'; return }
+        const data = await r.json()
+        _sessionData = data
+        updateSessionUI(data)
+        const secs = data.expiresIn || 0
+        if (secs <= 0) { window.location.href = '/admin/logout'; return }
+        if (secs <= data.warnBefore) {
+          if (!_warnModalShown) {
+            _warnModalShown = true
+            showIdleModal(secs)
+            if (_countdownInterval) clearInterval(_countdownInterval)
+            let remaining = secs
+            _countdownInterval = setInterval(() => {
+              remaining--
+              updateCountdown(remaining)
+              if (remaining <= 0) { clearInterval(_countdownInterval); window.location.href = '/admin/logout' }
+            }, 1000)
+          } else {
+            updateCountdown(secs)
+          }
+        } else {
+          if (_warnModalShown) hideIdleModal()
+          if (_countdownInterval) { clearInterval(_countdownInterval); _countdownInterval = null }
+        }
+      } catch {}
+    }
+
+    function startHeartbeat() {
+      if (_heartbeatInterval) return
+      _heartbeatInterval = setInterval(async () => {
+        if (document.visibilityState !== 'hidden') {
+          try {
+            const r = await fetch('/api/admin/heartbeat', { method: 'POST' })
+            if (!r.ok) window.location.href = '/admin/logout'
+          } catch {}
+        }
+      }, 120 * 1000)
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') sessionPoll()
+    })
+
+    async function initSession() {
+      startHeartbeat()
+      await sessionPoll()
+      _sessionPollInterval = setInterval(sessionPoll, 30 * 1000)
+    }
+
+    init().then(() => initSession())
   </script>
 </body>
 </html>`
