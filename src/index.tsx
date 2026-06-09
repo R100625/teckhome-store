@@ -6,6 +6,8 @@ import { getProducts, getAllProducts, saveProduct, deleteProduct, toggleFeatured
 type Bindings = {
   PRODUCTS_KV: KVNamespace
   ARTICLES_KV: KVNamespace
+  ADMIN_USERNAME: string
+  ADMIN_PASSWORD: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -251,23 +253,41 @@ app.get('/categoria/:id', (c) => {
 })
 
 // === AUTH ADMIN ===
-const ADMIN_USER = 'admin'
-const ADMIN_PASS = 'teckhome2026'
 const COOKIE_NAME = 'teckhome_auth'
-const COOKIE_VALUE = 'granted'
 const MAINTENANCE_KEY = 'site:maintenance'
+const SESSION_KEY_PREFIX = 'session:'
+const RATE_KEY_PREFIX = 'login:attempts:'
+const MAX_ATTEMPTS = 10          // tentativas antes do bloqueio
+const BLOCK_SECONDS = 900        // 15 minutos de bloqueio
+const SESSION_TTL = 86400        // sessão válida por 24h
 
-function isAuthenticated(c: any): boolean {
-  const cookieHeader = c.req.header('Cookie') || ''
-  return cookieHeader.includes(`${COOKIE_NAME}=${COOKIE_VALUE}`)
+// Retorna o IP do visitante (Cloudflare injeta CF-Connecting-IP)
+function getClientIP(c: any): string {
+  return c.req.header('CF-Connecting-IP') || c.req.header('X-Forwarded-For') || 'unknown'
 }
 
-// Middleware de manutenção — bloqueia páginas públicas quando admin está logado
+// Verifica se o token de sessão no cookie existe e é válido no KV
+async function isAuthenticated(c: any): Promise<boolean> {
+  try {
+    const cookieHeader = c.req.header('Cookie') || ''
+    const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`))
+    if (!match) return false
+    const token = match[1]
+    if (!token || token.length < 32) return false
+    const kv = c.env?.PRODUCTS_KV
+    if (!kv) return false
+    const stored = await kv.get(`${SESSION_KEY_PREFIX}${token}`)
+    return stored === '1'
+  } catch {
+    return false
+  }
+}
+
+// Middleware de manutenção — bloqueia páginas públicas
 app.use('*', async (c, next) => {
   const path = new URL(c.req.url).pathname
   const isAdminPath = path.startsWith('/admin') || path.startsWith('/api/') || path.startsWith('/static') || path === '/favicon.ico' || path === '/sitemap.xml'
   if (isAdminPath) return next()
-  // Verifica flag de manutenção no KV
   try {
     const kv = c.env?.PRODUCTS_KV
     if (kv) {
@@ -280,12 +300,29 @@ app.use('*', async (c, next) => {
   return next()
 })
 
-app.get('/admin', (c) => {
-  if (!isAuthenticated(c)) return c.html(loginPage())
+app.get('/admin', async (c) => {
+  if (!(await isAuthenticated(c))) return c.html(loginPage())
   return c.html(adminPage())
 })
 
 app.post('/admin/login', async (c) => {
+  const kv = c.env?.PRODUCTS_KV
+  const ip = getClientIP(c)
+  const rateKey = `${RATE_KEY_PREFIX}${ip}`
+
+  // --- Verificação de rate limiting ---
+  try {
+    if (kv) {
+      const attemptsRaw = await kv.get(rateKey)
+      const attempts = parseInt(attemptsRaw || '0', 10)
+      if (attempts >= MAX_ATTEMPTS) {
+        // Não revela detalhes — mensagem genérica
+        return c.html(loginPage('Acesso temporariamente bloqueado. Tente novamente mais tarde.'), 429)
+      }
+    }
+  } catch {}
+
+  // --- Leitura das credenciais ---
   let username = ''
   let password = ''
   try {
@@ -298,19 +335,58 @@ app.post('/admin/login', async (c) => {
     username = (params.get('username') || '').trim()
     password = (params.get('password') || '').trim()
   }
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
+
+  // --- Credenciais vêm exclusivamente das variáveis de ambiente ---
+  const expectedUser = c.env?.ADMIN_USERNAME || ''
+  const expectedPass = c.env?.ADMIN_PASSWORD || ''
+
+  // Rejeita se as variáveis de ambiente não foram configuradas
+  if (!expectedUser || !expectedPass) {
+    return c.html(loginPage('Painel não configurado. Contate o administrador.'), 503)
+  }
+
+  const valid = username === expectedUser && password === expectedPass
+
+  if (valid) {
+    // Login OK — zera contador de tentativas
+    try { if (kv) await kv.delete(rateKey) } catch {}
+
+    // Gera token de sessão único e armazena no KV com TTL
+    const sessionToken = crypto.randomUUID()
+    try {
+      if (kv) await kv.put(`${SESSION_KEY_PREFIX}${sessionToken}`, '1', { expirationTtl: SESSION_TTL })
+    } catch {}
+
     const res = c.redirect('/admin')
-    res.headers.set('Set-Cookie', `${COOKIE_NAME}=${COOKIE_VALUE}; Path=/; HttpOnly; Max-Age=86400; SameSite=Lax; Secure`)
+    res.headers.set('Set-Cookie', `${COOKIE_NAME}=${sessionToken}; Path=/; HttpOnly; Max-Age=${SESSION_TTL}; SameSite=Lax; Secure`)
     return res
   }
-  return c.html(loginPage('Usuário ou senha inválidos. Tente novamente.'))
+
+  // Login falhou — incrementa contador de tentativas
+  try {
+    if (kv) {
+      const attemptsRaw = await kv.get(rateKey)
+      const attempts = parseInt(attemptsRaw || '0', 10) + 1
+      await kv.put(rateKey, String(attempts), { expirationTtl: BLOCK_SECONDS })
+    }
+  } catch {}
+
+  // Mensagem genérica — não revela qual campo está errado
+  return c.html(loginPage('Usuário ou senha inválidos.'), 401)
 })
 
 app.get('/admin/logout', async (c) => {
-  // Desativar modo manutenção ao sair do admin
+  // Invalida o token de sessão no KV
   try {
     const kv = c.env?.PRODUCTS_KV
-    if (kv) await kv.put(MAINTENANCE_KEY, '0')
+    if (kv) {
+      // Desativar manutenção
+      await kv.put(MAINTENANCE_KEY, '0')
+      // Revogar sessão
+      const cookieHeader = c.req.header('Cookie') || ''
+      const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`))
+      if (match) await kv.delete(`${SESSION_KEY_PREFIX}${match[1]}`)
+    }
   } catch {}
   const res = c.redirect('/')
   res.headers.set('Set-Cookie', `${COOKIE_NAME}=; Path=/; HttpOnly; Max-Age=0; SameSite=Strict`)
@@ -319,7 +395,7 @@ app.get('/admin/logout', async (c) => {
 
 // === API: MANUTENÇÃO ===
 app.post('/api/admin/maintenance', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   const kv = c.env?.PRODUCTS_KV
   let maintenance = false
   if (kv) {
@@ -340,7 +416,7 @@ app.post('/api/admin/maintenance', async (c) => {
 })
 
 app.get('/api/admin/maintenance', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   const kv = c.env?.PRODUCTS_KV
   let maintenance = false
   if (kv) { const v = await kv.get(MAINTENANCE_KEY); maintenance = v === '1' }
@@ -369,7 +445,7 @@ app.get('/api/comparativos/:id', async (c) => {
 })
 
 app.post('/api/comparativos', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   try {
     const kv = c.env?.ARTICLES_KV
     const body = await c.req.json()
@@ -388,7 +464,7 @@ app.post('/api/comparativos', async (c) => {
 })
 
 app.put('/api/comparativos/:id', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   try {
     const kv = c.env?.ARTICLES_KV
     const id = c.req.param('id')
@@ -408,7 +484,7 @@ app.put('/api/comparativos/:id', async (c) => {
 })
 
 app.delete('/api/comparativos/:id', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   try {
     const kv = c.env?.ARTICLES_KV
     const id = c.req.param('id')
@@ -447,7 +523,7 @@ app.get('/api/pricecompare/:id', async (c) => {
 })
 
 app.post('/api/pricecompare', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   try {
     const kv = c.env?.ARTICLES_KV
     const body = await c.req.json()
@@ -474,7 +550,7 @@ app.post('/api/pricecompare', async (c) => {
 })
 
 app.put('/api/pricecompare/:id', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   try {
     const kv = c.env?.ARTICLES_KV
     const id = c.req.param('id')
@@ -494,7 +570,7 @@ app.put('/api/pricecompare/:id', async (c) => {
 })
 
 app.delete('/api/pricecompare/:id', async (c) => {
-  if (!isAuthenticated(c)) return c.json({ error: 'Unauthorized' }, 401)
+  if (!(await isAuthenticated(c))) return c.json({ error: 'Unauthorized' }, 401)
   try {
     const kv = c.env?.ARTICLES_KV
     const id = c.req.param('id')
@@ -534,7 +610,7 @@ app.get('/api/articles', async (c) => {
 // Criar artigo a partir de URL de produto
 app.post('/api/articles', async (c) => {
   try {
-    if (!isAuthenticated(c)) return c.json({ error: 'Não autorizado' }, 401)
+    if (!(await isAuthenticated(c))) return c.json({ error: 'Não autorizado' }, 401)
     const body = await c.req.json()
     const { title, excerpt, content, category, categoryIcon, image, productUrl, store, readTime, keywords } = body
     if (!title) return c.json({ error: 'Título obrigatório' }, 400)
@@ -573,7 +649,7 @@ app.post('/api/articles', async (c) => {
 // Deletar artigo
 app.delete('/api/articles/:id', async (c) => {
   try {
-    if (!isAuthenticated(c)) return c.json({ error: 'Não autorizado' }, 401)
+    if (!(await isAuthenticated(c))) return c.json({ error: 'Não autorizado' }, 401)
     const { id } = c.req.param()
     const kv = c.env?.ARTICLES_KV
     if (kv) await kv.delete(id)

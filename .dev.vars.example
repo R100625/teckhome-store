@@ -1,0 +1,7 @@
+# Variáveis de ambiente para desenvolvimento local
+# Copie este arquivo como .dev.vars e preencha com suas credenciais reais
+# O arquivo .dev.vars NUNCA deve ser commitado no Git
+
+# Credenciais do painel administrativo
+ADMIN_USERNAME=seu_usuario
+ADMIN_PASSWORD=sua_senha_segura
